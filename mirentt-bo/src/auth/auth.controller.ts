@@ -17,4 +17,23 @@ export class AuthController {
       }
       return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Invalid credentials' });
     }
+
+    @Post('register')
+    async register(@Body() user: User, @Res() res) {
+        try {
+            
+            const registeredUser = await this.authService.registerUser(user);
+            return res.status(HttpStatus.CREATED).json({
+                message: 'User registered successfully',
+                user: registeredUser,
+            });
+        } catch (error) {
+
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message: error.message || 'Failed to register user',
+            });
+        }
+    }
+
+    
 }

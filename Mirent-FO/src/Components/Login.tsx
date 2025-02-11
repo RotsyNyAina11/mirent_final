@@ -3,29 +3,22 @@ import axios from "axios";
 import { Box, TextField, Button, Typography, Grid } from "@mui/material";
 import loginHorizontal from "../assets/horizontal.png";
 
-
 const Login: React.FC = () => {
-  const[email, setEmail] = useState("");
-  const[password, setPassword] = useState("");
-
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-
-    
-    
     try {
-      const response = await axios.post('http://localhost:3000/auth/login', {
+      const response = await axios.post("http://localhost:3000/auth/login", {
         email,
         password,
       });
-      alert('Login successful');
+      alert("Login successful");
     } catch (error) {
-      alert('Login failed');
-
-    } 
+      alert("Login failed");
+    }
   };
 
   return (

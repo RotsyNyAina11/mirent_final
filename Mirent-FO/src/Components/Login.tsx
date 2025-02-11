@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../redux/slices/authSlice";
-import { RootState } from "../redux/store";
+import axios from "axios";
 import {
   TextField,
   Button,
@@ -11,30 +11,29 @@ import {
   Box,
   Paper,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const[email, setEmail] = useState("");
+  const[password, setPassword] = useState("");
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.auth.isAuthenticated
-  );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simuler une vérification d'authentification
-    if (
-      formData.email === "user@example.com" &&
-      formData.password === "password123"
-    ) {
-      dispatch(loginSuccess({ email: formData.email }));
-      alert("Connexion réussie !");
-    } else {
-      alert("Identifiants incorrects.");
+
+    
+    
+    try {
+      const response = await axios.post('http://localhost:3000/auth/login', {
+        email,
+        password,
+      });
+      alert('Login successful');
+    } catch (error) {
+      alert('Login failed');
     }
   };
 
@@ -50,8 +49,8 @@ const Login: React.FC = () => {
             label="Email"
             name="email"
             type="email"
-            value={formData.email}
-            onChange={handleChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             margin="normal"
             required
           />
@@ -60,8 +59,8 @@ const Login: React.FC = () => {
             label="Mot de passe"
             name="password"
             type="password"
-            value={formData.password}
-            onChange={handleChange}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             margin="normal"
             required
           />

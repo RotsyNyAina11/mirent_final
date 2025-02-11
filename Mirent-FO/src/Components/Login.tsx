@@ -1,28 +1,18 @@
-// src/components/Login.tsx
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { loginSuccess } from "../redux/slices/authSlice";
 import axios from "axios";
-import {
-  TextField,
-  Button,
-  Container,
-  Typography,
-  Box,
-  Paper,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box, TextField, Button, Typography, Grid } from "@mui/material";
+import loginHorizontal from "../assets/horizontal.png";
+
 
 const Login: React.FC = () => {
   const[email, setEmail] = useState("");
   const[password, setPassword] = useState("");
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
 
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
 
     
     
@@ -34,48 +24,85 @@ const Login: React.FC = () => {
       alert('Login successful');
     } catch (error) {
       alert('Login failed');
-    }
+
+    } 
   };
 
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ padding: 4, marginTop: 8 }}>
-        <Typography variant="h4" align="center" gutterBottom>
+    <Grid container sx={{ height: "100vh" }}>
+      {/* Section Logo */}
+      <Grid
+        item
+        xs={12}
+        md={6}
+        sx={{
+          backgroundColor: "#90caf9",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <img src={loginHorizontal} alt="Mirent Logo" style={{ width: "60%" }} />
+      </Grid>
+
+      {/* Section Formulaire */}
+      <Grid
+        item
+        xs={12}
+        md={6}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          p: 3,
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
           Connexion
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+
+        <Box
+          component="form"
+          sx={{ width: "80%", maxWidth: 400 }}
+          onSubmit={handleSubmit}
+        >
           <TextField
-            fullWidth
-            label="Email"
-            name="email"
+            label="E-mail"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            name="email"
+            fullWidth
             margin="normal"
+            variant="outlined"
             required
           />
+
           <TextField
-            fullWidth
             label="Mot de passe"
-            name="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            fullWidth
             margin="normal"
+            variant="outlined"
             required
           />
+
           <Button
             type="submit"
-            fullWidth
             variant="contained"
             color="primary"
-            sx={{ mt: 3, mb: 2 }}
+            fullWidth
+            sx={{ mt: 2 }}
           >
             Se connecter
           </Button>
         </Box>
-      </Paper>
-    </Container>
+      </Grid>
+    </Grid>
   );
 };
 

@@ -29,4 +29,15 @@ export class AuthService {
           access_token: this.jwtService.sign(payload),
         };
     }
+
+    async registerUser(user: User): Promise<User> {
+        const existingUser = await this.userRepository.findOne({ where: { email: user.email } });
+        if (existingUser) {
+            throw new Error('Email already in use');
+        }
+
+        
+        user.password = await bcrypt.hash(user.password, 10);
+        return this.userRepository.save(user);
+    }
 }

@@ -1,6 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
-import { User } from 'src/users/user.entity';
+import { BlacklistedToken } from 'src/entities/blacklisted-token.entity';
+import { User } from 'src/entities/user.entity';
 
 dotenv.config();
 
@@ -11,6 +12,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   username: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
-  entities: [User],
+  entities: [User, BlacklistedToken],
   synchronize: true,
 };

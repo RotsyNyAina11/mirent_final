@@ -2,7 +2,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
-import { User } from 'src/users/user.entity';
+import { BlacklistedToken } from 'src/entities/blacklisted-token.entity';
+import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -10,6 +11,8 @@ export class AuthService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
+        @InjectRepository(BlacklistedToken)
+        private readonly blacklistedTokenRepository: Repository<BlacklistedToken>,
         private readonly jwtService: JwtService
     ) {}
 
@@ -39,5 +42,23 @@ export class AuthService {
         
         user.password = await bcrypt.hash(user.password, 10);
         return this.userRepository.save(user);
+    }
+
+    async logout(token: string): Promise<void> {
+        // Verification de token s'il existe dejà dans la blacklist
+        const existinToken = await this.blacklistedTokenRepository.findOne({ where: { token } });
+        if(existinToken) {
+            throw new UnauthorizedException('Token already blacklisted');
+        }
+
+        // Ajout du token dans la blacklist
+        const blacklistedToken = new BlacklistedToken();
+        blacklistedToken.token = token;
+        await this.blacklistedTokenRepository.save(blacklistedToken);
+    }
+
+    async isTokenBlacklisted(token: string): Promise<boolean> {
+      const blacklistedToken = await this.blacklistedTokenRepository.findOne({ where: { token } });
+      return !!blacklistedToken;
     }
 }

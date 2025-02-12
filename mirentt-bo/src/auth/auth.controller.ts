@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { User } from 'src/users/user.entity';
+import { User } from 'src/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -35,5 +35,14 @@ export class AuthController {
         }
     }
 
+    @Post('logout')
+    async logout(@Body('token') token: string, @Res() res) {
+      try {
+        await this.authService.logout(token);
+        return res.status(HttpStatus.OK).json({ message: 'Logged out successfully' });
+      } catch (error) {
+        return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
+      }
+    }
     
 }

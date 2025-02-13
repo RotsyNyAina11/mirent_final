@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { VehiclesService } from './vehicles.service';
 import { Vehicle } from 'src/entities/vehicle.entity';
 
@@ -37,5 +37,18 @@ export class VehiclesController {
     @Delete(':id')
     async deleteVehicle(@Param('id') id: number): Promise<void> {
         return this.vehiclesService.delete(+id);
+    }
+
+    // Route pour la recherche par filtrage
+    @Get('search')
+    async searchVehicles(
+        @Query('nom') nom?: string,
+        @Query('marque') marque?: string,
+        @Query('modele') modele?: string,
+        @Query('type') type?: string,
+        @Query('immatriculation') immatriculation?: string,
+        @Query('nombrePlace') nombrePlace?: number,
+    ): Promise<Vehicle[]> {
+        return this.vehiclesService.findWithFilters(nom, marque, modele, type, immatriculation, nombrePlace);
     }
 }

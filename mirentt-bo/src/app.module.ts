@@ -10,6 +10,7 @@ import { VehiclesService } from './vehicles/vehicles.service';
 import { VehiclesModule } from './vehicles/vehicles.module';
 
 
+
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),

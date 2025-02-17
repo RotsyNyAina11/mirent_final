@@ -62,11 +62,11 @@ export class VehiclesService {
         }
 
         if (marque) {
-            queryBuilder.andWhere('LOWER(vehicle.brand) LIKE :brand', { brand: `%${marque.toLowerCase()}%` });
+            queryBuilder.andWhere('LOWER(vehicle.marque) LIKE :marque', { marque: `%${marque.toLowerCase()}%` });
           }
       
         if (modele) {
-            queryBuilder.andWhere('LOWER(vehicle.model) LIKE :model', { model: `%${modele.toLowerCase()}%` });
+            queryBuilder.andWhere('LOWER(vehicle.modele) LIKE :modele', { modele: `%${modele.toLowerCase()}%` });
         }
 
         if (type) {
@@ -74,7 +74,7 @@ export class VehiclesService {
           }
       
         if (immatriculation) {
-            queryBuilder.andWhere('LOWER(vehicle.registrationNumber) LIKE :registrationNumber', {
+            queryBuilder.andWhere('LOWER(vehicle.immatriculation) LIKE :immatriculation', {
               registrationNumber: `%${immatriculation.toLowerCase()}%`,
             });
         }

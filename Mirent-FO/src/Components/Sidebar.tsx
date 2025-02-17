@@ -25,7 +25,7 @@ import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 
 const Sidebar: React.FC = () => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -39,9 +39,9 @@ const Sidebar: React.FC = () => {
         sx={{
           position: "fixed",
           top: 16,
-          left: open ? 250 : 16, // Ajuste la position lorsque le menu est ouvert
+          left: open ? 250 : 16, 
           zIndex: 1000,
-          color: "#004D99", // Couleur bleu foncé
+          color: "#004D99", 
         }}
       >
         <Menu />
@@ -49,16 +49,17 @@ const Sidebar: React.FC = () => {
 
       {/* Sidebar */}
       <Drawer
+        variant="persistent"
         anchor="left"
         open={open}
         onClose={toggleDrawer}
         PaperProps={{
           sx: {
             width: 250,
-            background: "#F7FAFC", // Fond clair avec une touche de bleu
+            background: "#F7FAFC", 
             borderRight: "none",
             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-            transition: "transform 0.3s ease-in-out", // Animation fluide
+            transition: "transform 0.3s ease-in-out", 
           },
         }}
       >
@@ -151,7 +152,7 @@ const Sidebar: React.FC = () => {
               <ListItemIcon>
                 <DirectionsCar sx={{ color: "#004D99" }} />
               </ListItemIcon>
-              <ListItemText primary="Véhicules" primaryTypographyProps={{ color: "#004D99" }} />
+              <ListItemText primary="Liste des Véhicules" primaryTypographyProps={{ color: "#004D99" }} />
             </ListItem>
 
             <ListItem

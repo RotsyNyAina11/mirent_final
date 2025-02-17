@@ -19,7 +19,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); 
+    setError(null); // Réinitialiser l'état d'erreur avant la soumission
     setSuccess(false);
 
     if (!email || !password) {
@@ -36,8 +36,8 @@ const Login: React.FC = () => {
       if (response.data.success) {
         setSuccess(true);
         setTimeout(() => {
-          window.location.href = "/sidebar"; // Redirection vers le dashboard après succès
-        }, 2000); // Attente de 2 secondes avant la redirection
+          window.location.href = "/acceuil"; 
+        }, 2000);
       } else {
         setError("Identifiants incorrects.");
       }
@@ -73,13 +73,15 @@ const Login: React.FC = () => {
         xs={12}
         md={6}
         sx={{
+          overflow: "hidden",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#FAFAFA", // Fond blanc avec une touche de gris
+          backgroundColor: "#FAFAFA", 
           boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
         }}
+        data-mss-disabled="true"
       >
         <Box
           sx={{

@@ -23,4 +23,7 @@ export class Vehicle {
     @Column({ nullable: false, type:'int'})
     nombrePlace: number;
 
+    @Column({ type: 'varchar', nullable: false, default: 'disponible' })
+    status: string;
+
 }

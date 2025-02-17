@@ -5,44 +5,57 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { Grid } from "@mui/material";
-import { RootState } from "./redux/store";
-import Login from "./Components/Login";
-import Sidebar from "./Components/Sidebar";
-//import { VehicleCard } from "./Components/VehicleCard";
-import { Filters } from "./Components/Filter";
-//import { Dashboard } from "./Components/PieChart";
-import { PieChart } from "lucide-react";
-import Home from "./pages/Accueil";
+import { Grid, Box } from "@mui/material";
+import Sidebar from "./components/Sidebar";
+import Login from "./components/Login";
+import Accueil from "./pages/Accueil";
+import VehiclesList from "./pages/Vehicule";
+
 
 const App: React.FC = () => {
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.auth.isAuthenticated
-  );
+  // Composant Layout pour intégrer le Sidebar et le contenu principal
+  const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    return (
+      <Grid container>
+        <Grid item xs={2}>
+          <Sidebar />
+        </Grid>
+        <Grid item xs={10}>
+          <Box p={3}>{children}</Box>
+        </Grid>
+      </Grid>
+    );
+  };
 
   return (
     <Router>
-      <Grid container>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route
-            path="/login"
-            element={!isAuthenticated ? <Login /> : <Navigate to="/accueil" />}
-          />
-          <Route
-            path="/accueil"
-            element={
-              <>
-                <Filters />
-              </>
-            }
-          />
-          <Route path="/sidebar" element={<Sidebar />} />
-          <Route path="/dashboard" element={<PieChart />} />
-          <Route path="/" element={<Home />} />
-        </Routes>
-      </Grid>
+      <Routes>
+        {/* Route pour la page de connexion */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Route pour l'accueil avec Sidebar */}
+        <Route
+          path="/accueil"
+          element={
+            <MainLayout>
+              <Accueil />
+            </MainLayout>
+          }
+        />
+
+        {/* Route pour la liste des véhicules avec Sidebar */}
+        <Route
+          path="/vehicules"
+          element={
+            <MainLayout>
+              <VehiclesList />
+            </MainLayout>
+          }
+        />
+
+        {/* Redirection par défaut vers /accueil */}
+        <Route path="*" element={<Navigate to="/accueil" />} />
+      </Routes>
     </Router>
   );
 };

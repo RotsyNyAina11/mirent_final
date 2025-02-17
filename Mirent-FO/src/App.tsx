@@ -10,11 +10,10 @@ import { Grid } from "@mui/material";
 import { RootState } from "./redux/store";
 import Login from "./Components/Login";
 import Sidebar from "./Components/Sidebar";
-//import { VehicleCard } from "./Components/VehicleCard";
 import { Filters } from "./Components/Filter";
-//import { Dashboard } from "./Components/PieChart";
-import { PieChart } from "lucide-react";
+import { CustomerList } from "./Components/CustomerList";
 import Home from "./pages/Accueil";
+import CustomerPage from "./pages/CustomerPage";
 
 const App: React.FC = () => {
   const isAuthenticated = useSelector(
@@ -35,12 +34,20 @@ const App: React.FC = () => {
             element={
               <>
                 <Filters />
+                <Home />
+              </>
+            }
+          />
+          <Route
+            path="/clients"
+            element={
+              <>
+                <Sidebar />
+                <CustomerPage />
               </>
             }
           />
           <Route path="/sidebar" element={<Sidebar />} />
-          <Route path="/dashboard" element={<PieChart />} />
-          <Route path="/" element={<Home />} />
         </Routes>
       </Grid>
     </Router>

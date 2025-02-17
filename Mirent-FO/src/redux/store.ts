@@ -3,6 +3,7 @@ import authReducer from "./slices/authSlice";
 import sidebarReducer from "./slices/SidebarSlice";
 import vehicleReducer from "./slices/VehicleSlice";
 import filterReducer from "./slices/filterSlice";
+import customerReducer from "./slices/customersSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     vehicles: vehicleReducer,
     sidebar: sidebarReducer,
     filter: filterReducer,
+    customer: customerReducer,
     // Ajoutez vos reducers ici
   },
 });

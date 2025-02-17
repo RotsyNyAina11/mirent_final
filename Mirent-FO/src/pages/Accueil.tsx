@@ -3,16 +3,16 @@ import { Box, Grid, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import Sidebar from "../Components/Sidebar";
-import TopBar from "../components/TopBar";
-import SearchFilters from "../components/SearchFilter";
-import VehicleCard from "../components/VehicleCard";
-
+import TopBar from "../Components/TopBar";
+import SearchFilters from "../Components/SearchFilter";
+import VehicleCard from "../Components/VehicleCard";
+import { Container } from "@mui/material";
 
 const Home: React.FC = () => {
   const vehicles = useSelector((state: RootState) => state.vehicles.vehicles);
 
   return (
-    <>
+    <Container>
       <TopBar />
       <Sidebar />
       <Box sx={{ p: 3, ml: 8 }}>
@@ -28,7 +28,7 @@ const Home: React.FC = () => {
           ))}
         </Grid>
       </Box>
-    </>
+    </Container>
   );
 };
 

@@ -8,6 +8,8 @@ import {
   IconButton,
   Toolbar,
   Divider,
+  Box,
+  Typography,
 } from "@mui/material";
 import {
   Menu,
@@ -31,74 +33,177 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
+      {/* Bouton de navigation */}
       <IconButton
         onClick={toggleDrawer}
-        sx={{ position: "fixed", top: 16, left: 16 }}
+        sx={{
+          position: "fixed",
+          top: 16,
+          left: open ? 250 : 16, // Ajuste la position lorsque le menu est ouvert
+          zIndex: 1000,
+          color: "#004D99", // Couleur bleu foncé
+        }}
       >
         <Menu />
       </IconButton>
 
+      {/* Sidebar */}
       <Drawer
+        anchor="left"
         open={open}
         onClose={toggleDrawer}
-        sx={{
-          "& .MuiDrawer-paper": {
-            background: "#bbdefb", // Dégradé bleu
+        PaperProps={{
+          sx: {
+            width: 250,
+            background: "#F7FAFC", // Fond clair avec une touche de bleu
+            borderRight: "none",
+            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "transform 0.3s ease-in-out", // Animation fluide
           },
         }}
       >
-        <Toolbar />
-        <img
-          src={logo}
-          alt="Logo"
-          style={{ width: "100%", maxWidth: "150px", padding: "16px" }}
-        />
-        <List>
-          <ListItem button component={Link} to="/accueil">
+        <Box display="flex" flexDirection="column" height="100%">
+          {/* Logo */}
+          <Toolbar>
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              p={2}
+            >
+              <img
+                src={logo}
+                alt="Logo"
+                style={{ width: "100%", maxWidth: "150px" }}
+              />
+            </Box>
+          </Toolbar>
+
+          {/* Titre du menu */}
+          <Box px={2} pb={2}>
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              textAlign="center"
+              color="#004D99"
+              sx={{ textTransform: "uppercase" }}
+            >
+              Menu Principal
+            </Typography>
+          </Box>
+
+          {/* Liste des éléments */}
+          <List>
+            <ListItem
+              component={Link}
+              to="/accueil"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#E2F0FB", 
+                },
+              }}
+            >
+              <ListItemIcon>
+                <Home sx={{ color: "#004D99" }} />
+              </ListItemIcon>
+              <ListItemText primary="Accueil" primaryTypographyProps={{ color: "#004D99" }} />
+            </ListItem>
+
+            <ListItem
+              component={Link}
+              to="/dashboard"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#E2F0FB",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <Dashboard sx={{ color: "#004D99" }} />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" primaryTypographyProps={{ color: "#004D99" }} />
+            </ListItem>
+
+            <ListItem
+              component={Link}
+              to="/car"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#E2F0FB",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <CarRental sx={{ color: "#004D99" }} />
+              </ListItemIcon>
+              <ListItemText primary="My Rentals" primaryTypographyProps={{ color: "#004D99" }} />
+            </ListItem>
+
+            <ListItem
+              component={Link}
+              to="/vehicules"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#E2F0FB",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <DirectionsCar sx={{ color: "#004D99" }} />
+              </ListItemIcon>
+              <ListItemText primary="Véhicules" primaryTypographyProps={{ color: "#004D99" }} />
+            </ListItem>
+
+            <ListItem
+              component={Link}
+              to="/clients"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#E2F0FB",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <People sx={{ color: "#004D99" }} />
+              </ListItemIcon>
+              <ListItemText primary="Liste des clients" primaryTypographyProps={{ color: "#004D99" }} />
+            </ListItem>
+
+            <ListItem
+              component={Link}
+              to="/contact"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#E2F0FB",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <ContactMail sx={{ color: "#004D99" }} />
+              </ListItemIcon>
+              <ListItemText primary="Contact" primaryTypographyProps={{ color: "#004D99" }} />
+            </ListItem>
+          </List>
+
+          {/* Séparateur */}
+          <Divider sx={{ my: 2, borderColor: "#D1E8F8" }} />
+
+          {/* Lien vers Login */}
+          <ListItem
+            component={Link}
+            to="/login"
+            sx={{
+              "&:hover": {
+                backgroundColor: "#E2F0FB",
+              },
+            }}
+          >
             <ListItemIcon>
-              <Home sx={{ color: "blue" }} /> {/* Icône colorée */}
+              <AccountCircle sx={{ color: "#004D99" }} />
             </ListItemIcon>
-            <ListItemText primary="Accueil" sx={{ color: "darkblue" }} />{" "}
-            {/* Texte coloré */}
+            <ListItemText primary="Login" primaryTypographyProps={{ color: "#004D99" }} />
           </ListItem>
-          <ListItem button component={Link} to="/dashboard">
-            <ListItemIcon>
-              <Dashboard sx={{ color: "blue" }} />
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" sx={{ color: "darkblue" }} />
-          </ListItem>
-          <ListItem button component={Link} to="/car">
-            <ListItemIcon>
-              <CarRental sx={{ color: "blue" }} />
-            </ListItemIcon>
-            <ListItemText primary="My Rentals" sx={{ color: "darkblue" }} />
-          </ListItem>
-          <ListItem button component={Link} to="/vehicules">
-            <ListItemIcon>
-              <DirectionsCar sx={{ color: "blue" }} />
-            </ListItemIcon>
-            <ListItemText primary="Véhicules" sx={{ color: "darkblue" }} />
-          </ListItem>
-          <ListItem button component={Link} to="/clients">
-            <ListItemIcon>
-              <People sx={{ color: "blue" }} />
-            </ListItemIcon>
-            <ListItemText primary="Liste des clients" sx={{ color: "blue" }} />
-          </ListItem>
-          <ListItem component={Link} to="/contact">
-            <ListItemIcon>
-              <ContactMail sx={{ color: "blue" }} />
-            </ListItemIcon>
-            <ListItemText primary="Contact" sx={{ color: "darkblue" }} />
-          </ListItem>
-          <Divider sx={{ backgroundColor: "gray" }} /> {/* Séparateur coloré */}
-          <ListItem button component={Link} to="/login">
-            <ListItemIcon>
-              <AccountCircle sx={{ color: "blue" }} />
-            </ListItemIcon>
-            <ListItemText primary="Login" sx={{ color: "darkblue" }} />
-          </ListItem>
-        </List>
+        </Box>
       </Drawer>
     </>
   );

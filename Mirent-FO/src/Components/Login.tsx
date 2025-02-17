@@ -1,23 +1,48 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Box, TextField, Button, Typography, Grid } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Grid,
+  Alert,
+  Collapse,
+} from "@mui/material";
 import loginHorizontal from "../assets/horizontal.png";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null); 
+    setSuccess(false);
+
+    if (!email || !password) {
+      setError("Veuillez remplir tous les champs.");
+      return;
+    }
 
     try {
       const response = await axios.post("http://localhost:3000/auth/login", {
         email,
         password,
       });
-      alert("Login successful");
+
+      if (response.data.success) {
+        setSuccess(true);
+        setTimeout(() => {
+          window.location.href = "/sidebar"; // Redirection vers le dashboard après succès
+        }, 2000); // Attente de 2 secondes avant la redirection
+      } else {
+        setError("Identifiants incorrects.");
+      }
     } catch (error) {
-      alert("Login failed");
+      setError("Échec de la connexion. Veuillez réessayer.");
     }
   };
 
@@ -29,13 +54,17 @@ const Login: React.FC = () => {
         xs={12}
         md={6}
         sx={{
-          backgroundColor: "#90caf9",
+          backgroundColor: "#90CAF9", // Bleu clair
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
-        <img src={loginHorizontal} alt="Mirent Logo" style={{ width: "60%" }} />
+        <img
+          src={loginHorizontal}
+          alt="Mirent Logo"
+          style={{ width: "60%", maxWidth: "400px" }}
+        />
       </Grid>
 
       {/* Section Formulaire */}
@@ -48,51 +77,81 @@ const Login: React.FC = () => {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          p: 3,
+          backgroundColor: "#FAFAFA", // Fond blanc avec une touche de gris
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
-          Connexion
-        </Typography>
-
         <Box
-          component="form"
-          sx={{ width: "80%", maxWidth: 400 }}
-          onSubmit={handleSubmit}
+          sx={{
+            width: "80%",
+            maxWidth: 400,
+            textAlign: "center",
+            pb: 4,
+            borderRadius: "8px",
+            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.05)",
+            bgcolor: "#FFFFFF",
+            p: 4,
+          }}
         >
-          <TextField
-            label="E-mail"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            name="email"
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            required
-          />
-
-          <TextField
-            label="Mot de passe"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            name="password"
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            required
-          />
-
-          <Button
-            type="submit"
-            variant="contained"
+          <Typography
+            variant="h4"
+            fontWeight="bold"
             color="primary"
-            fullWidth
-            sx={{ mt: 2 }}
+            gutterBottom
+            sx={{ mb: 3 }}
           >
-            Se connecter
-          </Button>
+            Connexion
+          </Typography>
+
+          {/* Messages d'erreur/succès */}
+          <Collapse in={!!error}>
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          </Collapse>
+          <Collapse in={success}>
+            <Alert severity="success" sx={{ mb: 2 }}>
+              Connexion réussie ! Vous serez redirigé dans quelques instants.
+            </Alert>
+          </Collapse>
+
+          {/* Formulaire */}
+          <Box component="form" onSubmit={handleSubmit}>
+            <TextField
+              label="E-mail"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              required
+              error={!!error && !email}
+              helperText={!!error && !email ? "Veuillez entrer un e-mail valide." : ""}
+            />
+            <TextField
+              label="Mot de passe"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              required
+              error={!!error && !password}
+              helperText={!!error && !password ? "Veuillez entrer un mot de passe." : ""}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 2 }}
+              disabled={!email || !password}
+            >
+              Se connecter
+            </Button>
+          </Box>
         </Box>
       </Grid>
     </Grid>

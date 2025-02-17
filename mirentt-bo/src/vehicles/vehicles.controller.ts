@@ -38,4 +38,5 @@ export class VehiclesController {
     async deleteVehicle(@Param('id') id: number): Promise<void> {
         return this.vehiclesService.delete(+id);
     }
+
 }

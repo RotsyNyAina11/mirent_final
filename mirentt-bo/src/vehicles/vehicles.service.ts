@@ -45,43 +45,4 @@ export class VehiclesService {
         }
     }
 
-    // Recherche par filtrage
-    async findWithFilters(
-        nom?: string,
-        marque?: string,
-        modele?: string,
-        type?: string,
-        immatriculation?: string,
-        nombrePlace?: number,
-    ): Promise<Vehicle[]> {
-
-        const queryBuilder = this.vehicleRepository.createQueryBuilder('vehicle');
-
-        if (nom) {
-            queryBuilder.andWhere('LOWER(vehicle.nom) LIKE :nom', { nom: `%${nom.toLowerCase()}%` });
-        }
-
-        if (marque) {
-            queryBuilder.andWhere('LOWER(vehicle.marque) LIKE :marque', { marque: `%${marque.toLowerCase()}%` });
-          }
-      
-        if (modele) {
-            queryBuilder.andWhere('LOWER(vehicle.modele) LIKE :modele', { modele: `%${modele.toLowerCase()}%` });
-        }
-
-        if (type) {
-            queryBuilder.andWhere('LOWER(vehicle.type) LIKE :type', { type: `%${type.toLowerCase()}%` });
-          }
-      
-        if (immatriculation) {
-            queryBuilder.andWhere('LOWER(vehicle.immatriculation) LIKE :immatriculation', {
-              registrationNumber: `%${immatriculation.toLowerCase()}%`,
-            });
-        }
-        if (nombrePlace !== undefined) {
-            queryBuilder.andWhere('vehicle.nombrePlace = :nombrePlace', { nombrePlace });
-          }
-      
-        return queryBuilder.getMany();
-    }
 }

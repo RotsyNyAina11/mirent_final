@@ -22,4 +22,5 @@ export class Vehicle {
 
     @Column({ nullable: false, type:'int'})
     nombrePlace: number;
+
 }

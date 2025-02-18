@@ -6,10 +6,10 @@ import {
   Navigate,
 } from "react-router-dom";
 import { Grid, Box } from "@mui/material";
-import Sidebar from "./components/Sidebar";
-import Login from "./components/Login";
 import Accueil from "./pages/Accueil";
 import VehiclesList from "./pages/Vehicule";
+import Sidebar from "./Components/Sidebar";
+import Login from "./Components/Login";
 
 
 const App: React.FC = () => {

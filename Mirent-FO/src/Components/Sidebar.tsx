@@ -20,6 +20,7 @@ import {
   ContactMail,
   Dashboard,
   People,
+  Close,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
@@ -32,34 +33,35 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <>
-      {/* Bouton de navigation */}
+    <Box sx={{ display: "flex" }}>
+      {/* Bouton pour ouvrir/fermer */}
       <IconButton
         onClick={toggleDrawer}
         sx={{
           position: "fixed",
           top: 16,
-          left: open ? 250 : 16, 
-          zIndex: 1000,
-          color: "#004D99", 
+          left: open ? 250 : 16,
+          zIndex: 1300,
+          backgroundColor: "white",
+          boxShadow: 1,
         }}
       >
-        <Menu />
+        {open ? <Close /> : <Menu />}
       </IconButton>
 
       {/* Sidebar */}
       <Drawer
-        variant="persistent"
+        variant="permanent"
         anchor="left"
         open={open}
-        onClose={toggleDrawer}
         PaperProps={{
           sx: {
-            width: 250,
-            background: "#F7FAFC", 
+            width: open ? 250 : 70,
+            transition: "width 0.3s ease-in-out",
+            overflowX: "hidden",
+            backgroundColor: "#F7FAFC",
             borderRight: "none",
             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-            transition: "transform 0.3s ease-in-out", 
           },
         }}
       >
@@ -68,145 +70,76 @@ const Sidebar: React.FC = () => {
           <Toolbar>
             <Box
               display="flex"
-              justifyContent="center"
+              justifyContent={open ? "center" : "flex-start"}
               alignItems="center"
               p={2}
             >
-              <img
-                src={logo}
-                alt="Logo"
-                style={{ width: "100%", maxWidth: "150px" }}
-              />
+              {open && (
+                <img
+                  src={logo}
+                  alt="Logo"
+                  style={{ width: "100%", maxWidth: "100px" }}
+                />
+              )}
             </Box>
           </Toolbar>
 
           {/* Titre du menu */}
-          <Box px={2} pb={2}>
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              textAlign="center"
-              color="#004D99"
-              sx={{ textTransform: "uppercase" }}
-            >
-              Menu Principal
-            </Typography>
-          </Box>
+          {open && (
+            <Box px={2} pb={2}>
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                textAlign="center"
+                color="#004D99"
+                sx={{ textTransform: "uppercase" }}
+              >
+                Menu Principal
+              </Typography>
+            </Box>
+          )}
 
           {/* Liste des éléments */}
           <List>
-            <ListItem
-              component={Link}
-              to="/accueil"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#E2F0FB", 
-                },
-              }}
-            >
-              <ListItemIcon>
-                <Home sx={{ color: "#004D99" }} />
-              </ListItemIcon>
-              <ListItemText primary="Accueil" primaryTypographyProps={{ color: "#004D99" }} />
-            </ListItem>
-
-            <ListItem
-              component={Link}
-              to="/dashboard"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#E2F0FB",
-                },
-              }}
-            >
-              <ListItemIcon>
-                <Dashboard sx={{ color: "#004D99" }} />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" primaryTypographyProps={{ color: "#004D99" }} />
-            </ListItem>
-
-            <ListItem
-              component={Link}
-              to="/car"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#E2F0FB",
-                },
-              }}
-            >
-              <ListItemIcon>
-                <CarRental sx={{ color: "#004D99" }} />
-              </ListItemIcon>
-              <ListItemText primary="My Rentals" primaryTypographyProps={{ color: "#004D99" }} />
-            </ListItem>
-
-            <ListItem
-              component={Link}
-              to="/vehicules"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#E2F0FB",
-                },
-              }}
-            >
-              <ListItemIcon>
-                <DirectionsCar sx={{ color: "#004D99" }} />
-              </ListItemIcon>
-              <ListItemText primary="Liste des Véhicules" primaryTypographyProps={{ color: "#004D99" }} />
-            </ListItem>
-
-            <ListItem
-              component={Link}
-              to="/clients"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#E2F0FB",
-                },
-              }}
-            >
-              <ListItemIcon>
-                <People sx={{ color: "#004D99" }} />
-              </ListItemIcon>
-              <ListItemText primary="Liste des clients" primaryTypographyProps={{ color: "#004D99" }} />
-            </ListItem>
-
-            <ListItem
-              component={Link}
-              to="/contact"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#E2F0FB",
-                },
-              }}
-            >
-              <ListItemIcon>
-                <ContactMail sx={{ color: "#004D99" }} />
-              </ListItemIcon>
-              <ListItemText primary="Contact" primaryTypographyProps={{ color: "#004D99" }} />
-            </ListItem>
+            {[
+              { text: "Accueil", icon: <Home />, path: "/accueil" },
+              { text: "Dashboard", icon: <Dashboard />, path: "/dashboard" },
+              { text: "My Rentals", icon: <CarRental />, path: "/car" },
+              {
+                text: "Liste des Véhicules",
+                icon: <DirectionsCar />,
+                path: "/vehicules",
+              },
+              { text: "Liste des clients", icon: <People />, path: "/clients" },
+              { text: "Contact", icon: <ContactMail />, path: "/contact" },
+              { text: "Login", icon: <AccountCircle />, path: "/login" },
+            ].map((item, index) => (
+              <ListItem
+                component={Link}
+                to={item.path}
+                key={index}
+                sx={{
+                  "&:hover": { backgroundColor: "#E2F0FB" },
+                  display: "flex",
+                  justifyContent: open ? "flex-start" : "center",
+                  padding: "10px",
+                }}
+              >
+                <ListItemIcon
+                  sx={{ color: "#004D99", minWidth: 0, mr: open ? 2 : "auto" }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                {open && <ListItemText primary={item.text} />}
+              </ListItem>
+            ))}
           </List>
 
           {/* Séparateur */}
           <Divider sx={{ my: 2, borderColor: "#D1E8F8" }} />
-
-          {/* Lien vers Login */}
-          <ListItem
-            component={Link}
-            to="/login"
-            sx={{
-              "&:hover": {
-                backgroundColor: "#E2F0FB",
-              },
-            }}
-          >
-            <ListItemIcon>
-              <AccountCircle sx={{ color: "#004D99" }} />
-            </ListItemIcon>
-            <ListItemText primary="Login" primaryTypographyProps={{ color: "#004D99" }} />
-          </ListItem>
         </Box>
       </Drawer>
-    </>
+    </Box>
   );
 };
 

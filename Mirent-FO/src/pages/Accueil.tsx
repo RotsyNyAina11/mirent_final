@@ -1,14 +1,5 @@
 import React from "react";
-<<<<<<< HEAD
-import { Box, Grid, Typography } from "@mui/material";
-import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
-import Sidebar from "../Components/Sidebar";
-import TopBar from "../Components/TopBar";
-import SearchFilters from "../Components/SearchFilter";
-import VehicleCard from "../Components/VehicleCard";
-import { Container } from "@mui/material";
-=======
+
 import {
   Box,
   Typography,
@@ -21,8 +12,6 @@ import {
   Avatar,
 } from "@mui/material";
 import { styled } from "@mui/system";
-
->>>>>>> d5b55dd27c57553cb97b142e35d227e833a295b8
 
 const StyledBox = styled(Box)({
   display: "flex",
@@ -50,12 +39,6 @@ const Accueil: React.FC = () => {
   const theme = useTheme();
 
   return (
-<<<<<<< HEAD
-    <Container>
-      <TopBar />
-      <Sidebar />
-      <Box sx={{ p: 3, ml: 8 }}>
-=======
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       {/* Section de bienvenue */}
       <StyledBox>
@@ -71,12 +54,13 @@ const Accueil: React.FC = () => {
             A
           </Typography>
         </Avatar>
->>>>>>> d5b55dd27c57553cb97b142e35d227e833a295b8
+
         <Typography variant="h4" gutterBottom>
           Bienvenue, Administrateur !
         </Typography>
         <Typography variant="subtitle1" paragraph>
-          Consultez les dernières statistiques et gérez votre entreprise depuis ce tableau de bord.
+          Consultez les dernières statistiques et gérez votre entreprise depuis
+          ce tableau de bord.
         </Typography>
       </StyledBox>
 
@@ -148,8 +132,6 @@ const Accueil: React.FC = () => {
           </Grid>
         </Grid>
       </Box>
-<<<<<<< HEAD
-=======
 
       {/* Actions rapides */}
       <Box sx={{ py: 4 }}>
@@ -215,7 +197,6 @@ const Accueil: React.FC = () => {
           </Grid>
         </Grid>
       </Box>
->>>>>>> d5b55dd27c57553cb97b142e35d227e833a295b8
     </Container>
   );
 };

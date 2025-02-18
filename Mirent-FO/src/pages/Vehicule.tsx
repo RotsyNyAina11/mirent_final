@@ -11,7 +11,7 @@ import {
   Paper,
   LinearProgress,
 } from "@mui/material";
-import VehicleService  from "../services/api";
+import VehicleService from "../services/api";
 
 interface Vehicle {
   id: number;

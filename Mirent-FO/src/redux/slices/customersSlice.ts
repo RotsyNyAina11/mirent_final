@@ -31,7 +31,7 @@ const initialState: CustomersState = {
   ],
   rentals: [
     {
-      id: "1",
+      id: "3",
       customerId: "1",
       vehicleId: "1",
       startDate: "2024-02-25",

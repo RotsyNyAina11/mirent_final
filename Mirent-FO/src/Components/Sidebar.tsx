@@ -1,18 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Drawer,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  IconButton,
   Toolbar,
   Divider,
   Box,
-  Typography,
+  Tooltip,
 } from "@mui/material";
 import {
-  Menu,
   Home,
   CarRental,
   AccountCircle,
@@ -20,84 +18,62 @@ import {
   ContactMail,
   Dashboard,
   People,
-  Close,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 
 const Sidebar: React.FC = () => {
-  const [open, setOpen] = useState(true);
-
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
-
   return (
-    <Box sx={{ display: "flex" }}>
-      {/* Bouton pour ouvrir/fermer */}
-      <IconButton
-        onClick={toggleDrawer}
-        sx={{
-          position: "fixed",
-          top: 16,
-          left: open ? 250 : 16,
-          zIndex: 1300,
-          backgroundColor: "white",
-          boxShadow: 1,
-        }}
-      >
-        {open ? <Close /> : <Menu />}
-      </IconButton>
-
+    <>
       {/* Sidebar */}
       <Drawer
-        variant="permanent"
+        variant="persistent"
         anchor="left"
-        open={open}
+        open
         PaperProps={{
           sx: {
-            width: open ? 250 : 70,
-            transition: "width 0.3s ease-in-out",
-            overflowX: "hidden",
-            backgroundColor: "#F7FAFC",
+            width: "250px", // Largeur fixe de la sidebar
+            background: "#F7FAFC",
             borderRight: "none",
             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+            overflowX: "hidden",
+            transition: "width 0.3s ease-in-out",
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            "@media (max-width: 600px)": {
+              width: "60px", // Sidebar rétrécie sur petits écrans
+            },
           },
         }}
       >
         <Box display="flex" flexDirection="column" height="100%">
-          {/* Logo */}
-          <Toolbar>
+          {/* Logo enveloppé dans un Box pour utiliser sx */}
+          <Toolbar sx={{ justifyContent: "center", py: 2 }}>
             <Box
-              display="flex"
-              justifyContent={open ? "center" : "flex-start"}
-              alignItems="center"
-              p={2}
+              sx={{
+                width: "100px",
+                transition: "width 0.3s ease-in-out",
+                display: "block",
+                margin: "0 auto",
+                "@media (max-width: 600px)": {
+                  width: "35px",
+                },
+              }}
             >
-              {open && (
-                <img
-                  src={logo}
-                  alt="Logo"
-                  style={{ width: "100%", maxWidth: "100px" }}
-                />
-              )}
+              <img
+                src={logo}
+                alt="Logo"
+                style={{
+                  width: "100%",
+                  display: "block",
+                  margin: "0 auto",
+                }}
+              />
             </Box>
           </Toolbar>
 
-          {/* Titre du menu */}
-          {open && (
-            <Box px={2} pb={2}>
-              <Typography
-                variant="h6"
-                fontWeight="bold"
-                textAlign="center"
-                color="#004D99"
-                sx={{ textTransform: "uppercase" }}
-              >
-                Menu Principal
-              </Typography>
-            </Box>
-          )}
+          <Divider sx={{ my: 2, borderColor: "#D1E8F8" }} />
 
           {/* Liste des éléments */}
           <List>
@@ -110,36 +86,53 @@ const Sidebar: React.FC = () => {
                 icon: <DirectionsCar />,
                 path: "/vehicules",
               },
-              { text: "Liste des clients", icon: <People />, path: "/clients" },
+              { text: "Liste des Clients", icon: <People />, path: "/clients" },
               { text: "Contact", icon: <ContactMail />, path: "/contact" },
               { text: "Login", icon: <AccountCircle />, path: "/login" },
             ].map((item, index) => (
-              <ListItem
-                component={Link}
-                to={item.path}
-                key={index}
-                sx={{
-                  "&:hover": { backgroundColor: "#E2F0FB" },
-                  display: "flex",
-                  justifyContent: open ? "flex-start" : "center",
-                  padding: "10px",
-                }}
-              >
-                <ListItemIcon
-                  sx={{ color: "#004D99", minWidth: 0, mr: open ? 2 : "auto" }}
+              <Tooltip key={index} title={item.text} placement="right">
+                <ListItem
+                  component={Link}
+                  to={item.path}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#E2F0FB",
+                      boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                      borderRadius: "8px",
+                    },
+                    transition: "all 0.2s ease-in-out",
+                    padding: "8px 16px",
+                  }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                {open && <ListItemText primary={item.text} />}
-              </ListItem>
+                  <ListItemIcon
+                    sx={{
+                      color: "#004D99",
+                      minWidth: "36px",
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    primaryTypographyProps={{
+                      color: "#004D99",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                    }}
+                    sx={{
+                      display: {
+                        xs: "none",
+                        sm: "block",
+                      },
+                    }}
+                  />
+                </ListItem>
+              </Tooltip>
             ))}
           </List>
-
-          {/* Séparateur */}
-          <Divider sx={{ my: 2, borderColor: "#D1E8F8" }} />
         </Box>
       </Drawer>
-    </Box>
+    </>
   );
 };
 

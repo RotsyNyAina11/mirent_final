@@ -5,15 +5,12 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-
 import { Grid, Box } from "@mui/material";
-import Sidebar from "./Components/Sidebar";
-import Login from "./Components/Login";
 import Accueil from "./pages/Accueil";
 import VehiclesList from "./pages/Vehicule";
-import CustomerList from "./pages/CustomerPage";
-import Contact from "./pages/contact";
-import Reservations from "./pages/reservation";
+import Sidebar from "./Components/Sidebar";
+import Login from "./Components/Login";
+import ClientList from "./pages/CustomerPage";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -57,30 +54,12 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
-        {/* Route pour la liste des Clients avec Sidebar */}
+        {/* Route pour la liste des clients avec Sidebar */}
         <Route
           path="/clients"
           element={
             <MainLayout>
-              <CustomerList />
-            </MainLayout>
-          }
-        />
-        {/**Route pour le contact avec sidebar */}
-        <Route
-          path="/contact"
-          element={
-            <MainLayout>
-              <Contact />
-            </MainLayout>
-          }
-        />
-        {/**Route pour les réservations avec sidebar */}
-        <Route
-          path="/reservations"
-          element={
-            <MainLayout>
-              <Reservations />
+              <ClientList />
             </MainLayout>
           }
         />

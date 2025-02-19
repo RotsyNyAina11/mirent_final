@@ -11,6 +11,7 @@ import VehiclesList from "./pages/Vehicule";
 import Sidebar from "./Components/Sidebar";
 import Login from "./Components/Login";
 import ClientList from "./pages/CustomerPage";
+import Reservations from "./pages/reservation";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -63,7 +64,15 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
-
+        {/* Route pour la page de reservation */}
+        <Route
+          path="/reservations"
+          element={
+            <MainLayout>
+              <Reservations />
+            </MainLayout>
+          }
+        />
         {/* Redirection par défaut vers /accueil */}
         <Route path="*" element={<Navigate to="/accueil" />} />
       </Routes>

@@ -1,7 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Type } from "./type.entity";
+import { Status } from "./status.entity";
 
 @Entity()
-export class Vehicle {
+export class Vehicule {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -14,16 +16,16 @@ export class Vehicle {
     @Column({ nullable: false })
     modele: string;
 
-    @Column({ nullable: false })
-    type: string;
-
     @Column({ nullable: false, unique: true })
     immatriculation: string;
 
-    @Column({ nullable: false, type:'int'})
+    @Column()
     nombrePlace: number;
 
-    @Column({ type: 'varchar', nullable: false, default: 'disponible' })
-    status: string;
+    @ManyToOne(() => Type, (type) => type.vehicules, { eager: true})
+    type: Type;
+
+    @ManyToOne(() => Status, (status) => status.vehicules, { eager: true })
+    status: Status;
 
 }

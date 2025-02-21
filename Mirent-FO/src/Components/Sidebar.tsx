@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import {
   Home,
-  Dashboard,
   ShoppingCart, // Nouvelle icône pour "Commande"
   ReceiptLong, // Autre option pour "Commande"
   DirectionsCar,
@@ -32,7 +31,7 @@ const NavLinkButton = styled(({ to, selected, ...rest }: any) => (
   <RouterLink to={to} style={{ textDecoration: "none", color: "inherit" }}>
     <ListItemButton {...rest} />
   </RouterLink>
-))<{ selected?: boolean }>(({ theme, selected }) => ({
+))<{ selected?: boolean }>(({ selected }) => ({
   "&:hover": {
     backgroundColor: "#E2F0FB",
     color: "#004D99",

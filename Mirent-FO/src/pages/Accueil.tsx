@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -7,204 +7,212 @@ import {
   Card,
   CardContent,
   Button,
-  useTheme,
   Avatar,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { AccessTime, DirectionsCar, People, AttachMoney } from "@mui/icons-material";
+import { CarRental, Home, Person, MonetizationOn } from "@mui/icons-material";
 
-// Styled components
+// Styles
 const StyledBox = styled(Box)({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
   minHeight: "50vh",
-  background: "#f7fafc",
-  padding: "3rem",
+  backgroundColor: "#f5f5f5",
+  padding: "2rem 1.5rem",
   textAlign: "center",
+  fontFamily: "'Roboto', sans-serif",
 });
 
 const DashboardCard = styled(Card)({
-  backgroundColor: "#fff",
-  borderRadius: "15px",
-  boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.1)",
-  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease",
+  backgroundColor: "#ffffff",
+  borderRadius: "12px",
+  boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.08)",
+  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out",
   "&:hover": {
-    transform: "scale(1.05)",
-    boxShadow: "0px 12px 24px rgba(0, 0, 0, 0.15)",
+    transform: "scale(1.03)",
+    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+    backgroundColor: "#fafafa",
+  },
+  padding: "1.5rem",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  textAlign: "center",
+  position: "relative",
+});
+
+const AvatarStyled = styled(Avatar)({
+  width: 80,
+  height: 80,
+  marginBottom: "1rem",
+  backgroundColor: "#3f51b5",
+  fontSize: "2rem",
+  boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.1)",
+});
+
+const ActionButton = styled(Button)({
+  padding: "0.8rem 1.2rem",
+  fontWeight: "bold",
+  borderRadius: "8px",
+  fontSize: "0.95rem",
+  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
+  transition: "background-color 0.3s ease, box-shadow 0.3s ease",
+  "&:hover": {
+    backgroundColor: "#3f51b5",
+    boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)",
   },
 });
 
+const LoadingIndicator = styled(CircularProgress)({
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+});
+
+
 const Accueil: React.FC = () => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+
+  const [availableVehiclesCount, setAvailableVehiclesCount] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchAvailableVehicles = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/vehicles/available-count"); 
+        const data = await response.json();
+        console.log("Réponse complète de l'API:", data);
+        console.log("Type de data:", typeof data);
+        console.log("Clés disponibles dans data:", Object.keys(data));
+        setAvailableVehiclesCount(data);
+
+      } catch (error) {
+        console.error("Erreur lors de la récupération des véhicules disponibles", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAvailableVehicles();
+  }, []);
+
+
+
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 6, mb: 6 }}>
-      {/* Section de bienvenue */}
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <StyledBox>
-        <Avatar
-          sx={{
-            width: 90,
-            height: 90,
-            bgcolor: theme.palette.primary.main,
-            mb: 3,
-          }}
-        >
-          <Typography variant="h5" sx={{ color: "#fff", fontWeight: 600 }}>
+        <AvatarStyled>
+          <Typography variant="h5" sx={{ color: "#fff", fontWeight: "bold" }}>
             A
           </Typography>
-        </Avatar>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+        </AvatarStyled>
+        <Typography variant="h4" gutterBottom sx={{ fontFamily: "'Roboto', sans-serif", fontWeight: 600 }}>
           Bienvenue, Administrateur !
         </Typography>
-        <Typography variant="subtitle1" paragraph sx={{ fontSize: "1.1rem" }}>
-          Consultez les dernières statistiques et gérez votre entreprise depuis ce tableau de bord.
+        <Typography variant="subtitle1" paragraph sx={{ fontSize: "1rem", color: theme.palette.text.secondary }}>
+          Découvrez vos statistiques et gérez votre flotte de véhicules de manière optimisée.
         </Typography>
       </StyledBox>
 
-      {/* Section de tableau de bord */}
-      <Box sx={{ py: 6 }}>
-        <Typography
-          variant="h5"
-          align="center"
-          gutterBottom
-          sx={{ fontWeight: "bold", color: theme.palette.primary.main }}
-        >
+      <Box sx={{ py: 4 }}>
+        <Typography variant="h5" align="center" gutterBottom sx={{ fontWeight: "bold", color: theme.palette.primary.main }}>
           Tableau de bord
         </Typography>
         <Grid container spacing={4} justifyContent="center">
-          {/* Carte Véhicules disponibles */}
           <Grid item xs={12} sm={6} md={3}>
             <DashboardCard>
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <DirectionsCar sx={{ fontSize: 40, color: theme.palette.primary.main, mr: 2 }} />
-                  <Typography variant="h6" gutterBottom>
-                    Véhicules disponibles
-                  </Typography>
-                </Box>
-                <Typography variant="h4" align="center" color="text.primary">
-                  125
+              <IconButton sx={{ fontSize: "2.5rem", color: theme.palette.primary.main }}>
+                <CarRental />
+              </IconButton>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+                Véhicules disponibles
+              </Typography>
+              {loading ? (
+                <LoadingIndicator />
+              ) : (
+                <Typography variant="h4" color="text.primary">
+                  {availableVehiclesCount !== null ? availableVehiclesCount : "Erreur"}
                 </Typography>
-              </CardContent>
+              )}
             </DashboardCard>
           </Grid>
 
-          {/* Carte Locations en cours */}
           <Grid item xs={12} sm={6} md={3}>
             <DashboardCard>
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <AccessTime sx={{ fontSize: 40, color: theme.palette.primary.main, mr: 2 }} />
-                  <Typography variant="h6" gutterBottom>
-                    Locations en cours
-                  </Typography>
-                </Box>
-                <Typography variant="h4" align="center" color="text.primary">
-                  42
-                </Typography>
-              </CardContent>
+              <IconButton sx={{ fontSize: "2.5rem", color: theme.palette.secondary.main }}>
+                <Home />
+              </IconButton>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+                Locations en cours
+              </Typography>
+              <Typography variant="h4" color="text.primary">
+                42
+              </Typography>
             </DashboardCard>
           </Grid>
 
-          {/* Carte Nouveaux clients */}
           <Grid item xs={12} sm={6} md={3}>
             <DashboardCard>
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <People sx={{ fontSize: 40, color: theme.palette.primary.main, mr: 2 }} />
-                  <Typography variant="h6" gutterBottom>
-                    Nouveaux clients
-                  </Typography>
-                </Box>
-                <Typography variant="h4" align="center" color="text.primary">
-                  15
-                </Typography>
-              </CardContent>
+              <IconButton sx={{ fontSize: "2.5rem", color: theme.palette.info.main }}>
+                <Person />
+              </IconButton>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+                Nouveaux clients
+              </Typography>
+              <Typography variant="h4" color="text.primary">
+                15
+              </Typography>
             </DashboardCard>
           </Grid>
 
-          {/* Carte Revenus totaux */}
           <Grid item xs={12} sm={6} md={3}>
             <DashboardCard>
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <AttachMoney sx={{ fontSize: 40, color: theme.palette.primary.main, mr: 2 }} />
-                  <Typography variant="h6" gutterBottom>
-                    Revenus totaux
-                  </Typography>
-                </Box>
-                <Typography variant="h4" align="center" color="text.primary">
-                  2 000 000 Ar
-                </Typography>
-              </CardContent>
+              <IconButton sx={{ fontSize: "2.5rem", color: theme.palette.success.main }}>
+                <MonetizationOn />
+              </IconButton>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+                Revenus totaux
+              </Typography>
+              <Typography variant="h4" color="text.primary">
+                2 000 000 Ar
+              </Typography>
             </DashboardCard>
           </Grid>
         </Grid>
       </Box>
 
-      {/* Actions rapides */}
-      <Box sx={{ py: 6 }}>
-        <Typography
-          variant="h5"
-          align="center"
-          gutterBottom
-          sx={{ fontWeight: "bold", color: theme.palette.primary.main }}
-        >
+      <Box sx={{ py: 4 }}>
+        <Typography variant="h5" align="center" gutterBottom sx={{ fontWeight: "bold", color: theme.palette.primary.main }}>
           Actions rapides
         </Typography>
-        <Grid container spacing={2} justifyContent="center">
-          {/* Bouton 1 */}
+        <Grid container spacing={3} justifyContent="center">
           <Grid item xs={12} sm={6} md={3}>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              href="/vehicules"
-              sx={{ height: "100%", py: 2, borderRadius: 5 }}
-            >
+            <ActionButton variant="contained" color="primary" fullWidth href="/vehicules">
               Gérer les véhicules
-            </Button>
+            </ActionButton>
           </Grid>
 
-          {/* Bouton 2 */}
           <Grid item xs={12} sm={6} md={3}>
-            <Button
-              variant="contained"
-              color="secondary"
-              fullWidth
-              href="/clients"
-              sx={{ height: "100%", py: 2, borderRadius: 5 }}
-            >
+            <ActionButton variant="contained" color="secondary" fullWidth href="/clients">
               Gérer les clients
-            </Button>
+            </ActionButton>
           </Grid>
 
-          {/* Bouton 3 */}
           <Grid item xs={12} sm={6} md={3}>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              href="/reservations"
-              sx={{ height: "100%", py: 2, borderRadius: 5 }}
-            >
+            <ActionButton variant="contained" color="primary" fullWidth href="/reservations">
               Voir les réservations
-            </Button>
-          </Grid>
-
-          {/* Bouton 4 */}
-          <Grid item xs={12} sm={6} md={3}>
-            <Button
-              variant="contained"
-              color="success"
-              fullWidth
-              href="/ajouter-vehicule"
-              sx={{ height: "100%", py: 2, borderRadius: 5 }}
-            >
-              Ajouter un véhicule
-            </Button>
+            </ActionButton>
           </Grid>
         </Grid>
       </Box>

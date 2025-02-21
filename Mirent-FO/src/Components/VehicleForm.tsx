@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Modal, Typography, MenuItem, Grid, Fade } from "@mui/material";
-import { addVehicle } from "../redux/slices/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 
 const VehicleForm: React.FC = () => {
@@ -17,6 +16,7 @@ const VehicleForm: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
 
   // Validation des champs
   const validateForm = () => {
@@ -35,11 +35,25 @@ const VehicleForm: React.FC = () => {
     setVehicle({ ...vehicle, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      dispatch(addVehicle(vehicle));
-      setOpen(false);
+  const submitVehicle = async () => {
+    try {
+      const response = await fetch("http://ton-backend-api.com/vehicles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(vehicle),
+      });
+
+      if (!response.ok) {
+        throw new Error("Échec de l'ajout du véhicule");
+      }
+
+      const data = await response.json();
+      // Dispatch si nécessaire (par exemple, ajouter le véhicule à Redux)
+      dispatch({ type: "ADD_VEHICLE", payload: data });
+
+      // Réinitialiser le formulaire après l'ajout
       setVehicle({
         nom: "",
         marque: "",
@@ -50,6 +64,17 @@ const VehicleForm: React.FC = () => {
         status: "disponible",
       });
       setErrors({});
+      setOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      setLoading(true);
+      submitVehicle().finally(() => setLoading(false));
     }
   };
 
@@ -193,8 +218,9 @@ const VehicleForm: React.FC = () => {
                   bgcolor: "#2E7D32",
                   ":hover": { bgcolor: "#1B5E20" }
                 }}
+                disabled={loading}
               >
-                 Ajouter
+                {loading ? "Ajout en cours..." : "Ajouter"}
               </Button>
               <Button 
                 fullWidth
@@ -202,7 +228,7 @@ const VehicleForm: React.FC = () => {
                 sx={{ mt: 2, py: 1.5, fontSize: "16px", fontWeight: "bold" }}
                 onClick={() => setOpen(false)}
               >
-                 Annuler
+                Annuler
               </Button>
             </form>
           </Box>

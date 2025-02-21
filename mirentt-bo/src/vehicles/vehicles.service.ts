@@ -1,48 +1,84 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Vehicle } from 'src/entities/vehicle.entity';
+import { Type } from 'src/entities/type.entity';
+import { Status } from 'src/entities/status.entity';
 import { Repository } from 'typeorm';
+import { Vehicule } from 'src/entities/vehicle.entity';
+import { CreateVehiculeDto } from './createVehicule.dto';
+
 
 @Injectable()
 export class VehiclesService {
     constructor(
-        @InjectRepository(Vehicle)
-        private readonly vehicleRepository: Repository<Vehicle>
+        @InjectRepository(Vehicule)
+        private readonly vehiculeRepository: Repository<Vehicule>,
+        @InjectRepository(Type)
+        private readonly typeRepository: Repository<Type>,
+        @InjectRepository(Status)
+        private readonly statusRepository: Repository<Status>,
     ) {}
 
+    async getAvailableVehiculeCount(): Promise<number>{
+      const availableStatus = await this.statusRepository.findOne({ where: {status: 'Disponible'}});
 
-    // Recuperer tous les vehicules
-    async findAll(): Promise<Vehicle[]> {
-        return this.vehicleRepository.find();
+      if(!availableStatus){
+        throw new Error('Statut "Disponible" non trouvé');
+      }
+
+      const availableVehiculeCount = await this.vehiculeRepository.count({
+        where: {
+          status: availableStatus,
+        },
+      });
+      return availableVehiculeCount;
     }
 
-    // Recuperer un vehicule par son ID
-    async findOne(id: number): Promise<Vehicle > {
-        const vehicle = await this.vehicleRepository.findOne({ where: { id } });
-        if (!vehicle) {
-            throw new HttpException('Vehicle with id ${id} not found', HttpStatus.NOT_FOUND);
+     async findAll(): Promise<Vehicule[]> {
+        return this.vehiculeRepository.find({ relations: ['type', 'status']});
+      }
+    
+      async findOne(id: number): Promise<Vehicule | null> {
+        return await this.vehiculeRepository.findOne({ where: { id }, relations: ['type', 'status'] }) || null;
+      }
+      
+    
+      async create(dto: CreateVehiculeDto): Promise<Vehicule> {
+        const type = await this.typeRepository.findOne({ where: { id: dto.typeId } });
+        const status = await this.statusRepository.findOne({ where: { id: dto.statusId } });
+    
+        if (!type || !status) {
+          throw new Error('Type ou Status non trouvé');
         }
-        return vehicle;
-    } 
+    
+        const vehicule = this.vehiculeRepository.create({
+          ...dto,
+          type,
+          status,
+        });
+    
+        return this.vehiculeRepository.save(vehicule);
+      }
+    
+      
+    async update(id: number, dto: CreateVehiculeDto): Promise<Vehicule | null> {
+        const type = await this.typeRepository.findOne({ where: { id: dto.typeId } });
+        const status = await this.statusRepository.findOne({ where: { id: dto.statusId } });
 
-    // Creation d'un nouvel vehicule
-    async create(vehicle: Vehicle): Promise<Vehicle> {
-        return this.vehicleRepository.save(vehicle);
-    }
+        if (!type || !status) {
+        throw new Error('Type ou Status non trouvé');
+        }
 
-    // Mettre à jour un vehicule
-    async update(id: number, vehicle: Partial<Vehicle>): Promise<Vehicle | null> {
-        const existingVehicle = await this.findOne(id); // Vérifie si le véhicule existe
-        await this.vehicleRepository.update(id, vehicle);
+        await this.vehiculeRepository.update(id, {
+        ...dto,
+        type,
+        status,
+        });
+
         return this.findOne(id);
     }
-
-    // Supprimer un vehicule
-    async delete(id: number): Promise<void> {
-        const result = await this.vehicleRepository.delete(id);
-        if (result.affected === 0) {
-          throw new HttpException(`Vehicle with id ${id} not found`, HttpStatus.NOT_FOUND);
-        }
-    }
-
+      
+    
+      async remove(id: number): Promise<void> {
+        await this.vehiculeRepository.delete(id);
+      }
 }

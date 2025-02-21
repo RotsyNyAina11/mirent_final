@@ -1,42 +1,41 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
 import { VehiclesService } from './vehicles.service';
-import { Vehicle } from 'src/entities/vehicle.entity';
+import { Vehicule } from 'src/entities/vehicle.entity';
+import { CreateVehiculeDto } from './createVehicule.dto';
+
+
 
 @Controller('vehicles')
 export class VehiclesController {
-    constructor(
-        private readonly vehiclesService: VehiclesService
-    ) {}
+    constructor(private readonly vehiculesService: VehiclesService) {}
 
-    @Get()
-    async findAllVehicles(): Promise<Vehicle[]> {
-        return this.vehiclesService.findAll();
-    }
 
-    // Recuperer un vehicule par son ID
-    @Get(':id')
-    async findOneVehicle(@Param('id', ParseIntPipe) id: number): Promise<Vehicle | null> {
-        return this.vehiclesService.findOne(id);
-    }
+  @Get('available-count')
+  async getAvailableVehiclesCount(): Promise<number> {
+    return this.vehiculesService.getAvailableVehiculeCount();
+  }
+  @Get()
+  findAll(): Promise<Vehicule[]> {
+    return this.vehiculesService.findAll();
+  }
 
-    // Creer un nouveau vehicule
-    @Post()
-    @UsePipes(ValidationPipe) 
-    async createVehicle(@Body() vehicle: Vehicle): Promise<Vehicle> {
-      return this.vehiclesService.create(vehicle);
-    }
+  @Get(':id')
+  async findOne(@Param('id') id: number): Promise<Vehicule | null> {
+    return await this.vehiculesService.findOne(id);
+  }
 
-    // Mettre à jour un vehicule
-    @Put(':id')
-    @UsePipes(ValidationPipe)
-    async updateVehicle(@Param('id') id: number, @Body() vehicle: Vehicle): Promise<Vehicle | null> {
-      return this.vehiclesService.update(+id, vehicle);
-    }
+  @Post()
+    create(@Body() dto: CreateVehiculeDto): Promise<Vehicule> {
+    return this.vehiculesService.create(dto);
+  }
 
-    // Supprimer un véhicule
-    @Delete(':id')
-    async deleteVehicle(@Param('id') id: number): Promise<void> {
-        return this.vehiclesService.delete(+id);
-    }
+  @Put(':id')
+    update(@Param('id') id: number, @Body() dto: CreateVehiculeDto): Promise<Vehicule | null> {
+    return this.vehiculesService.update(id, dto);
+   }
 
+  @Delete(':id')
+  remove(@Param('id') id: number): Promise<void> {
+    return this.vehiculesService.remove(id);
+  }
 }

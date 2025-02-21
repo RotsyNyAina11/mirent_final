@@ -60,22 +60,28 @@ export class VehiclesService {
       }
     
       
-    async update(id: number, dto: CreateVehiculeDto): Promise<Vehicule | null> {
+      async update(id: number, dto: CreateVehiculeDto): Promise<Vehicule | null> {
+        const vehicule = await this.vehiculeRepository.findOne({ where: { id }, relations: ['type', 'status'] });
+    
+        if (!vehicule) {
+            throw new Error('Véhicule non trouvé');
+        }
+    
         const type = await this.typeRepository.findOne({ where: { id: dto.typeId } });
         const status = await this.statusRepository.findOne({ where: { id: dto.statusId } });
-
+    
         if (!type || !status) {
-        throw new Error('Type ou Status non trouvé');
+            throw new Error('Type ou Status non trouvé');
         }
-
-        await this.vehiculeRepository.update(id, {
-        ...dto,
-        type,
-        status,
-        });
-
-        return this.findOne(id);
+    
+        // Mise à jour des propriétés
+        vehicule.type = type;
+        vehicule.status = status;
+        vehicule.marque = dto.marque;  // Ajoute d'autres champs si besoin
+    
+        return await this.vehiculeRepository.save(vehicule);
     }
+    
       
     
       async remove(id: number): Promise<void> {

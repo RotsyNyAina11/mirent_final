@@ -5,12 +5,10 @@ import {
   Container,
   Grid,
   Card,
-  CardContent,
   Button,
   Avatar,
   IconButton,
   useTheme,
-  useMediaQuery,
   CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/system";
@@ -80,7 +78,6 @@ const LoadingIndicator = styled(CircularProgress)({
 
 const Accueil: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
 
   const [availableVehiclesCount, setAvailableVehiclesCount] = useState<number | null>(null);

@@ -5,6 +5,8 @@ import { typeOrmConfig } from './config/database.config';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { TypeModule } from './type/type.module';
 import { StatusModule } from './status/status.module';
+import { RegionModule } from './region/region.module';
+import { DistrictModule } from './district/district.module';
 
 
 @Module({
@@ -13,7 +15,9 @@ import { StatusModule } from './status/status.module';
     AuthModule,
     VehiclesModule,
     TypeModule,
-    StatusModule
+    StatusModule,
+    RegionModule,
+    DistrictModule
   ],
 })
 export class AppModule {}

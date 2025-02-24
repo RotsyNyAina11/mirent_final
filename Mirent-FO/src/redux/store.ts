@@ -3,6 +3,18 @@ import authReducer from "./slices/authSlice";
 import sidebarReducer from "./slices/SidebarSlice";
 import filterReducer from "./slices/filterSlice";
 import vehiclesReducer from "./slices/vehiclesSlice";
+import { create } from "zustand";
+import { Proforma } from "../types/Proforma";
+interface ProformaState {
+  proformas: Proforma[];
+  addProforma: (newProforma: Proforma) => void;
+}
+
+export const useProformaStore = create<ProformaState>((set) => ({
+  proformas: [],
+  addProforma: (newProforma) =>
+    set((state) => ({ proformas: [...state.proformas, newProforma] })),
+}));
 
 export const store = configureStore({
   reducer: {

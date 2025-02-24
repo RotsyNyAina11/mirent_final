@@ -183,7 +183,6 @@ const VehiclesList: React.FC = () => {
         onPageChange={(event, newPage) => setCurrentPage(newPage)}
         sx={{ marginTop: 2 }}
       />
-
       <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
         <DialogTitle>Êtes-vous sûr de vouloir supprimer ce véhicule ?</DialogTitle>
         <DialogActions>

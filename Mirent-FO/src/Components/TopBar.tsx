@@ -16,12 +16,12 @@ const TopBar: React.FC = () => {
     >
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Car Rental
+          Mirent Car
         </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField label="Search for a car" variant="outlined" size="small" />
           <Button variant="contained" color="primary">
-            Login
+            Rerchercher
           </Button>
         </Box>
       </Toolbar>

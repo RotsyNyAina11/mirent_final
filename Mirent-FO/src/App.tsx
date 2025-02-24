@@ -10,12 +10,19 @@ import Accueil from "./pages/Accueil";
 import VehiclesList from "./pages/Vehicule";
 import Sidebar from "./Components/Sidebar";
 import Login from "./Components/Login";
-
+import ClientList from "./pages/CustomerPage";
+import Reservations from "./pages/reservation";
+import Performat from "./pages/Commande";
+import Devis from "./pages/Devis";
+import Facturation from "./pages/FacturationPage";
+import ProformaList from "./pages/ProformaList";
 
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
-  const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const MainLayout: React.FC<{ children: React.ReactNode }> = ({
+    children,
+  }) => {
     return (
       <Grid container>
         <Grid item xs={2}>
@@ -53,9 +60,55 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
+        {/* Route pour la liste des clients avec Sidebar */}
+        <Route
+          path="/clients"
+          element={
+            <MainLayout>
+              <ClientList />
+            </MainLayout>
+          }
+        />
+        {/* Route pour la page de reservation */}
+        <Route
+          path="/reservations"
+          element={
+            <MainLayout>
+              <Reservations />
+            </MainLayout>
+          }
+        />
+        {/* Route pour la page de Performat sur la commande */}
+        <Route
+          path="/proformat"
+          element={
+            <MainLayout>
+              <Performat />
+            </MainLayout>
+          }
+        />
 
+        {/* Route pour la page de Devis sur la commande */}
+        <Route
+          path="/devis"
+          element={
+            <MainLayout>
+              <Devis />
+            </MainLayout>
+          }
+        />
+        {/* Route pour la page de Facturation sur la commande */}
+        <Route
+          path="/facturation"
+          element={
+            <MainLayout>
+              <Facturation />
+            </MainLayout>
+          }
+        />
         {/* Redirection par défaut vers /accueil */}
-        <Route path="*" element={<Navigate to="/accueil" />} />
+        <Route path="" element={<Navigate to="/accueil" />} />
+        <Route path="/proformat-list" element={<ProformaList />} />
       </Routes>
     </Router>
   );

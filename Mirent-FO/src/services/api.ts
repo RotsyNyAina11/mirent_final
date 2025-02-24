@@ -20,7 +20,10 @@ class VehicleService {
       const response = await axios.get(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {
-      console.error(`Erreur lors de la récupération du véhicule avec l'ID ${id}`, error);
+      console.error(
+        `Erreur lors de la récupération du véhicule avec l'ID ${id}`,
+        error
+      );
       throw this.handleError(error);
     }
   }
@@ -42,7 +45,10 @@ class VehicleService {
       const response = await axios.put(`${API_URL}/${id}`, vehicle);
       return response.data;
     } catch (error) {
-      console.error(`Erreur lors de la mise à jour du véhicule avec l'ID ${id}`, error);
+      console.error(
+        `Erreur lors de la mise à jour du véhicule avec l'ID ${id}`,
+        error
+      );
       throw this.handleError(error);
     }
   }
@@ -52,7 +58,10 @@ class VehicleService {
     try {
       await axios.delete(`${API_URL}/${id}`);
     } catch (error) {
-      console.error(`Erreur lors de la suppression du véhicule avec l'ID ${id}`, error);
+      console.error(
+        `Erreur lors de la suppression du véhicule avec l'ID ${id}`,
+        error
+      );
       throw this.handleError(error);
     }
   }
@@ -60,11 +69,17 @@ class VehicleService {
   // Gestion des erreurs
   private handleError(error: any) {
     if (error.response) {
-      return new Error(`Code d'erreur : ${error.response.status}: ${error.response.data.message}`)
+      return new Error(
+        `Code d'erreur : ${error.response.status}: ${error.response.data.message}`
+      );
     } else if (error.request) {
-      return new Error("Aucune réponse du serveur. Veuillez vérifier votre connexion.");
+      return new Error(
+        "Aucune réponse du serveur. Veuillez vérifier votre connexion."
+      );
     } else {
-      return new Error("Une erreur est survenue lors de la requête. Veuillez réessayer.");
+      return new Error(
+        "Une erreur est survenue lors de la requête. Veuillez réessayer."
+      );
     }
   }
 }

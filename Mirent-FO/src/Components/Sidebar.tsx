@@ -22,6 +22,7 @@ import {
   AccountCircle,
   ExpandLess,
   ExpandMore,
+  AddShoppingCart,
 } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 import logo from "../assets/horizontal.png";
@@ -230,7 +231,7 @@ const Sidebar: React.FC = () => {
                     }}
                   >
                     <ListItemIcon>
-                      <ReceiptLong /> {/* Icône pour Devis */}
+                      <AddShoppingCart /> {/* Icône pour Devis */}
                     </ListItemIcon>
                     <ListItemText
                       primary="Devis"

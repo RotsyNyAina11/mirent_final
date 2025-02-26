@@ -16,6 +16,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+//import image from "../assets/logo.png";
 
 interface Customer {
   id: number;
@@ -23,6 +24,7 @@ interface Customer {
   lastName: string;
   email: string;
   phone: string;
+  logo: string;
 }
 
 const CustomerManagement: React.FC = () => {
@@ -37,35 +39,72 @@ const CustomerManagement: React.FC = () => {
     lastName: "",
     email: "",
     phone: "",
+    logo: "",
   });
 
   const fetchCustomers = async () => {
-    const response = await fetch("http://localhost:3001/customers");
-    const data = await response.json();
-    setCustomers(data);
+    try {
+      const response = await fetch("http://localhost:3000/clients");
+      const data = await response.json();
+      console.log("Données reçues :", data); // Vérifie la structure
+
+      // Assurer que `data` est bien un tableau avant de le stocker
+      setCustomers(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Erreur lors du chargement des clients :", error);
+      setCustomers([]); // Évite l'erreur `map()` en mettant un tableau vide
+    }
   };
 
   const handleAddOrEditCustomer = async () => {
     const url = editMode
-      ? `http://localhost:3001/customers/${selectedCustomer?.id}`
-      : "http://localhost:3001/customers";
+      ? `http://localhost:3000/clients/${selectedCustomer?.id}`
+      : "http://localhost:3000/clients";
     const method = editMode ? "PUT" : "POST";
 
-    await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    // Assurez-vous que tous les champs requis sont présents
+    const payload = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone,
+      logo: form.logo || "default-logo.png", // Valeur par défaut si le logo est manquant
+    };
 
-    setOpen(false);
-    setEditMode(false);
-    setSelectedCustomer(null);
-    setForm({ firstName: "", lastName: "", email: "", phone: "" });
-    fetchCustomers();
+    try {
+      console.log("Données envoyées :", payload); // Log les données envoyées
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      console.log("Réponse de l'API :", data); // Log la réponse
+
+      if (response.ok) {
+        setOpen(false);
+        setEditMode(false);
+        setSelectedCustomer(null);
+        setForm({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          logo: "",
+        });
+        fetchCustomers();
+      } else {
+        console.error("Erreur lors de la modification/ajout du client :", data);
+      }
+    } catch (error) {
+      console.error("Erreur réseau :", error);
+    }
   };
 
   const handleDeleteCustomer = async (id: number) => {
-    await fetch(`http://localhost:3001/customers/${id}`, { method: "DELETE" });
+    await fetch(`http://localhost:3000/clients/${id}`, { method: "DELETE" });
     fetchCustomers();
   };
 
@@ -74,16 +113,16 @@ const CustomerManagement: React.FC = () => {
   }, []);
 
   return (
-    <Box sx={{ maxWidth: "80%", margin: "auto", marginTop: 4 }}>
+    <Box sx={{ maxWidth: "100%", margin: "auto", marginTop: 4 }}>
       <Typography variant="h5" align="center">
         Gestion des Clients
       </Typography>
 
       <Button
-        variant="contained"
+        variant="outlined"
         onClick={() => {
           setOpen(true);
-          setEditMode(false);
+          setEditMode(true);
         }}
       >
         Ajouter un Client
@@ -91,42 +130,65 @@ const CustomerManagement: React.FC = () => {
 
       <TableContainer component={Paper} sx={{ marginTop: 2 }}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "#E2F0FB" }}>
             <TableRow>
-              <TableCell>Nom</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Téléphone</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell sx={{ color: "black", fontWeight: "bold" }}>
+                Nom
+              </TableCell>
+              <TableCell sx={{ color: "black", fontWeight: "bold" }}>
+                Prénoms
+              </TableCell>
+              <TableCell sx={{ color: "black", fontWeight: "bold" }}>
+                Email
+              </TableCell>
+              <TableCell sx={{ color: "black", fontWeight: "bold" }}>
+                Téléphone
+              </TableCell>
+              <TableCell sx={{ color: "black", fontWeight: "bold" }}>
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {customers.map((customer) => (
-              <TableRow key={customer.id}>
-                <TableCell>
-                  {customer.firstName} {customer.lastName}
-                </TableCell>
-                <TableCell>{customer.email}</TableCell>
-                <TableCell>{customer.phone}</TableCell>
-                <TableCell>
-                  <Button
-                    onClick={() => {
-                      setSelectedCustomer(customer);
-                      setForm(customer);
-                      setEditMode(true);
-                      setOpen(true);
-                    }}
-                  >
-                    Modifier
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteCustomer(customer.id)}
-                    color="error"
-                  >
-                    Supprimer
-                  </Button>
+            {customers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  Aucun client trouvé
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              customers.map((customer) => (
+                <TableRow key={customer.id}>
+                  <TableCell>{customer.lastName}</TableCell>
+                  <TableCell>{customer.firstName}</TableCell>
+                  <TableCell>{customer.email}</TableCell>
+                  <TableCell>{customer.phone}</TableCell>
+                  <TableCell>
+                    <Button
+                      onClick={() => {
+                        setSelectedCustomer(customer);
+                        setForm(customer);
+                        setEditMode(true);
+                        setOpen(true);
+                        console.log(
+                          "Client sélectionné pour modification :",
+                          customer
+                        ); // Log le client sélectionné
+                      }}
+                    >
+                      Modifier
+                    </Button>
+                    <Button
+                      onClick={() => handleDeleteCustomer(customer.id)}
+                      color="error"
+                    >
+                      Supprimer
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -167,7 +229,9 @@ const CustomerManagement: React.FC = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Annuler</Button>
+          <Button onClick={() => setOpen(false)} color="error">
+            Annuler
+          </Button>
           <Button onClick={handleAddOrEditCustomer} variant="contained">
             {editMode ? "Modifier" : "Ajouter"}
           </Button>

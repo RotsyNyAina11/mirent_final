@@ -6,6 +6,7 @@ export interface Customer {
   phone: string;
   licenseNumber: string;
   createdAt: string;
+  logo: string;
 }
 
 export interface Rental {

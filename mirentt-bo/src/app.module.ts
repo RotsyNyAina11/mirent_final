@@ -7,7 +7,7 @@ import { TypeModule } from './type/type.module';
 import { StatusModule } from './status/status.module';
 import { RegionModule } from './region/region.module';
 import { DistrictModule } from './district/district.module';
-
+import { ClientModule } from './client/client.module';
 
 @Module({
   imports: [
@@ -17,7 +17,8 @@ import { DistrictModule } from './district/district.module';
     TypeModule,
     StatusModule,
     RegionModule,
-    DistrictModule
+    DistrictModule,
+    ClientModule,
   ],
 })
 export class AppModule {}

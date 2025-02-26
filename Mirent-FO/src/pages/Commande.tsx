@@ -51,7 +51,7 @@ const NewProforma: React.FC = () => {
   return (
     <Paper sx={{ padding: 4, maxWidth: 600, margin: "auto", mt: 4 }}>
       <Typography variant="h5" gutterBottom align="center">
-        Créer un Nouveau Devis
+        Créer un Nouveau Proforma
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
@@ -134,7 +134,7 @@ const NewProforma: React.FC = () => {
             <TextField
               fullWidth
               type="number"
-              label="Prix unitaire (€)"
+              label="Prix unitaire (Ar)"
               name="prixUnitaire"
               value={form.prixUnitaire}
               onChange={handleChange}

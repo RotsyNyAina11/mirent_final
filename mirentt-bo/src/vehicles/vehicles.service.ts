@@ -42,7 +42,7 @@ export class VehiclesService {
       }
       
     
-      async create(dto: CreateVehiculeDto): Promise<Vehicule> {
+      async create(dto: CreateVehiculeDto, imageUrl?: string): Promise<Vehicule> {
         const type = await this.typeRepository.findOne({ where: { id: dto.typeId } });
         const status = await this.statusRepository.findOne({ where: { id: dto.statusId } });
     
@@ -54,6 +54,7 @@ export class VehiclesService {
           ...dto,
           type,
           status,
+          imageUrl: imageUrl || undefined,
         });
     
         return this.vehiculeRepository.save(vehicule);

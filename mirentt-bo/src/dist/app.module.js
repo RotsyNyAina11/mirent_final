@@ -11,6 +11,8 @@ var common_1 = require("@nestjs/common");
 var auth_module_1 = require("./auth/auth.module");
 var typeorm_1 = require("@nestjs/typeorm");
 var database_config_1 = require("./config/database.config");
+var serve_static_1 = require("@nestjs/serve-static");
+var path_1 = require("path");
 var vehicles_module_1 = require("./vehicles/vehicles.module");
 var type_module_1 = require("./type/type.module");
 var status_module_1 = require("./status/status.module");
@@ -31,6 +33,10 @@ var AppModule = /** @class */ (function () {
                 region_module_1.RegionModule,
                 district_module_1.DistrictModule,
                 client_module_1.ClientModule,
+                serve_static_1.ServeStaticModule.forRoot({
+                    rootPath: path_1.join(__dirname, '..', 'uploads'),
+                    serveRoot: '/uploads'
+                }),
             ]
         })
     ], AppModule);

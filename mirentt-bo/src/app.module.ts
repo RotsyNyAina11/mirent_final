@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/database.config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { TypeModule } from './type/type.module';
 import { StatusModule } from './status/status.module';
@@ -18,7 +20,13 @@ import { ClientModule } from './client/client.module';
     StatusModule,
     RegionModule,
     DistrictModule,
+
     ClientModule,
+
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
   ],
 })
 export class AppModule {}

@@ -13,6 +13,7 @@ async function bootstrap() {
   // Activer CORS pour permettre les requêtes frontend
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173', // URL du frontend
+
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });

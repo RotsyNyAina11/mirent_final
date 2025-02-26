@@ -28,4 +28,7 @@ export class Vehicule {
     @ManyToOne(() => Status, (status) => status.vehicules, { eager: true })
     status: Status;
 
+    @Column({ type: 'varchar', nullable: true })
+    imageUrl: string | null;
+
 }

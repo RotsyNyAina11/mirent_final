@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 
 export class CreateVehiculeDto {
@@ -19,14 +20,21 @@ export class CreateVehiculeDto {
     immatriculation: string;
   
     @IsNotEmpty()
-    @IsNumber()
-    nombre_de_places: number;
+    @IsInt()
+    @Type(() => Number)
+    nombrePlace: number;
 
     @IsNotEmpty()
-    @IsNumber()
+    @IsInt()
+    @Type(() => Number)
     typeId: number;
   
     @IsNotEmpty()
-    @IsNumber()
+    @IsInt()
+    @Type(() => Number)
     statusId: number;
+
+    @IsOptional()
+    @IsString()
+    imageUrl?: string;
   }

@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Box, TextField, Button, FormControl, InputLabel, Select, MenuItem, Dialog, DialogTitle, Grid, IconButton } from "@mui/material";
-import { createVehicle } from "../redux/slices/vehiclesSlice";
-import { SelectChangeEvent } from "@mui/material/Select";
+import {
+  Box,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  Grid,
+  CircularProgress,
+  Alert,
+  FormHelperText,
+  Typography,
+  SelectChangeEvent,
+} from "@mui/material";
+import { createVehicle, Vehicle } from "../redux/slices/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
-import { AiOutlineCar, AiOutlineTag, AiOutlineNumber, AiOutlineClose } from "react-icons/ai";
+import { toast } from "react-toastify"; 
+import { AiOutlineCar, AiOutlineTag, AiOutlineNumber, AiOutlineClose, AiOutlineUpload } from "react-icons/ai";
 
 interface AddVehicleProps {
   open: boolean;
@@ -12,7 +28,7 @@ interface AddVehicleProps {
 
 const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
   const dispatch = useAppDispatch();
-  const [vehicle, setVehicle] = useState({
+  const [vehicle, setVehicle] = useState<Vehicle>({
     nom: "",
     marque: "",
     modele: "",
@@ -20,33 +36,55 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
     nombrePlace: 0,
     type: { id: 0, type: "" },
     status: { id: 0, status: "" },
+    image: null as File | null,
   });
 
-  const [vehicleTypes, setVehicleTypes] = useState<{ id: number; type: string }[]>([]);
-  const [vehicleStatuses, setVehicleStatuses] = useState<{ id: number; status: string }[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [vehicleTypes, setVehicleTypes] = useState<any[]>([]);
+  const [vehicleStatuses, setVehicleStatuses] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    const fetchVehicleTypes = async () => {
-      const response = await fetch("http://localhost:3000/type");
-      const data = await response.json();
-      setVehicleTypes(data);
-      if (data.length > 0 && vehicle.type.type === "") {
-        setVehicle((prev) => ({ ...prev, type: { id: data[0].id, type: data[0].type } }));
-      }
-    };
-    const fetchVehicleStatuses = async () => {
-      const response = await fetch("http://localhost:3000/status");
-      const data = await response.json();
-      setVehicleStatuses(data);
-      if (data.length > 0 && vehicle.status.status === "") {
-        setVehicle((prev) => ({ ...prev, status: { id: data[0].id, status: data[0].status } }));
+    const fetchVehicleData = async () => {
+      setIsLoading(true);
+
+      try {
+        const [typesResponse, statusesResponse] = await Promise.all([
+          fetch("http://localhost:3000/type"),
+          fetch("http://localhost:3000/status"),
+        ]);
+
+        const [typesData, statusesData] = await Promise.all([
+          typesResponse.json(),
+          statusesResponse.json(),
+        ]);
+
+        setVehicleTypes(typesData);
+        setVehicleStatuses(statusesData);
+
+        if (typesData.length > 0 && vehicle.type.type === "") {
+          setVehicle((prev) => ({
+            ...prev,
+            type: { id: typesData[0].id, type: typesData[0].type },
+          }));
+        }
+
+        if (statusesData.length > 0 && vehicle.status.status === "") {
+          setVehicle((prev) => ({
+            ...prev,
+            status: { id: statusesData[0].id, status: statusesData[0].status },
+          }));
+        }
+      } catch (err) {
+        console.error("Erreur lors de la récupération des données:", err);
+        toast.error("Une erreur s'est produite lors du chargement des données.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchVehicleTypes();
-    fetchVehicleStatuses();
-  }, [isInitialized]);
+    fetchVehicleData();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,49 +94,89 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
     }));
   };
 
-    const handleSelectType = (event: SelectChangeEvent) => {
-      const value = event.target.value;
-      if (!value) return; 
-      const selectedType = vehicleTypes.find((type) => type.type === value);
-      if (selectedType) {
-        setVehicle((prev) => ({
-          ...prev,
-          type: { id: selectedType.id, type: selectedType.type },
-        }));
-      }
-    };
-    
-    const handleSelectStatus = (event: SelectChangeEvent) => {
-      const value = event.target.value;
-      if (!value) return; 
-      const selectedStatus = vehicleStatuses.find((status) => status.status === value);
-      if (selectedStatus) {
-        setVehicle((prev) => ({
-          ...prev,
-          status: { id: selectedStatus.id, status: selectedStatus.status },
-        }));
-      }
-    };
-  
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(createVehicle(vehicle));
-    // Réinitialiser le formulaire et fermer le dialogue
-    setVehicle({
-      nom: "",
-      marque: "",
-      modele: "",
-      immatriculation: "",
-      nombrePlace: 0,
-      type: { id: 0, type: "" },
-      status: { id: 0, status: "" },
-    });
-    onClose();
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setVehicle((prev) => ({
+        ...prev,
+        image: file,
+      }));
+    }
+  };
+
+  const handleSelectType = (event: SelectChangeEvent) => {
+    const value = event.target.value;
+    if (!value) return;
+
+    const selectedType = vehicleTypes.find((type) => type.type === value);
+    if (selectedType) {
+      setVehicle((prev) => ({
+        ...prev,
+        type: { id: selectedType.id, type: selectedType.type },
+      }));
+    }
+  };
+
+
+  const handleSelectStatus = (event: SelectChangeEvent) => {
+    const value = event.target.value;
+    if (!value) return;
+
+    const selectedStatus = vehicleStatuses.find((status) => status.status === value);
+    if (selectedStatus) {
+      setVehicle((prev) => ({
+        ...prev,
+        status: { id: selectedStatus.id, status: selectedStatus.status },
+      }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!vehicle.nom) newErrors.nom = "Le nom est requis.";
+    if (!vehicle.marque) newErrors.marque = "La marque est requise.";
+    if (!vehicle.modele) newErrors.modele = "Le modèle est requis.";
+    if (!vehicle.immatriculation)
+      newErrors.immatriculation = "L'immatriculation est requise.";
+    if (vehicle.nombrePlace <= 0)
+      newErrors.nombrePlace = "Le nombre de places doit être supérieur à 0.";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("nom", vehicle.nom);
+      formData.append("marque", vehicle.marque);
+      formData.append("modele", vehicle.modele);
+      formData.append("immatriculation", vehicle.immatriculation);
+      formData.append("nombrePlace", vehicle.nombrePlace.toString());
+      formData.append("typeId", vehicle.type.id.toString());
+      formData.append("statusId", vehicle.status.id.toString());
+
+      if (vehicle.image) {
+        formData.append("image", vehicle.image);
+      }
+
+      await dispatch(createVehicle(formData));
+      toast.success("Véhicule ajouté avec succès !");
+      onClose();
+    } catch (err) {
+      console.error("Erreur lors de l'ajout du véhicule:", err);
+      toast.error("Une erreur s'est produite lors de l'ajout du véhicule.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
-    // Réinitialiser et fermer le dialogue
     setVehicle({
       nom: "",
       marque: "",
@@ -107,143 +185,259 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
       nombrePlace: 0,
       type: { id: 0, type: "" },
       status: { id: 0, status: "" },
+      image: null,
     });
     onClose();
   };
 
   return (
-    <Dialog open={open} onClose={handleCancel} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ fontWeight: 600, color: "#1976d2" }}>
-        Ajouter un véhicule
-        <IconButton
-          edge="end"
-          color="inherit"
-          onClick={handleCancel}
-          sx={{ position: 'absolute', right: 8, top: 8 }}
-        >
-          <AiOutlineClose />
-        </IconButton>
+    <Dialog open={open} onClose={handleCancel}>
+      <DialogTitle>
+        <Box display="flex" alignItems="center" gap={1}>
+          <AiOutlineCar size={24} color="#1976D2" />
+          Ajouter un véhicule
+        </Box>
       </DialogTitle>
-      <Box component="form" p={3} onSubmit={handleSubmit}>
+      <Box
+        sx={{
+          p: 3,
+          maxWidth: 600,
+          mx: "auto",
+          backgroundColor: "#f9f9f9",
+          borderRadius: 2,
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+        }}
+      >
         <Grid container spacing={2}>
+         
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom fontWeight="bold">
+              Informations générales
+            </Typography>
+          </Grid>
+
           <Grid item xs={12} sm={6}>
             <TextField
-              label="Nom"
               fullWidth
-              variant="outlined"
+              label="Nom"
               name="nom"
               value={vehicle.nom}
               onChange={handleInputChange}
-              sx={{ marginBottom: 2, "& .MuiInputBase-root": { borderRadius: "12px" } }}
+              error={!!errors.nom}
+              helperText={errors.nom}
               InputProps={{
                 startAdornment: (
-                  <IconButton sx={{ color: "#1976d2" }}>
-                    <AiOutlineCar />
-                  </IconButton>
+                  <AiOutlineTag style={{ marginRight: "8px", color: "#1976D2" }} />
                 ),
               }}
             />
           </Grid>
+
           <Grid item xs={12} sm={6}>
             <TextField
-              label="Marque"
               fullWidth
-              variant="outlined"
+              label="Marque"
               name="marque"
               value={vehicle.marque}
               onChange={handleInputChange}
-              sx={{ marginBottom: 2, "& .MuiInputBase-root": { borderRadius: "12px" } }}
+              error={!!errors.marque}
+              helperText={errors.marque}
               InputProps={{
                 startAdornment: (
-                  <IconButton sx={{ color: "#1976d2" }}>
-                    <AiOutlineTag />
-                  </IconButton>
+                  <AiOutlineCar style={{ marginRight: "8px", color: "#1976D2" }} />
                 ),
               }}
             />
           </Grid>
+
           <Grid item xs={12} sm={6}>
             <TextField
-              label="Modèle"
               fullWidth
-              variant="outlined"
+              label="Modèle"
               name="modele"
               value={vehicle.modele}
               onChange={handleInputChange}
-              sx={{ marginBottom: 2, "& .MuiInputBase-root": { borderRadius: "12px" } }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Immatriculation"
-              fullWidth
-              variant="outlined"
-              name="immatriculation"
-              value={vehicle.immatriculation}
-              onChange={handleInputChange}
-              sx={{ marginBottom: 2, "& .MuiInputBase-root": { borderRadius: "12px" } }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Nombre de places"
-              fullWidth
-              variant="outlined"
-              name="nombrePlace"
-              type="number"
-              value={vehicle.nombrePlace}
-              onChange={handleInputChange}
-              sx={{ marginBottom: 2, "& .MuiInputBase-root": { borderRadius: "12px" } }}
+              error={!!errors.modele}
+              helperText={errors.modele}
               InputProps={{
                 startAdornment: (
-                  <IconButton sx={{ color: "#1976d2" }}>
-                    <AiOutlineNumber />
-                  </IconButton>
+                  <AiOutlineCar style={{ marginRight: "8px", color: "#1976D2" }} />
                 ),
               }}
             />
           </Grid>
+
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth variant="outlined" sx={{ marginBottom: 2 }}>
+            <TextField
+              fullWidth
+              label="Immatriculation"
+              name="immatriculation"
+              value={vehicle.immatriculation}
+              onChange={handleInputChange}
+              error={!!errors.immatriculation}
+              helperText={errors.immatriculation}
+              InputProps={{
+                startAdornment: (
+                  <AiOutlineNumber style={{ marginRight: "8px", color: "#1976D2" }} />
+                ),
+              }}
+            />
+          </Grid>
+
+          {/* Image */}
+          <Grid item xs={12}>
+            <input
+              accept="image/*"
+              style={{ display: "none" }}
+              id="contained-button-file"
+              multiple
+              type="file"
+              onChange={handleFileChange}
+            />
+            <label htmlFor="contained-button-file">
+              <Button
+                variant="contained"
+                component="span"
+                startIcon={<AiOutlineUpload />}
+                fullWidth
+                sx={{
+                  backgroundColor: "#1976D2",
+                  "&:hover": { backgroundColor: "#1565C0" },
+                }}
+              >
+                Choisir une image
+              </Button>
+            </label>
+            {vehicle.image && (
+              <Box mt={2} display="flex" justifyContent="center">
+                <img
+                  src={URL.createObjectURL(vehicle.image)}
+                  alt="Preview"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+              </Box>
+            )}
+          </Grid>
+
+          {/* Détails supplémentaires */}
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom fontWeight="bold">
+              Détails supplémentaires
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Nombre de places"
+              name="nombrePlace"
+              type="number"
+              value={vehicle.nombrePlace}
+              onChange={(e) =>
+                setVehicle((prev) => ({
+                  ...prev,
+                  nombrePlace: parseInt(e.target.value, 10),
+                }))
+              }
+              error={!!errors.nombrePlace}
+              helperText={errors.nombrePlace}
+              InputProps={{
+                startAdornment: (
+                  <AiOutlineNumber style={{ marginRight: "8px", color: "#1976D2" }} />
+                ),
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
               <InputLabel>Type de véhicule</InputLabel>
               <Select
                 value={vehicle.type.type}
                 onChange={handleSelectType}
-                label="Type de véhicule"
-                sx={{ borderRadius: "12px" }}
+                displayEmpty
+                inputProps={{ "aria-label": "Type de véhicule" }}
               >
+                <MenuItem disabled value="">
+                  Sélectionnez un type
+                </MenuItem>
                 {vehicleTypes.map((type) => (
                   <MenuItem key={type.id} value={type.type}>
                     {type.type}
                   </MenuItem>
                 ))}
               </Select>
+              {errors.type && (
+                <FormHelperText error>{errors.type}</FormHelperText>
+              )}
             </FormControl>
           </Grid>
+
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth variant="outlined" sx={{ marginBottom: 2 }}>
-              <InputLabel>Status</InputLabel>
+            <FormControl fullWidth>
+              <InputLabel>Statut</InputLabel>
               <Select
                 value={vehicle.status.status}
                 onChange={handleSelectStatus}
-                label="Status"
-                sx={{ borderRadius: "12px" }}
+                displayEmpty
+                inputProps={{ "aria-label": "Statut" }}
               >
+                <MenuItem disabled value="">
+                  Sélectionnez un statut
+                </MenuItem>
                 {vehicleStatuses.map((status) => (
                   <MenuItem key={status.id} value={status.status}>
                     {status.status}
                   </MenuItem>
                 ))}
               </Select>
+              {errors.status && (
+                <FormHelperText error>{errors.status}</FormHelperText>
+              )}
             </FormControl>
           </Grid>
         </Grid>
-        <Box display="flex" justifyContent="flex-end">
-          <Button variant="contained" color="primary" type="submit" sx={{ borderRadius: "12px" }}>
-            Ajouter
-          </Button>
-          <Button variant="outlined" color="secondary" onClick={handleCancel} sx={{ borderRadius: "12px", marginLeft: 2 }}>
+
+        {/* Actions */}
+        <Box
+          sx={{
+            mt: 3,
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 2,
+          }}
+        >
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleCancel}
+            startIcon={<AiOutlineClose />}
+            sx={{
+              borderColor: "#FF5252",
+              color: "#FF5252",
+              "&:hover": { borderColor: "#E53935", color: "#E53935" },
+            }}
+          >
             Annuler
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={isLoading || Object.keys(errors).length > 0}
+            startIcon={isLoading ? <CircularProgress size={16} /> : <AiOutlineCar />}
+            sx={{
+              backgroundColor: "#1976D2",
+              "&:hover": { backgroundColor: "#1565C0" },
+            }}
+          >
+            Ajouter le véhicule
           </Button>
         </Box>
       </Box>

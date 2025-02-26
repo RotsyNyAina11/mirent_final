@@ -10,6 +10,7 @@ export interface Vehicle {
   nombrePlace: number;
   type: { id: number; type: string };
   status: { id: number; status: string };
+  image: File | null;
 }
 
 interface VehicleState {
@@ -42,10 +43,28 @@ export const fetchVehicles = createAsyncThunk("vehicles/fetchVehicles", async ()
   return response.data;
 });
 
-export const createVehicle = createAsyncThunk("vehicles/createVehicle", async (vehicle: Vehicle) => {
-  const response = await axios.post("http://localhost:3000/vehicles", vehicle);
-  return response.data;
-});
+export const createVehicle = createAsyncThunk(
+  "vehicles/createVehicle",
+  async (formData: FormData, { rejectWithValue }) => {
+    try {
+      const response = await fetch("http://localhost:3000/vehicles", {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create vehicle");
+      }
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      if (err instanceof Error) {
+        return rejectWithValue(err.message);
+      } else {
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  }
+);
 
 export const deleteVehicle = createAsyncThunk("vehicles/deleteVehicle", async (id: number) => {
   await axios.delete(`http://localhost:3000/vehicles/${id}`);

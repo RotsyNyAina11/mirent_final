@@ -27,7 +27,7 @@ var Client = /** @class */ (function () {
         typeorm_1.Column()
     ], Client.prototype, "phone");
     __decorate([
-        typeorm_1.Column({ nullable: true })
+        typeorm_1.Column({ type: 'varchar', nullable: true })
     ], Client.prototype, "logo");
     Client = __decorate([
         typeorm_1.Entity()

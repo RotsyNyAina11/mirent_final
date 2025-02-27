@@ -47,6 +47,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.ClientController = void 0;
 var common_1 = require("@nestjs/common");
+var platform_express_1 = require("@nestjs/platform-express");
+var multer_1 = require("multer");
+var path_1 = require("path");
 var ClientController = /** @class */ (function () {
     function ClientController(clientService) {
         this.clientService = clientService;
@@ -58,26 +61,37 @@ var ClientController = /** @class */ (function () {
             });
         });
     };
-    ClientController.prototype.create = function (createClientDto) {
+    ClientController.prototype.update = function (id, dto, file) {
         return __awaiter(this, void 0, Promise, function () {
+            var logo, updateClient, error_1;
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.clientService.create(createClientDto)];
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        logo = file
+                            ? "http://localhost:3000/uploads/" + file.filename
+                            : undefined;
+                        return [4 /*yield*/, this.clientService.update(id, dto, logo)];
+                    case 1:
+                        updateClient = _a.sent();
+                        return [2 /*return*/, updateClient];
+                    case 2:
+                        error_1 = _a.sent();
+                        console.error('Error during filr upload or update:', error_1);
+                        throw new common_1.InternalServerErrorException('Internal server error');
+                    case 3: return [2 /*return*/];
+                }
             });
         });
     };
-    ClientController.prototype.update = function (id, updateClientDto) {
+    ClientController.prototype.create = function (dto, file) {
         return __awaiter(this, void 0, Promise, function () {
-            var updatedClient;
+            var logo;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.clientService.update(id, updateClientDto)];
-                    case 1:
-                        updatedClient = _a.sent();
-                        if (!updatedClient) {
-                            throw new common_1.NotFoundException("Client avec ID " + id + " introuvable");
-                        }
-                        return [2 /*return*/, updatedClient];
-                }
+                logo = file
+                    ? "http://localhost:3000/uploads/" + file.filename
+                    : undefined;
+                return [2 /*return*/, this.clientService.create(dto, logo)];
             });
         });
     };
@@ -101,16 +115,36 @@ var ClientController = /** @class */ (function () {
         common_1.Get()
     ], ClientController.prototype, "findAll");
     __decorate([
-        common_1.Post(),
-        __param(0, common_1.Body())
-    ], ClientController.prototype, "create");
-    __decorate([
         common_1.Put(':id'),
-        __param(0, common_1.Param('id', common_1.ParseIntPipe)),
-        __param(1, common_1.Body())
+        common_1.UseInterceptors(platform_express_1.FileInterceptor('logo', {
+            storage: multer_1.diskStorage({
+                destination: './uploads',
+                filename: function (req, file, callback) {
+                    var uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    callback(null, file.fieldname + "-" + uniqueSuffix + path_1.extname(file.originalname));
+                }
+            })
+        })),
+        __param(0, common_1.Param('id')),
+        __param(1, common_1.Body()),
+        __param(2, common_1.UploadedFile())
     ], ClientController.prototype, "update");
     __decorate([
         common_1.Post(),
+        common_1.UsePipes(new common_1.ValidationPipe({ transform: true })),
+        common_1.UseInterceptors(platform_express_1.FileInterceptor('logo', {
+            storage: multer_1.diskStorage({
+                destination: './uploads',
+                filename: function (req, file, callback) {
+                    var uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    callback(null, file.fieldname + "-" + uniqueSuffix + path_1.extname(file.originalname));
+                }
+            })
+        })),
+        __param(0, common_1.Body()),
+        __param(1, common_1.UploadedFile())
+    ], ClientController.prototype, "create");
+    __decorate([
         common_1.Delete(':id'),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], ClientController.prototype, "remove");

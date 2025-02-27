@@ -27,8 +27,8 @@ var CreateClientDto = /** @class */ (function () {
         class_validator_1.IsNotEmpty()
     ], CreateClientDto.prototype, "phone");
     __decorate([
-        class_validator_1.IsString(),
-        class_validator_1.IsNotEmpty()
+        class_validator_1.IsOptional(),
+        class_validator_1.IsString()
     ], CreateClientDto.prototype, "logo");
     return CreateClientDto;
 }());

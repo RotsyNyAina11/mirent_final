@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Client } from 'src/entities/client.entity';
@@ -21,11 +21,13 @@ export class ClientService {
     return (result.affected ?? 0) > 0;
   }
 
-  async create(createClientDto: CreateClientDto): Promise<Client> {
-    const newClient = this.clientRepository.create(createClientDto);
-    return this.clientRepository.save(newClient);
+  async create(dto: CreateClientDto, logo?: string): Promise<Client> {
+    const client = this.clientRepository.create({
+      ...dto,
+      logo: logo || undefined,
+    });
+    return this.clientRepository.save(client);
   }
-
   async findOne(id: number): Promise<Client | null> {
     const client = await this.clientRepository.findOne({ where: { id } });
     if (!client) {
@@ -35,17 +37,19 @@ export class ClientService {
   }
   async update(
     id: number,
-    updateClientDto: UpdateClientDto,
+    dto: UpdateClientDto,
+    logo?: string,
   ): Promise<Client | null> {
-    const client = await this.clientRepository.preload({
-      id,
-      ...updateClientDto,
-    });
+    const client = await this.clientRepository.findOne({ where: { id } });
 
     if (!client) {
-      return null;
+      throw new NotFoundException('Client non trouvé');
     }
-
-    return this.clientRepository.save(client);
+    client.firstName = dto.firstName || client.firstName;
+    client.lastName = dto.lastName || client.lastName;
+    client.email = dto.email || client.email;
+    client.phone = dto.phone || client.phone;
+    client.logo = logo || client.logo;
+    return await this.clientRepository.save(client);
   }
 }

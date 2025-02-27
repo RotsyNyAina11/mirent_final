@@ -20,7 +20,6 @@ import { ClientModule } from './client/client.module';
     StatusModule,
     RegionModule,
     DistrictModule,
-
     ClientModule,
 
     ServeStaticModule.forRoot({

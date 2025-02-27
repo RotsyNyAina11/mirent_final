@@ -32,7 +32,8 @@ const DashboardCard = styled(Card)({
   backgroundColor: "#ffffff",
   borderRadius: "12px",
   boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.08)",
-  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out",
+  transition:
+    "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out",
   "&:hover": {
     transform: "scale(1.03)",
     boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
@@ -76,26 +77,30 @@ const LoadingIndicator = styled(CircularProgress)({
   transform: "translate(-50%, -50%)",
 });
 
-
 const Accueil: React.FC = () => {
   const theme = useTheme();
 
-
-  const [availableVehiclesCount, setAvailableVehiclesCount] = useState<number | null>(null);
+  const [availableVehiclesCount, setAvailableVehiclesCount] = useState<
+    number | null
+  >(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchAvailableVehicles = async () => {
       try {
-        const response = await fetch("http://localhost:3000/vehicles/available-count"); 
+        const response = await fetch(
+          "http://localhost:3000/vehicles/available-count"
+        );
         const data = await response.json();
         console.log("Réponse complète de l'API:", data);
         console.log("Type de data:", typeof data);
         console.log("Clés disponibles dans data:", Object.keys(data));
         setAvailableVehiclesCount(data);
-
       } catch (error) {
-        console.error("Erreur lors de la récupération des véhicules disponibles", error);
+        console.error(
+          "Erreur lors de la récupération des véhicules disponibles",
+          error
+        );
       } finally {
         setLoading(false);
       }
@@ -103,9 +108,6 @@ const Accueil: React.FC = () => {
 
     fetchAvailableVehicles();
   }, []);
-
-
-
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -115,22 +117,38 @@ const Accueil: React.FC = () => {
             A
           </Typography>
         </AvatarStyled>
-        <Typography variant="h4" gutterBottom sx={{ fontFamily: "'Roboto', sans-serif", fontWeight: 600 }}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ fontFamily: "'Roboto', sans-serif", fontWeight: 600 }}
+        >
           Bienvenue, Administrateur !
         </Typography>
-        <Typography variant="subtitle1" paragraph sx={{ fontSize: "1rem", color: theme.palette.text.secondary }}>
-          Découvrez vos statistiques et gérez votre flotte de véhicules de manière optimisée.
+        <Typography
+          variant="subtitle1"
+          paragraph
+          sx={{ fontSize: "1rem", color: theme.palette.text.secondary }}
+        >
+          Découvrez vos statistiques et gérez votre flotte de véhicules de
+          manière optimisée.
         </Typography>
       </StyledBox>
 
       <Box sx={{ py: 4 }}>
-        <Typography variant="h5" align="center" gutterBottom sx={{ fontWeight: "bold", color: theme.palette.primary.main }}>
+        <Typography
+          variant="h5"
+          align="center"
+          gutterBottom
+          sx={{ fontWeight: "bold", color: theme.palette.primary.main }}
+        >
           Tableau de bord
         </Typography>
         <Grid container spacing={4} justifyContent="center">
           <Grid item xs={12} sm={6} md={3}>
             <DashboardCard>
-              <IconButton sx={{ fontSize: "2.5rem", color: theme.palette.primary.main }}>
+              <IconButton
+                sx={{ fontSize: "2.5rem", color: theme.palette.primary.main }}
+              >
                 <CarRental />
               </IconButton>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
@@ -140,14 +158,18 @@ const Accueil: React.FC = () => {
                 <LoadingIndicator />
               ) : (
                 <Typography variant="h4" color="text.primary">
-                  {availableVehiclesCount !== null ? availableVehiclesCount : "Erreur"}
+                  {availableVehiclesCount !== null
+                    ? availableVehiclesCount
+                    : "Erreur"}
                 </Typography>
               )}
             </DashboardCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <DashboardCard>
-              <IconButton sx={{ fontSize: "2.5rem", color: theme.palette.secondary.main }}>
+              <IconButton
+                sx={{ fontSize: "2.5rem", color: theme.palette.secondary.main }}
+              >
                 <Home />
               </IconButton>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
@@ -161,7 +183,9 @@ const Accueil: React.FC = () => {
 
           <Grid item xs={12} sm={6} md={3}>
             <DashboardCard>
-              <IconButton sx={{ fontSize: "2.5rem", color: theme.palette.info.main }}>
+              <IconButton
+                sx={{ fontSize: "2.5rem", color: theme.palette.info.main }}
+              >
                 <Person />
               </IconButton>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
@@ -175,7 +199,9 @@ const Accueil: React.FC = () => {
 
           <Grid item xs={12} sm={6} md={3}>
             <DashboardCard>
-              <IconButton sx={{ fontSize: "2.5rem", color: theme.palette.success.main }}>
+              <IconButton
+                sx={{ fontSize: "2.5rem", color: theme.palette.success.main }}
+              >
                 <MonetizationOn />
               </IconButton>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
@@ -189,22 +215,42 @@ const Accueil: React.FC = () => {
         </Grid>
       </Box>
       <Box sx={{ py: 4 }}>
-        <Typography variant="h5" align="center" gutterBottom sx={{ fontWeight: "bold", color: theme.palette.primary.main }}>
+        <Typography
+          variant="h5"
+          align="center"
+          gutterBottom
+          sx={{ fontWeight: "bold", color: theme.palette.primary.main }}
+        >
           Actions rapides
         </Typography>
         <Grid container spacing={3} justifyContent="center">
           <Grid item xs={12} sm={6} md={3}>
-            <ActionButton variant="contained" color="primary" fullWidth href="/vehicules">
+            <ActionButton
+              variant="contained"
+              color="primary"
+              fullWidth
+              href="/vehicules"
+            >
               Gérer les véhicules
             </ActionButton>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <ActionButton variant="contained" color="secondary" fullWidth href="/clients">
+            <ActionButton
+              variant="contained"
+              color="secondary"
+              fullWidth
+              href="/clients"
+            >
               Gérer les clients
             </ActionButton>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <ActionButton variant="contained" color="primary" fullWidth href="/reservations">
+            <ActionButton
+              variant="contained"
+              color="primary"
+              fullWidth
+              href="/reservations"
+            >
               Voir les réservations
             </ActionButton>
           </Grid>

@@ -1,4 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../redux/store";
+import {
+  fetchClients,
+  addClient,
+  updateClient,
+  deleteClient,
+} from "../redux/slices/customersSlice";
 import {
   Table,
   TableBody,
@@ -15,9 +23,12 @@ import {
   DialogActions,
   Typography,
   Box,
+  Avatar,
+  Stack,
+  Grid,
 } from "@mui/material";
-//import image from "../assets/logo.png";
 
+// Définition du type Customer
 interface Customer {
   id: number;
   firstName: string;
@@ -28,7 +39,11 @@ interface Customer {
 }
 
 const CustomerManagement: React.FC = () => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { clients, loading, error } = useSelector(
+    (state: RootState) => state.customer
+  );
+
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
@@ -42,201 +57,209 @@ const CustomerManagement: React.FC = () => {
     logo: "",
   });
 
-  const fetchCustomers = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/clients");
-      const data = await response.json();
-      console.log("Données reçues :", data); // Vérifie la structure
+  useEffect(() => {
+    dispatch(fetchClients());
+  }, [dispatch]);
 
-      // Assurer que `data` est bien un tableau avant de le stocker
-      setCustomers(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Erreur lors du chargement des clients :", error);
-      setCustomers([]); // Évite l'erreur `map()` en mettant un tableau vide
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleAddOrEditCustomer = async () => {
-    const url = editMode
-      ? `http://localhost:3000/clients/${selectedCustomer?.id}`
-      : "http://localhost:3000/clients";
-    const method = editMode ? "PUT" : "POST";
-
-    // Assurez-vous que tous les champs requis sont présents
-    const payload = {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      email: form.email,
-      phone: form.phone,
-      logo: form.logo || "default-logo.png", // Valeur par défaut si le logo est manquant
-    };
-
-    try {
-      console.log("Données envoyées :", payload); // Log les données envoyées
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      console.log("Réponse de l'API :", data); // Log la réponse
-
-      if (response.ok) {
-        setOpen(false);
-        setEditMode(false);
-        setSelectedCustomer(null);
-        setForm({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-          logo: "",
-        });
-        fetchCustomers();
-      } else {
-        console.error("Erreur lors de la modification/ajout du client :", data);
-      }
-    } catch (error) {
-      console.error("Erreur réseau :", error);
+    if (editMode && selectedCustomer) {
+      dispatch(updateClient({ id: selectedCustomer.id, ...form }));
+    } else {
+      dispatch(addClient(form));
     }
+    handleCloseDialog();
   };
 
-  const handleDeleteCustomer = async (id: number) => {
-    await fetch(`http://localhost:3000/clients/${id}`, { method: "DELETE" });
-    fetchCustomers();
+  const handleDeleteCustomer = (id: number) => {
+    dispatch(deleteClient(id));
   };
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
+  const handleOpenDialog = (customer?: Customer) => {
+    if (customer) {
+      setSelectedCustomer(customer);
+      setForm(customer);
+      setEditMode(true);
+    } else {
+      setSelectedCustomer(null);
+      setForm({ firstName: "", lastName: "", email: "", phone: "", logo: "" });
+      setEditMode(false);
+    }
+    setOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+    setSelectedCustomer(null);
+    setEditMode(false);
+    setForm({ firstName: "", lastName: "", email: "", phone: "", logo: "" });
+  };
 
   return (
-    <Box sx={{ maxWidth: "100%", margin: "auto", marginTop: 4 }}>
-      <Typography variant="h5" align="center">
+    <Box sx={{ maxWidth: "95%", margin: "auto", marginTop: 4 }}>
+      <Typography
+        variant="h5"
+        align="center"
+        sx={{ fontWeight: "bold", mb: 2 }}
+      >
         Gestion des Clients
       </Typography>
 
-      <Button
-        variant="outlined"
-        onClick={() => {
-          setOpen(true);
-          setEditMode(true);
-        }}
-      >
-        Ajouter un Client
-      </Button>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleOpenDialog()}
+        >
+          Ajouter un Client
+        </Button>
+      </Box>
 
-      <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+      {/* Boîte de dialogue pour l'ajout/modification */}
+      <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ fontWeight: "bold", textAlign: "center" }}>
+          {editMode ? "Modifier Client" : "Ajouter Client"}
+        </DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sx={{ textAlign: "center" }}>
+              <Avatar
+                src={form.logo}
+                sx={{ width: 80, height: 80, margin: "auto" }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="logo"
+                type="file"
+                fullWidth
+                onChange={(e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (file) {
+                    setForm({ ...form, logo: URL.createObjectURL(file) });
+                  }
+                }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                name="lastName"
+                label="Nom"
+                type="text"
+                fullWidth
+                value={form.lastName}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                name="firstName"
+                label="Prénoms"
+                type="text"
+                fullWidth
+                value={form.firstName}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="email"
+                label="Email"
+                type="email"
+                fullWidth
+                value={form.email}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="phone"
+                label="Téléphone"
+                type="text"
+                fullWidth
+                value={form.phone}
+                onChange={handleInputChange}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="error">
+            Annuler
+          </Button>
+          <Button
+            onClick={handleAddOrEditCustomer}
+            color="primary"
+            variant="contained"
+          >
+            {editMode ? "Modifier" : "Ajouter"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Affichage des erreurs ou du chargement */}
+      {loading && <Typography align="center">Chargement...</Typography>}
+      {error && (
+        <Typography align="center" color="error">
+          {error}
+        </Typography>
+      )}
+
+      {/* Tableau des clients */}
+      <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
         <Table>
           <TableHead sx={{ backgroundColor: "#E2F0FB" }}>
             <TableRow>
-              <TableCell sx={{ color: "black", fontWeight: "bold" }}>
-                Nom
-              </TableCell>
-              <TableCell sx={{ color: "black", fontWeight: "bold" }}>
-                Prénoms
-              </TableCell>
-              <TableCell sx={{ color: "black", fontWeight: "bold" }}>
-                Email
-              </TableCell>
-              <TableCell sx={{ color: "black", fontWeight: "bold" }}>
-                Téléphone
-              </TableCell>
-              <TableCell sx={{ color: "black", fontWeight: "bold" }}>
-                Actions
-              </TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Logo</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Nom</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Prénoms</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Téléphone</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
             </TableRow>
           </TableHead>
-
           <TableBody>
-            {customers.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} align="center">
-                  Aucun client trouvé
-                </TableCell>
-              </TableRow>
-            ) : (
-              customers.map((customer) => (
+            {clients.length > 0 ? (
+              clients.map((customer) => (
                 <TableRow key={customer.id}>
+                  <TableCell>
+                    <Avatar src={customer.logo} />
+                  </TableCell>
                   <TableCell>{customer.lastName}</TableCell>
                   <TableCell>{customer.firstName}</TableCell>
                   <TableCell>{customer.email}</TableCell>
                   <TableCell>{customer.phone}</TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() => {
-                        setSelectedCustomer(customer);
-                        setForm(customer);
-                        setEditMode(true);
-                        setOpen(true);
-                        console.log(
-                          "Client sélectionné pour modification :",
-                          customer
-                        ); // Log le client sélectionné
-                      }}
-                    >
-                      Modifier
-                    </Button>
-                    <Button
-                      onClick={() => handleDeleteCustomer(customer.id)}
-                      color="error"
-                    >
-                      Supprimer
-                    </Button>
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        onClick={() => handleOpenDialog(customer)}
+                        color="primary"
+                      >
+                        Modifier
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteCustomer(customer.id)}
+                        color="error"
+                      >
+                        Supprimer
+                      </Button>
+                    </Stack>
                   </TableCell>
                 </TableRow>
               ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  Aucun client trouvé.
+                </TableCell>
+              </TableRow>
             )}
           </TableBody>
         </Table>
       </TableContainer>
-
-      {/* Popup pour Ajouter/Modifier un Client */}
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>
-          {editMode ? "Modifier le Client" : "Ajouter un Client"}
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Prénom"
-            value={form.firstName}
-            onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-            fullWidth
-            sx={{ marginBottom: 2 }}
-          />
-          <TextField
-            label="Nom"
-            value={form.lastName}
-            onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-            fullWidth
-            sx={{ marginBottom: 2 }}
-          />
-          <TextField
-            label="Email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            fullWidth
-            sx={{ marginBottom: 2 }}
-          />
-          <TextField
-            label="Téléphone"
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            fullWidth
-            sx={{ marginBottom: 2 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color="error">
-            Annuler
-          </Button>
-          <Button onClick={handleAddOrEditCustomer} variant="contained">
-            {editMode ? "Modifier" : "Ajouter"}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

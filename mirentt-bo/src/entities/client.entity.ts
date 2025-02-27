@@ -17,6 +17,6 @@ export class Client {
   @Column()
   phone: string;
 
-  @Column({ nullable: true })
-  logo: string;
+  @Column({ type: 'varchar', nullable: true })
+  logo: string | null;
 }

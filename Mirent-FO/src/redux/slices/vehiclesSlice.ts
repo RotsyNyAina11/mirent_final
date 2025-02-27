@@ -27,22 +27,26 @@ const initialState: VehicleState = {
   vehiclesStatus: [],
 };
 
+// Afficher les status de vehicules
 export const fetchVehicleStatuses = createAsyncThunk("vehicles/fetchVehicleStatuses", async () => {
   const response = await axios.get("http://localhost:3000/status");
   return response.data;
 });
 
-
+// Afficher les types de  vehicules
 export const fetchVehicleTypes = createAsyncThunk("vehicles/fetchVehicleTypes", async () => {
   const response = await axios.get("http://localhost:3000/type");
   return response.data;
 });
 
+// Affcher les vehicules
 export const fetchVehicles = createAsyncThunk("vehicles/fetchVehicles", async () => {
   const response = await axios.get("http://localhost:3000/vehicles"); 
   return response.data;
 });
 
+
+// Creer un vehicule
 export const createVehicle = createAsyncThunk(
   "vehicles/createVehicle",
   async (formData: FormData, { rejectWithValue }) => {
@@ -66,10 +70,35 @@ export const createVehicle = createAsyncThunk(
   }
 );
 
+// Supprimer un vehicule
 export const deleteVehicle = createAsyncThunk("vehicles/deleteVehicle", async (id: number) => {
   await axios.delete(`http://localhost:3000/vehicles/${id}`);
   return id;
 });
+
+// Modifier un vehicule
+export const updateVehicle = createAsyncThunk(
+  "vehicles/updateVehicle",
+  async ({ id, formData }: { id: number; formData: FormData }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`http://localhost:3000/vehicles/${id}`, {
+        method: "PUT",
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update vehicle");
+      }
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      if (err instanceof Error) {
+        return rejectWithValue(err.message);
+      } else {
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  } 
+);
 
 const vehiclesSlice = createSlice({
   name: "vehicles",

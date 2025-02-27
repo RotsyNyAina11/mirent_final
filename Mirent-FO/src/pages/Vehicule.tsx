@@ -21,13 +21,14 @@ import {
   Chip,
   Skeleton,
   InputAdornment,
-  useMediaQuery,
 } from "@mui/material";
-import { Delete, Search, Edit, Add } from "@mui/icons-material";
-import { deleteVehicle, fetchVehicles } from "../redux/slices/vehiclesSlice";
+import { Delete, Search, Edit, Add} from "@mui/icons-material";
+import { deleteVehicle, fetchVehicles, Vehicle } from "../redux/slices/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 import { useSelector } from "react-redux";
 import AddVehicle from "../Components/AddVehicle";
+
+
 
 const VehiclesList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -37,6 +38,8 @@ const VehiclesList: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(6);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [vehicleToDelete, setVehicleToDelete] = useState<any>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [filterType, setFilterType] = useState<string>("");
   const [vehicleTypes, setVehicleTypes] = useState<string[]>([]);
@@ -76,6 +79,11 @@ const VehiclesList: React.FC = () => {
       );
     });
   }, [vehicles, search, filterType]);
+
+  const handleEditClick = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
+    setIsEditOpen(true);
+  };
 
   const handleDeleteVehicle = () => {
     dispatch(deleteVehicle(vehicleToDelete.id));
@@ -131,7 +139,7 @@ const VehiclesList: React.FC = () => {
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
             label="Filtrer par type"
-          >
+          > 
             <MenuItem value="">Tous</MenuItem>
             {vehicleTypes.map((type) => (
               <MenuItem key={type} value={type}>
@@ -239,9 +247,9 @@ const VehiclesList: React.FC = () => {
                   {/* Actions (Modifier / Supprimer) */}
                   <Box display="flex" justifyContent="space-between" mt={2}>
                     <Tooltip title="Modifier">
-                      <IconButton color="primary">
-                        <Edit sx={{ transform: "scale(1.1)", transition: "transform 0.3s" }} />
-                      </IconButton>
+                    <IconButton color="primary" onClick={() => handleEditClick(veh)}>
+                      <Edit />
+                    </IconButton>
                     </Tooltip>
                     <Tooltip title="Supprimer">
                       <IconButton
@@ -256,8 +264,8 @@ const VehiclesList: React.FC = () => {
                     </Tooltip>
                   </Box>
                 </Paper>
-              </Grid>
-            ))}
+                </Grid>
+              ))}
         </Grid>
       )}
 

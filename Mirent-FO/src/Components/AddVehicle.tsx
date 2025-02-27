@@ -11,7 +11,6 @@ import {
   DialogTitle,
   Grid,
   CircularProgress,
-  Alert,
   FormHelperText,
   Typography,
   SelectChangeEvent,
@@ -20,6 +19,7 @@ import { createVehicle, Vehicle } from "../redux/slices/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 import { toast } from "react-toastify"; 
 import { AiOutlineCar, AiOutlineTag, AiOutlineNumber, AiOutlineClose, AiOutlineUpload } from "react-icons/ai";
+import { CameraAltOutlined } from "@mui/icons-material";
 
 interface AddVehicleProps {
   open: boolean;
@@ -216,6 +216,48 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
             </Typography>
           </Grid>
 
+             {/* Image */}
+             <Grid item xs={12}>
+            <input
+              accept="image/*"
+              style={{ display: "none" }}
+              id="contained-button-file"
+              multiple
+              type="file"
+              onChange={handleFileChange}
+            />
+            <label htmlFor="contained-button-file">
+              <Button
+                variant="contained"
+                component="span"
+                startIcon={<CameraAltOutlined />}
+                fullWidth
+                sx={{
+                  backgroundColor: "#1976D2",
+                  "&:hover": { backgroundColor: "#1565C0" },
+                }}
+              >
+                Choisir une image
+              </Button>
+            </label>
+            {vehicle.image && (
+              <Box mt={2} display="flex" justifyContent="center">
+                <img
+                  src={URL.createObjectURL(vehicle.image)}
+                  alt="Preview"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+              </Box>
+            )}
+          </Grid>
+
+
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -282,47 +324,6 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
                 ),
               }}
             />
-          </Grid>
-
-          {/* Image */}
-          <Grid item xs={12}>
-            <input
-              accept="image/*"
-              style={{ display: "none" }}
-              id="contained-button-file"
-              multiple
-              type="file"
-              onChange={handleFileChange}
-            />
-            <label htmlFor="contained-button-file">
-              <Button
-                variant="contained"
-                component="span"
-                startIcon={<AiOutlineUpload />}
-                fullWidth
-                sx={{
-                  backgroundColor: "#1976D2",
-                  "&:hover": { backgroundColor: "#1565C0" },
-                }}
-              >
-                Choisir une image
-              </Button>
-            </label>
-            {vehicle.image && (
-              <Box mt={2} display="flex" justifyContent="center">
-                <img
-                  src={URL.createObjectURL(vehicle.image)}
-                  alt="Preview"
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-              </Box>
-            )}
           </Grid>
 
           {/* Détails supplémentaires */}

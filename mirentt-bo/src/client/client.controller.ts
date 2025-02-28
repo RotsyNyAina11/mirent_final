@@ -26,6 +26,11 @@ import { extname } from 'path';
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
+  @Get('client-count')
+  async getClientCount(): Promise<number> {
+    return this.clientService.getClientCount();
+  }
+
   @Get()
   async findAll(): Promise<Client[]> {
     return this.clientService.findAll();

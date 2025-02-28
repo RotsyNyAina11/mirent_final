@@ -54,6 +54,13 @@ var ClientController = /** @class */ (function () {
     function ClientController(clientService) {
         this.clientService = clientService;
     }
+    ClientController.prototype.getClientCount = function () {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.clientService.getClientCount()];
+            });
+        });
+    };
     ClientController.prototype.findAll = function () {
         return __awaiter(this, void 0, Promise, function () {
             return __generator(this, function (_a) {
@@ -111,6 +118,9 @@ var ClientController = /** @class */ (function () {
             });
         });
     };
+    __decorate([
+        common_1.Get('client-count')
+    ], ClientController.prototype, "getClientCount");
     __decorate([
         common_1.Get()
     ], ClientController.prototype, "findAll");

@@ -6,6 +6,7 @@ import vehiclesReducer from "./slices/vehiclesSlice";
 import { create } from "zustand";
 import { Proforma } from "../types/Proforma";
 import customersReducer from "./slices/customersSlice";
+import proformaReducer from "./slices/proformaSlice";
 interface ProformaState {
   proformas: Proforma[];
   addProforma: (newProforma: Proforma) => void;
@@ -24,6 +25,7 @@ export const store = configureStore({
     sidebar: sidebarReducer,
     filter: filterReducer,
     customer: customersReducer,
+    proforma: proformaReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

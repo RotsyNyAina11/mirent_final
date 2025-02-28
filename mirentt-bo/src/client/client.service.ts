@@ -12,6 +12,16 @@ export class ClientService {
     private clientRepository: Repository<Client>,
   ) {}
 
+  async getClientCount(): Promise<number> {
+    const availableClientCount = await this.clientRepository.count({});
+
+    if (availableClientCount === 0) {
+      throw new NotFoundException('Aucun client disponible trouvé');
+    }
+
+    return availableClientCount;
+  }
+
   findAll(): Promise<Client[]> {
     return this.clientRepository.find();
   }
@@ -28,6 +38,7 @@ export class ClientService {
     });
     return this.clientRepository.save(client);
   }
+
   async findOne(id: number): Promise<Client | null> {
     const client = await this.clientRepository.findOne({ where: { id } });
     if (!client) {
@@ -35,6 +46,7 @@ export class ClientService {
     }
     return client;
   }
+
   async update(
     id: number,
     dto: UpdateClientDto,
@@ -45,11 +57,13 @@ export class ClientService {
     if (!client) {
       throw new NotFoundException('Client non trouvé');
     }
+
     client.firstName = dto.firstName || client.firstName;
     client.lastName = dto.lastName || client.lastName;
     client.email = dto.email || client.email;
     client.phone = dto.phone || client.phone;
     client.logo = logo || client.logo;
+
     return await this.clientRepository.save(client);
   }
 }

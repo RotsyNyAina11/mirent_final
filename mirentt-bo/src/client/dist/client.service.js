@@ -64,6 +64,22 @@ var ClientService = /** @class */ (function () {
     function ClientService(clientRepository) {
         this.clientRepository = clientRepository;
     }
+    ClientService.prototype.getClientCount = function () {
+        return __awaiter(this, void 0, Promise, function () {
+            var availableClientCount;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.clientRepository.count({})];
+                    case 1:
+                        availableClientCount = _a.sent();
+                        if (availableClientCount === 0) {
+                            throw new common_1.NotFoundException('Aucun client disponible trouvé');
+                        }
+                        return [2 /*return*/, availableClientCount];
+                }
+            });
+        });
+    };
     ClientService.prototype.findAll = function () {
         return this.clientRepository.find();
     };

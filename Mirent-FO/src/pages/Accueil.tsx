@@ -109,6 +109,37 @@ const Accueil: React.FC = () => {
     fetchAvailableVehicles();
   }, []);
 
+  const [availableClientsCount, setAvailableClientsCount] = useState<
+    number | null
+  >(null);
+
+  useEffect(() => {
+    const fetchAvailableClients = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/clients/client-count"
+        );
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log("Nombre de clients disponibles :", data);
+          setAvailableClientsCount(data);
+        } else {
+          console.error("Erreur API:", data.message);
+          setAvailableClientsCount(null);
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des clients disponibles",
+          error
+        );
+        setAvailableClientsCount(null);
+      }
+    };
+
+    fetchAvailableClients();
+  }, []);
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <StyledBox>
@@ -184,16 +215,22 @@ const Accueil: React.FC = () => {
           <Grid item xs={12} sm={6} md={3}>
             <DashboardCard>
               <IconButton
-                sx={{ fontSize: "2.5rem", color: theme.palette.info.main }}
+                sx={{ fontSize: "2.5rem", color: theme.palette.warning.main }}
               >
                 <Person />
               </IconButton>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                Nouveaux clients
+                Clients disponibles
               </Typography>
-              <Typography variant="h4" color="text.primary">
-                15
-              </Typography>
+              {availableClientsCount !== null ? (
+                <Typography variant="h4" color="text.primary">
+                  {availableClientsCount}
+                </Typography>
+              ) : (
+                <Typography variant="h4" color="text.primary">
+                  Erreur
+                </Typography>
+              )}
             </DashboardCard>
           </Grid>
 

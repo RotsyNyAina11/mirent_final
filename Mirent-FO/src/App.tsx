@@ -12,11 +12,11 @@ import Sidebar from "./Components/Sidebar";
 import Login from "./Components/Login";
 import ClientList from "./pages/CustomerPage";
 import Reservations from "./pages/reservation";
-import Performat from "./pages/Commande";
+import Performat from "./pages/ProformaTable";
 import Devis from "./pages/Devis";
 import Facturation from "./pages/FacturationPage";
-import ProformaList from "./pages/ProformaList";
-
+//import ProformaList from "./pages/ProformaList";
+import ProformaForm from "./Components/ProformaForm";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -39,6 +39,7 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         {/* Route pour la page de connexion */}
+        {/*<Route path="/" element={<Login />} />*/}
         <Route path="/login" element={<Login />} />
 
         {/* Route pour l'accueil avec Sidebar */}
@@ -83,6 +84,15 @@ const App: React.FC = () => {
           path="/proformat"
           element={
             <MainLayout>
+              <ProformaForm />
+            </MainLayout>
+          }
+        />
+        {/** Route pour la page Table proforma*/}
+        <Route
+          path="/tableau_proforma"
+          element={
+            <MainLayout>
               <Performat />
             </MainLayout>
           }
@@ -108,7 +118,6 @@ const App: React.FC = () => {
         />
         {/* Redirection par défaut vers /accueil */}
         <Route path="" element={<Navigate to="/accueil" />} />
-        <Route path="/proformat-list" element={<ProformaList />} />
       </Routes>
     </Router>
   );

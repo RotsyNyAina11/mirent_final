@@ -10,7 +10,7 @@ export interface Vehicle {
   nombrePlace: number;
   type: { id: number; type: string };
   status: { id: number; status: string };
-  image: File | null;
+  imageUrl: string;
 }
 
 interface VehicleState {
@@ -119,6 +119,11 @@ const vehiclesSlice = createSlice({
       .addCase(createVehicle.fulfilled, (state, action) => {
         state.vehicles.push(action.payload);
       })
+      .addCase(updateVehicle.fulfilled, (state, action) => {
+        state.vehicles = state.vehicles.map((vehicle) =>
+          vehicle.id === action.payload.id ? action.payload : vehicle
+        );
+      })      
       .addCase(deleteVehicle.fulfilled, (state, action) => {
         state.vehicles = state.vehicles.filter((vehicle) => vehicle.id !== action.payload);
       })

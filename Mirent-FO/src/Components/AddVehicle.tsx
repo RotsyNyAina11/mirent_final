@@ -18,7 +18,7 @@ import {
 import { createVehicle, Vehicle } from "../redux/slices/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 import { toast } from "react-toastify"; 
-import { AiOutlineCar, AiOutlineTag, AiOutlineNumber, AiOutlineClose, AiOutlineUpload } from "react-icons/ai";
+import { AiOutlineCar, AiOutlineTag, AiOutlineNumber, AiOutlineClose } from "react-icons/ai";
 import { CameraAltOutlined } from "@mui/icons-material";
 
 interface AddVehicleProps {
@@ -36,7 +36,7 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
     nombrePlace: 0,
     type: { id: 0, type: "" },
     status: { id: 0, status: "" },
-    image: null as File | null,
+    imageUrl: "",
   });
 
   const [vehicleTypes, setVehicleTypes] = useState<any[]>([]);
@@ -100,7 +100,7 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
     if (file) {
       setVehicle((prev) => ({
         ...prev,
-        image: file,
+        imageUrl: URL.createObjectURL(file),
       }));
     }
   };
@@ -111,10 +111,12 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
 
     const selectedType = vehicleTypes.find((type) => type.type === value);
     if (selectedType) {
-      setVehicle((prev) => ({
-        ...prev,
-        type: { id: selectedType.id, type: selectedType.type },
-      }));
+      setVehicle((prev) => {
+        return {
+          ...prev,
+          type: { id: selectedType.id, type: selectedType.type },
+        };
+      });
     }
   };
 
@@ -125,10 +127,12 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
 
     const selectedStatus = vehicleStatuses.find((status) => status.status === value);
     if (selectedStatus) {
-      setVehicle((prev) => ({
-        ...prev,
-        status: { id: selectedStatus.id, status: selectedStatus.status },
-      }));
+      setVehicle((prev) => {
+        return {
+          ...prev,
+          status: { id: selectedStatus.id, status: selectedStatus.status },
+        };
+      });
     }
   };
 
@@ -161,8 +165,8 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
       formData.append("typeId", vehicle.type.id.toString());
       formData.append("statusId", vehicle.status.id.toString());
 
-      if (vehicle.image) {
-        formData.append("image", vehicle.image);
+      if (vehicle.imageUrl) {
+        formData.append("image", vehicle.imageUrl);
       }
 
       await dispatch(createVehicle(formData));
@@ -185,7 +189,7 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
       nombrePlace: 0,
       type: { id: 0, type: "" },
       status: { id: 0, status: "" },
-      image: null,
+      imageUrl: "",
     });
     onClose();
   };
@@ -218,6 +222,21 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
 
              {/* Image */}
              <Grid item xs={12}>
+             {vehicle.imageUrl && (
+              <Box  sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+                <img
+                  src={vehicle.imageUrl}
+                  alt="Preview"
+                  style={{
+                    width: "200px",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+              </Box>
+            )}
             <input
               accept="image/*"
               style={{ display: "none" }}
@@ -240,21 +259,6 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
                 Choisir une image
               </Button>
             </label>
-            {vehicle.image && (
-              <Box mt={2} display="flex" justifyContent="center">
-                <img
-                  src={URL.createObjectURL(vehicle.image)}
-                  alt="Preview"
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-              </Box>
-            )}
           </Grid>
 
 

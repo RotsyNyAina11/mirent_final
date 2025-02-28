@@ -22,13 +22,12 @@ import {
   Skeleton,
   InputAdornment,
 } from "@mui/material";
-import { Delete, Search, Edit, Add} from "@mui/icons-material";
+import { Delete, Search, Edit, Add } from "@mui/icons-material";
 import { deleteVehicle, fetchVehicles, Vehicle } from "../redux/slices/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 import { useSelector } from "react-redux";
 import AddVehicle from "../Components/AddVehicle";
-
-
+import EditVehicle from "../Components/EditVehicle";
 
 const VehiclesList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -45,7 +44,6 @@ const VehiclesList: React.FC = () => {
   const [vehicleTypes, setVehicleTypes] = useState<string[]>([]);
   const [showAddVehicle, setShowAddVehicle] = useState(false);
 
-  // Fetch vehicles and types of vehicles
   useEffect(() => {
     dispatch(fetchVehicles());
 
@@ -99,7 +97,6 @@ const VehiclesList: React.FC = () => {
       return false;
     }
   };
-  
 
   return (
     <Box
@@ -139,7 +136,7 @@ const VehiclesList: React.FC = () => {
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
             label="Filtrer par type"
-          > 
+          >
             <MenuItem value="">Tous</MenuItem>
             {vehicleTypes.map((type) => (
               <MenuItem key={type} value={type}>
@@ -188,127 +185,202 @@ const VehiclesList: React.FC = () => {
               <Grid item xs={12} sm={6} md={4} key={veh.id}>
                 <Paper
                   sx={{
-                    padding: 2,
+                    padding: 3,
                     boxShadow: 3,
                     borderRadius: 2,
                     position: "relative",
                     transition: "all 0.3s ease",
                     "&:hover": { boxShadow: 6, transform: "scale(1.05)", cursor: "pointer" },
+                    backgroundColor: "#ffffff",
                   }}
                 >
-                {/* Image avec gestion des erreurs */}
-                {veh.imageUrl && isValidImageUrl(veh.imageUrl) ? (
+                  {/* Image avec gestion des erreurs */}
+                  {veh.imageUrl && isValidImageUrl(veh.imageUrl) ? (
+                    <Box
+                      component="img"
+                      src={veh.imageUrl}
+                      alt={veh.nom}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "../assets/img-placeholder.jpg";
+                      }}
+                      sx={{
+                        width: "100%",
+                        height: 180,
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                        transition: "transform 0.2s ease-in-out",
+                        "&:hover": {
+                          transform: "scale(1.05)",
+                        },
+                      }}
+                    />
+                  ) : (
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      align="center"
+                      sx={{
+                        py: 3,
+                        backgroundColor: "#f5f5f5",
+                        borderRadius: "8px",
+                        height: 130,
+                      }}
+                    >
+                      Aucune image disponible
+                    </Typography>
+                  )}
+
                   <Box
-                    component="img"
-                    src={veh.imageUrl}
-                    alt={veh.nom}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "../assets/img-placeholder.jpg"; 
-                    }}
                     sx={{
-                      width: "100%", 
-                      height: 150, 
-                      objectFit: "cover",
-                      borderRadius: "8px", 
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", 
-                      transition: "transform 0.2s ease-in-out", 
-                      "&:hover": {
-                        transform: "scale(1.05)", 
-                      },
+                      padding: 2,
+                      backgroundColor: "#fff",
+                      boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
+                      transition: "all 0.3s ease",
                     }}
-                  />
-                ) : (
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    align="center"
-                    sx={{ py: 3, backgroundColor: "#f5f5f5", borderRadius: "8px" }}
                   >
-                    Aucune image disponible
-                  </Typography>
-                )}
+                    {/* Titre du véhicule */}
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: 600,
+                        color: "#333",
+                        marginBottom: 1,
+                        fontSize: "1.3rem",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {veh.nom}
+                    </Typography>
 
-                  {/* Informations sur le véhicule */}
-                  <Typography variant="h6" sx={{ fontWeight: "600", marginBottom: 1 }}>
-                    {veh.nom}
-                  </Typography>
-                  <Typography variant="subtitle1" sx={{ color: "#444", marginBottom: 1 }}>
-                    {veh.marque} {veh.modele}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    {veh.immatriculation}
-                  </Typography>
-                  <Chip
-                    label={veh.status?.status}
-                    color={veh.status?.status === "disponible" ? "success" : "error"}
-                    sx={{ marginTop: 1 }}
-                  />
-
-                  {/* Actions (Modifier / Supprimer) */}
-                  <Box display="flex" justifyContent="space-between" mt={2}>
-                    <Tooltip title="Modifier">
-                    <IconButton color="primary" onClick={() => handleEditClick(veh)}>
-                      <Edit />
-                    </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Supprimer">
-                      <IconButton
-                        color="error"
-                        onClick={() => {
-                          setVehicleToDelete(veh);
-                          setOpenDeleteDialog(true);
+                    {/* Marque et modèle */}
+                    <Box display="flex" justifyContent="space-between" sx={{ marginBottom: 2 }}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#555",
+                          fontSize: "1.1rem",
+                          fontWeight: 500,
                         }}
                       >
-                        <Delete sx={{ transform: "scale(1.1)", transition: "transform 0.3s" }} />
-                      </IconButton>
-                    </Tooltip>
+                        {veh.marque}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#555",
+                          fontSize: "1.1rem",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {veh.modele}
+                      </Typography>
+                    </Box>
+
+                    {/* Informations supplémentaires */}
+                    <Box
+                      display="grid"
+                      gridTemplateColumns="repeat(2, 1fr)"
+                      gap={2}
+                      sx={{ marginBottom: 2 }}
+                    >
+                      <Typography variant="body2" color="textSecondary">
+                        Immatriculation: {veh.immatriculation}
+                      </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                        Type: {veh.type?.type}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                        Status: {" "}
+                        <span
+                          style={{
+                          color: veh.status?.status === "Disponible" ? "green" : "red"
+                        }}
+                        >
+                         {veh.status?.status}
+                        </span>
+                        </Typography>
+                    </Box>
+
+                    <Box display="flex" justifyContent="space-between">
+                      {/* Boutons de modification et suppression */}
+                      <Tooltip title="Modifier le véhicule">
+                        <IconButton onClick={() => handleEditClick(veh)}>
+                          <Edit />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Supprimer le véhicule">
+                        <IconButton
+                          onClick={() => {
+                            setVehicleToDelete(veh);
+                            setOpenDeleteDialog(true);
+                          }}
+                        >
+                          <Delete color="error" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </Box>
                 </Paper>
-                </Grid>
-              ))}
+              </Grid>
+            ))}
         </Grid>
       )}
 
       {/* Pagination */}
       <TablePagination
-        rowsPerPageOptions={[6, 10, 25]}
+        rowsPerPageOptions={[6, 12, 18]}
         component="div"
         count={filteredVehicles.length}
         rowsPerPage={rowsPerPage}
         page={currentPage}
         onPageChange={(_, newPage) => setCurrentPage(newPage)}
         onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+        sx={{
+          marginTop: 3,
+          backgroundColor: "#fff",
+          borderRadius: "8px",
+          padding: "10px 15px",
+        }}
       />
 
-      {/* Confirmation de suppression */}
+      {/* Dialog de suppression */}
       <Dialog
         open={openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}
-        aria-labelledby="delete-dialog-title"
       >
-        <DialogTitle id="delete-dialog-title">
-          Êtes-vous sûr de vouloir supprimer ce véhicule ?
-        </DialogTitle>
+        <DialogTitle>Êtes-vous sûr de vouloir supprimer ce véhicule ?</DialogTitle>
         <DialogActions>
           <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
             Annuler
           </Button>
-          <Button onClick={handleDeleteVehicle} color="secondary">
+          <Button onClick={handleDeleteVehicle} color="error">
             Supprimer
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Notification de suppression réussie */}
+      {/* Snackbar de succès */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
         onClose={() => setOpenSnackbar(false)}
       >
-        <Alert severity="success" sx={{ width: "100%" }}>
+        <Alert onClose={() => setOpenSnackbar(false)} severity="success">
           Véhicule supprimé avec succès !
         </Alert>
       </Snackbar>
+
+      {/* Dialog d'édition */}
+      {isEditOpen && selectedVehicle && (
+        <EditVehicle
+          open={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          vehicle={selectedVehicle}
+        />
+      )}
     </Box>
   );
 };

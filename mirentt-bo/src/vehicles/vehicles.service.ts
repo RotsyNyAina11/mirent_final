@@ -77,14 +77,15 @@ export class VehiclesService {
           throw new BadRequestException('Type ou Status non trouvé');
         }
 
-        vehicule.nom = dto.nom ?? vehicule.nom;
-        vehicule.marque = dto.marque ?? vehicule.marque;
-        vehicule.modele = dto.modele ?? vehicule.modele;
-        vehicule.immatriculation = dto.immatriculation ?? vehicule.immatriculation;
-        vehicule.nombrePlace = dto.nombrePlace ?? vehicule.nombrePlace;
+        vehicule.nom = dto.nom || vehicule.nom;
+        vehicule.marque = dto.marque || vehicule.marque;
+        vehicule.modele = dto.modele || vehicule.modele;
+        vehicule.immatriculation = dto.immatriculation || vehicule.immatriculation;
+        vehicule.nombrePlace = dto.nombrePlace || vehicule.nombrePlace;
         vehicule.type = type;
         vehicule.status = status;
-        vehicule.imageUrl = imageUrl || vehicule.imageUrl; 
+        vehicule.imageUrl = imageUrl || vehicule.imageUrl;
+        
       
         return await this.vehiculeRepository.save(vehicule);
       }

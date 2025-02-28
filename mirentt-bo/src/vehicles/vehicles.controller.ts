@@ -65,7 +65,7 @@ export class VehiclesController {
           return callback(new BadRequestException('Invalid file type'), false);
         }
         callback(null, true);
-      }
+      } 
     }))
     async update(
       @Param('id') id: number,

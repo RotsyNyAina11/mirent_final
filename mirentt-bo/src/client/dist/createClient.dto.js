@@ -14,10 +14,6 @@ var CreateClientDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsString(),
         class_validator_1.IsNotEmpty()
-    ], CreateClientDto.prototype, "firstName");
-    __decorate([
-        class_validator_1.IsString(),
-        class_validator_1.IsNotEmpty()
     ], CreateClientDto.prototype, "lastName");
     __decorate([
         class_validator_1.IsEmail()

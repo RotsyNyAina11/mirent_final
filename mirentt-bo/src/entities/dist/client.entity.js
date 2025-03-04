@@ -16,9 +16,6 @@ var Client = /** @class */ (function () {
     ], Client.prototype, "id");
     __decorate([
         typeorm_1.Column()
-    ], Client.prototype, "firstName");
-    __decorate([
-        typeorm_1.Column()
     ], Client.prototype, "lastName");
     __decorate([
         typeorm_1.Column({ unique: true })

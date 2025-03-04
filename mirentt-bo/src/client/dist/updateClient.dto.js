@@ -14,10 +14,6 @@ var UpdateClientDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsString(),
         class_validator_1.IsOptional()
-    ], UpdateClientDto.prototype, "firstName");
-    __decorate([
-        class_validator_1.IsString(),
-        class_validator_1.IsOptional()
     ], UpdateClientDto.prototype, "lastName");
     __decorate([
         class_validator_1.IsEmail(),

@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 interface Customer {
   id: number;
-  firstName: string;
   lastName: string;
   email: string;
   phone: string;
@@ -35,7 +34,6 @@ export const addClient = createAsyncThunk(
   "clients/addClient",
   async (client: Omit<Customer, "id">) => {
     const formData = new FormData();
-    formData.append("firstName", client.firstName);
     formData.append("lastName", client.lastName);
     formData.append("email", client.email);
     formData.append("phone", client.phone);
@@ -58,7 +56,6 @@ export const updateClient = createAsyncThunk(
   "clients/updateClient",
   async (client: Customer) => {
     const formData = new FormData();
-    formData.append("firstName", client.firstName);
     formData.append("lastName", client.lastName);
     formData.append("email", client.email);
     formData.append("phone", client.phone);

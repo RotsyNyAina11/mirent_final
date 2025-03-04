@@ -1,6 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../redux/store";
-import { removeQuote } from "../redux/slices/proformaSlice";
 import {
   Table,
   TableBody,
@@ -17,7 +16,7 @@ import {
 import companyLogo from "../assets/horizontal.png"; // Logo de l’entreprise
 import clientLogo from "../assets/oms.png"; // Logo du client
 
-const QuoteTable = () => {
+const ProformaTable = () => {
   const quotes = useSelector((state: RootState) => state.proforma.quotes);
   const dispatch = useDispatch();
 
@@ -56,12 +55,13 @@ const QuoteTable = () => {
             alt="Logo de l'entreprise"
             style={{ width: 100, height: "auto" }}
           />
+          <Typography>Facture n**</Typography>
         </Grid>
 
         {/* Titre principal */}
         <Grid item xs={4} sx={{ textAlign: "center" }}>
           <Typography variant="h5" fontWeight="bold">
-            Proforma
+            Proforma/Devis
           </Typography>
         </Grid>
 
@@ -97,7 +97,6 @@ const QuoteTable = () => {
                   "Carburant",
                   "Prix U",
                   "Prix Total",
-                  "Action",
                 ].map((header) => (
                   <TableCell key={header} align="center">
                     {header}
@@ -125,15 +124,6 @@ const QuoteTable = () => {
                   </TableCell>
                   <TableCell>
                     {parseFloat(quote.prixTotal.toString()).toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      onClick={() => dispatch(removeQuote(quote.ref))}
-                    >
-                      Supprimer
-                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -206,4 +196,4 @@ const QuoteTable = () => {
   );
 };
 
-export default QuoteTable;
+export default ProformaTable;

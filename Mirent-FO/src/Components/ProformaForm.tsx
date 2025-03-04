@@ -34,6 +34,79 @@ const ProformaForm = () => {
     prixTotal: 0,
   });
 
+  // Fonction pour valider le proforma et générer une facture
+  const handleValidate = () => {
+    if (Object.values(quote).some((value) => value === "" || value === 0)) {
+      alert("Veuillez remplir tous les champs correctement !");
+      return;
+    }
+
+    // Logique pour valider le proforma et mettre à jour la facture
+    const updatedInvoice = {
+      ...quote,
+      status: "validée", // État de la facture
+    };
+
+    // Effectuer l'appel API pour valider le proforma et créer la facture (côté serveur)
+    fetch("http://localhost:3000/api/invoices", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedInvoice),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        alert("Facture générée et proforma validé !");
+        printInvoice(data); // Appelez une fonction pour imprimer la facture après validation
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la validation du proforma :", error);
+        alert("Erreur lors de la validation du proforma");
+      });
+  };
+
+  // Fonction pour imprimer la facture
+  const printInvoice = (invoiceData: any) => {
+    // Ouvrir une nouvelle fenêtre pour l'impression
+    const printWindow = window.open("", "_blank");
+
+    if (!printWindow) {
+      alert("Impossible d'ouvrir la fenêtre d'impression.");
+      return;
+    }
+
+    // Créer le contenu HTML pour la facture
+    const invoiceContent = `
+      <html>
+        <head><title>Facture</title></head>
+        <body>
+          <h1>Facture N°: ${invoiceData.ref}</h1>
+          <p>Voiture: ${invoiceData.voiture}</p>
+          <p>Numéro de Voiture: ${invoiceData.numeroVoiture}</p>
+          <p>Destination: ${invoiceData.destination}</p>
+          <p>Date de départ: ${invoiceData.dateDepart}</p>
+          <p>Date d'arrivée: ${invoiceData.dateArrivee}</p>
+          <p>Nombre de jours: ${invoiceData.nombreJours}</p>
+          <p>Carburant: ${invoiceData.carburant}</p>
+          <p>Prix unitaire: ${invoiceData.prixUnitaire}€</p>
+          <p>Prix total: ${invoiceData.prixTotal}Ar</p>
+          <p>Status: ${invoiceData.status}</p>
+        </body>
+      </html>
+    `;
+
+    // Attendre que la fenêtre soit prête avant de lui injecter le contenu
+    printWindow.document.write(invoiceContent);
+    printWindow.document.close(); // Important de fermer le document
+
+    // Donner un peu de temps à la fenêtre avant de la demander à imprimer
+    setTimeout(() => {
+      printWindow.print(); // Imprimer la fenêtre
+      printWindow.close(); // Fermer la fenêtre après l'impression
+    }, 500); // Le délai ici (500ms) peut être ajusté si nécessaire
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -186,6 +259,14 @@ const ProformaForm = () => {
           <Grid item xs={12}>
             <Button variant="contained" color="secondary" type="submit">
               Ajouter
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleValidate}
+              style={{ marginLeft: "10px" }}
+            >
+              Valider le proforma
             </Button>
           </Grid>
         </Grid>

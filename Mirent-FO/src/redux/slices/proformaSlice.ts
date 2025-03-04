@@ -44,15 +44,10 @@ const proformaSlice = createSlice({
         alert("Un devis avec cette référence existe déjà !");
       }
     },
-    removeQuote(state, action: PayloadAction<string>) {
-      state.quotes = state.quotes.filter(
-        (quote) => quote.ref !== action.payload
-      ); // Supprimer un devis
-    },
+
     // Autres actions comme ajouter un devis, etc.
   },
 });
 
-export const { removeQuote, validateProforma, addQuote } =
-  proformaSlice.actions;
+export const { validateProforma, addQuote } = proformaSlice.actions;
 export default proformaSlice.reducer;

@@ -40,18 +40,19 @@ var core_1 = require("@nestjs/core");
 var app_module_1 = require("./app.module");
 var common_1 = require("@nestjs/common");
 require("reflect-metadata");
-var dotenv = require("dotenv");
-dotenv.config(); // Charge les variables d'environnement
+var path_1 = require("path");
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function () {
-        var app, logger, PORT;
+        var app, PORT;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule)];
                 case 1:
                     app = _a.sent();
-                    logger = new common_1.Logger('Bootstrap');
-                    // Activer CORS pour permettre les requêtes frontend
+                    app.useLogger(new common_1.Logger());
+                    app.useStaticAssets(path_1.join(__dirname, '..', 'uploads'), {
+                        prefix: '/uploads/'
+                    });
                     app.enableCors({
                         origin: process.env.FRONTEND_URL || 'http://localhost:5173',
                         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -67,7 +68,7 @@ function bootstrap() {
                     return [4 /*yield*/, app.listen(PORT)];
                 case 2:
                     _a.sent();
-                    logger.log("\uD83D\uDE80 Serveur d\u00E9marr\u00E9 sur http://localhost:" + PORT);
+                    common_1.Logger.log("\uD83D\uDE80 Serveur d\u00E9marr\u00E9 sur http://localhost:" + PORT);
                     return [2 /*return*/];
             }
         });

@@ -37,6 +37,16 @@ interface EditVehicleProps {
   vehicle: Vehicle;
 }
 
+interface VehicleType {
+  id: number;
+  type: string;
+}
+
+interface VehicleStatus {
+  id: number;
+  status: string;
+}
+
 const EditVehicle: React.FC<EditVehicleProps> = ({
   open,
   onClose,

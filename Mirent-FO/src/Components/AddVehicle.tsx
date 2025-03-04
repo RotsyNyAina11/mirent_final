@@ -15,7 +15,7 @@ import {
   Typography,
   SelectChangeEvent,
 } from "@mui/material";
-import { createVehicle, Vehicle } from "../redux/slices/vehiclesSlice";
+import { createVehicle, fetchVehicles, Vehicle } from "../redux/slices/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 import { toast } from "react-toastify"; 
 import { AiOutlineCar, AiOutlineTag, AiOutlineNumber, AiOutlineClose } from "react-icons/ai";
@@ -29,6 +29,7 @@ interface AddVehicleProps {
 const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
   const dispatch = useAppDispatch();
   const [vehicle, setVehicle] = useState<Vehicle>({
+    id: 0,
     nom: "",
     marque: "",
     modele: "",
@@ -43,6 +44,7 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
   const [vehicleStatuses, setVehicleStatuses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchVehicleData = async () => {
@@ -98,10 +100,17 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setVehicle((prev) => ({
-        ...prev,
-        imageUrl: URL.createObjectURL(file),
-      }));
+        setImageFile(file);
+        setVehicle((prev) => ({
+            ...prev,
+            imageUrl: URL.createObjectURL(file),
+        }));
+    } else {
+        setImageFile(null);
+        setVehicle((prev) => ({
+            ...prev,
+            imageUrl: "",
+        }));
     }
   };
 
@@ -165,12 +174,17 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
       formData.append("typeId", vehicle.type.id.toString());
       formData.append("statusId", vehicle.status.id.toString());
 
-      if (vehicle.imageUrl) {
-        formData.append("image", vehicle.imageUrl);
+      if (imageFile) { 
+        formData.append("image", imageFile);
+        console.log("Type de imageFile :", imageFile); 
       }
+
+      console.log("FormData avant l'envoi :", formData.get("image"));
+
 
       await dispatch(createVehicle(formData));
       toast.success("Véhicule ajouté avec succès !");
+      dispatch(fetchVehicles()); 
       onClose();
     } catch (err) {
       console.error("Erreur lors de l'ajout du véhicule:", err);
@@ -182,6 +196,7 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
 
   const handleCancel = () => {
     setVehicle({
+      id: 0,
       nom: "",
       marque: "",
       modele: "",

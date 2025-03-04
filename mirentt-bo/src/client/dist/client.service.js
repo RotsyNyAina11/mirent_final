@@ -133,7 +133,6 @@ var ClientService = /** @class */ (function () {
                         if (!client) {
                             throw new common_1.NotFoundException('Client non trouvé');
                         }
-                        client.firstName = dto.firstName || client.firstName;
                         client.lastName = dto.lastName || client.lastName;
                         client.email = dto.email || client.email;
                         client.phone = dto.phone || client.phone;

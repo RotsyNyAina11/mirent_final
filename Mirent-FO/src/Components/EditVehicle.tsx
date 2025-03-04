@@ -2,7 +2,7 @@ import { Box, Button, Dialog, DialogTitle, FormControl, Grid, InputLabel, MenuIt
 import { AiOutlineCar, AiOutlineClose, AiOutlineEdit, AiOutlineNumber, AiOutlineTag } from "react-icons/ai";
 import { CameraAltOutlined } from "@mui/icons-material";
 import { updateVehicle, Vehicle, fetchVehicleTypes, fetchVehicleStatuses } from "../redux/slices/vehiclesSlice";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../redux/store";
 import { RootState } from "../redux/store";
@@ -14,19 +14,47 @@ interface EditVehicleProps {
     vehicle: Vehicle;
 }
 
+interface VehicleType {
+    id: number;
+    type: string;
+}
+
+interface VehicleStatus {
+    id: number;
+    status: string;
+}
+
 const EditVehicle: React.FC<EditVehicleProps> = ({ open, onClose, vehicle }) => {
-    const [nom, setNom] = useState(vehicle.nom);
-    const [marque, setMarque] = useState(vehicle.marque);
-    const [modele, setModele] = useState(vehicle.modele);
-    const [immatriculation, setImmatriculation] = useState(vehicle.immatriculation);
-    const [nombrePlace, setNombrePlace] = useState(vehicle.nombrePlace);
-    const [type, setType] = useState(vehicle.type.id);
-    const [status, setStatus] = useState(vehicle.status.id);
-    const [image, setImage] = useState<File | null>(null);
+
 
     const dispatch = useDispatch<AppDispatch>();
-    const vehicleTypes = useSelector((state: RootState) => state.vehicles.vehiclesType);
-    const vehicleStatuses = useSelector((state: RootState) => state.vehicles.vehiclesStatus);
+    const vehicleTypes = useSelector((state: RootState) => state.vehicles.vehiclesType) as VehicleType[];
+    const vehicleStatuses = useSelector((state: RootState) => state.vehicles.vehiclesStatus) as VehicleStatus[];
+    const vehicleTypesLoading = useSelector((state: RootState) => state.vehicles.vehiclesTypeLoading);
+    const vehicleStatusesLoading = useSelector((state: RootState) => state.vehicles.vehiclesStatusLoading);
+    const vehicleTypesError = useSelector((state: RootState) => state.vehicles.vehiclesTypeError);
+    const vehicleStatusesError = useSelector((state: RootState) => state.vehicles.vehiclesStatusError);
+
+    const [type, setType] = useState<number>(vehicle.type.id); // Stocker l'ID
+    const [status, setStatus] = useState<number>(vehicle.status.id); // Stocker l'ID
+
+    const [nom, setNom] = useState(vehicle.nom || "");
+    const [marque, setMarque] = useState(vehicle.marque || "");
+    const [modele, setModele] = useState(vehicle.modele || "");
+    const [immatriculation, setImmatriculation] = useState(vehicle.immatriculation || "");
+    const [nombrePlace, setNombrePlace] = useState(vehicle.nombrePlace || 0);
+    const [image, setImage] = useState<File | null>(null);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [isUpdating, setIsUpdating] = useState(false);
+
+
+    useEffect(() => {
+        if (image) {
+            setPreviewImage(URL.createObjectURL(image));
+        } else {
+            setPreviewImage(null);
+        }
+    }, [image]);
 
     useEffect(() => {
         if (open) {
@@ -36,11 +64,15 @@ const EditVehicle: React.FC<EditVehicleProps> = ({ open, onClose, vehicle }) => 
     }, [open, dispatch]);
 
     useEffect(() => {
-        console.log("Vehicle Object:", vehicle);
-    }, [vehicle]);
+        if (vehicleTypes.length > 0) {
+            console.log("Vehicle Types:", vehicleTypes);
+        }
+        if (vehicleStatuses.length > 0) {
+            console.log("Vehicle Statuses:", vehicleStatuses);
+        }
+    }, [vehicleTypes, vehicleStatuses]);
 
-    const handleUpdate = () => {
-
+    const handleUpdate = useCallback(() => {
         if (!nom || !marque || !modele || !immatriculation || !nombrePlace || !type || !status) {
             toast.error("Tous les champs doivent être remplis.");
             return;
@@ -52,34 +84,59 @@ const EditVehicle: React.FC<EditVehicleProps> = ({ open, onClose, vehicle }) => 
         formData.append("modele", modele);
         formData.append("immatriculation", immatriculation);
         formData.append("nombrePlace", nombrePlace.toString());
-        formData.append("type", type.toString());
-        formData.append("status", status.toString());
+        formData.append("typeId", type.toString()); 
+        formData.append("statusId", status.toString());
         if (image) {
             formData.append("image", image);
         }
-        dispatch(updateVehicle({ id: vehicle.id!, formData }))
-            .unwrap()
-            .then(() => {
-                toast.success("Véhicule modifié avec succès");  // Afficher une notification de succès
-                onClose();
-            })
-            .catch((error) => {
-                console.error("Erreur lors de la mise à jour :", error);
-                toast.error("Erreur lors de la mise à jour du véhicule");  // Afficher une notification d'erreur
-            });
-    };
+        console.log("FormData:", formData);
+        setIsUpdating(true);
+        if (vehicle.id) {
+            dispatch(updateVehicle({ id: vehicle.id, formData }))
+                .unwrap()
+                .then(() => {
+                    setIsUpdating(false);
+                    toast.success("Véhicule modifié avec succès");
+                    onClose();
+                })
+                .catch((error) => {
+                    setIsUpdating(false);
+                    console.error("Erreur lors de la mise à jour :", error);
+                    toast.error("Erreur lors de la mise à jour du véhicule");
+                });
+        }
+    },[dispatch, vehicle, nom, marque, modele, immatriculation, nombrePlace, type, status, image, onClose]);
 
-    const handleCancel = () => {
+    const handleCancel = useCallback(() => {
         setNom(vehicle.nom);
         setMarque(vehicle.marque);
         setModele(vehicle.modele);
         setImmatriculation(vehicle.immatriculation);
         setNombrePlace(vehicle.nombrePlace);
-        setType(vehicle.type.id);
-        setStatus(vehicle.status.id);
-        setImage(null);  // Réinitialiser l'image
-        onClose();  // Fermer la boîte de dialogue
-    };
+        setType(vehicle.type.id); 
+        setStatus(vehicle.status.id); 
+        setImage(null);
+        onClose();
+    }, [vehicle, onClose]);
+
+    const defaultImageUrl = "../assets/img-placeholder.jpg";
+    const imageUrl = image ? URL.createObjectURL(image) : (typeof vehicle.imageUrl === "string" && vehicle.imageUrl ? vehicle.imageUrl : defaultImageUrl);
+
+    if (vehicleTypesLoading || vehicleStatusesLoading) {
+        return (
+            <Dialog open={open} onClose={onClose}>
+                <DialogTitle>Chargement...</DialogTitle>
+            </Dialog>
+        );
+    }
+
+    if (vehicleTypesError || vehicleStatusesError) {
+        return (
+            <Dialog open={open} onClose={onClose}>
+                <DialogTitle>Erreur lors du chargement des données.</DialogTitle>
+            </Dialog>
+        );
+    }
 
     return (
         <Dialog open={open} onClose={onClose}>
@@ -109,7 +166,7 @@ const EditVehicle: React.FC<EditVehicleProps> = ({ open, onClose, vehicle }) => 
                     <Grid item xs={12}>
                         <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
                             <img
-                                src={image ? URL.createObjectURL(image) : (typeof vehicle.imageUrl === "string" && vehicle.imageUrl ? vehicle.imageUrl : "../assets/img-placeholder.jpg")}
+                                src={previewImage || imageUrl}
                                 style={{
                                     width: "200px",
                                     maxHeight: "200px",
@@ -232,14 +289,14 @@ const EditVehicle: React.FC<EditVehicleProps> = ({ open, onClose, vehicle }) => 
                             <InputLabel>Type de véhicule</InputLabel>
                             <Select
                                 value={type}
-                                onChange={(e) => setType(e.target.value as number)}
-                                 displayEmpty
-                                 inputProps={{ "aria-label": "Type de véhicule" }}
-                             >
-                                 {vehicleTypes.map((t: any) => (
-                                     <MenuItem key={t.id} value={t.id}>
-                                         {t.type}
-                                     </MenuItem>
+                                onChange={(e) => setType(Number(e.target.value))} 
+                                displayEmpty
+                                inputProps={{ "aria-label": "Type de véhicule" }}
+                            >
+                                {vehicleTypes.map((t: VehicleType) => (
+                                    <MenuItem key={t.id} value={t.id}>
+                                        {t.type}
+                                    </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
@@ -250,10 +307,10 @@ const EditVehicle: React.FC<EditVehicleProps> = ({ open, onClose, vehicle }) => 
                             <InputLabel>Statut</InputLabel>
                             <Select
                                 value={status}
-                                onChange={(e) => setStatus(e.target.value as number)}
+                                onChange={(e) => setStatus(Number(e.target.value))}
                                 inputProps={{ "aria-label": "Statut" }}
                             >
-                                {vehicleStatuses.map((s: any) => (
+                                {vehicleStatuses.map((s: VehicleStatus) => (
                                     <MenuItem key={s.id} value={s.id}>
                                         {s.status}
                                     </MenuItem>
@@ -292,6 +349,7 @@ const EditVehicle: React.FC<EditVehicleProps> = ({ open, onClose, vehicle }) => 
                             backgroundColor: "#1976D2",
                             "&:hover": { backgroundColor: "#1565C0" },
                         }}
+                        disabled={isUpdating} 
                         onClick={handleUpdate}
                     >
                         Modifier le véhicule

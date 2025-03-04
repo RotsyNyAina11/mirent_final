@@ -1,28 +1,26 @@
+import { Transform, TransformFnParams } from 'class-transformer';
 import { IsString, IsOptional, IsInt, IsNotEmpty } from 'class-validator';
 
 export class UpdateVehiculeDto {
   @IsOptional()  
   @IsString()
-  @IsNotEmpty()
   nom?: string;
 
   @IsOptional() 
   @IsString()
-  @IsNotEmpty()
   marque?: string;
 
   @IsOptional()  
   @IsString()
-  @IsNotEmpty()
   modele?: string;
 
   @IsOptional()  
   @IsString()
-  @IsNotEmpty()
   immatriculation?: string;
 
   @IsOptional() 
   @IsInt()
+  @Transform(({ value }: TransformFnParams) => parseInt(value))
   nombrePlace?: number;
 
   @IsOptional()  
@@ -31,12 +29,12 @@ export class UpdateVehiculeDto {
 
   @IsOptional()  
   @IsInt()
-  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => parseInt(value))
   typeId?: number;
 
   @IsOptional()  
   @IsInt()
-  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => parseInt(value))
   statusId?: number;
 }
 export default UpdateVehiculeDto;

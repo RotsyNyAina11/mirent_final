@@ -45,8 +45,12 @@ export class VehiclesService {
       
     
       async create(dto: CreateVehiculeDto, imageUrl?: string): Promise<Vehicule> {
+        console.log("DTO reçu :", dto);
         const type = await this.typeRepository.findOne({ where: { id: dto.typeId } });
         const status = await this.statusRepository.findOne({ where: { id: dto.statusId } });
+
+        console.log("Type récupéré :", type);
+        console.log("Status récupéré :", status);
     
         if (!type || !status) {
           throw new Error('Type ou Status non trouvé');
@@ -58,37 +62,58 @@ export class VehiclesService {
           status,
           imageUrl: imageUrl || undefined,
         });
+        console.log("Vehicule à sauvegarder :", vehicule);
     
         return this.vehiculeRepository.save(vehicule);
       }
     
       
       async update(id: number, dto: UpdateVehiculeDto, imageUrl?: string): Promise<Vehicule | null> {
+        console.log(`Mise à jour du véhicule avec l'ID : ${id}`);
+        console.log('DTO reçu :', dto);
         const vehicule = await this.vehiculeRepository.findOne({ where: { id }, relations: ['type', 'status'] });
-      
+
         if (!vehicule) {
-          throw new NotFoundException('Véhicule non trouvé');
+            throw new NotFoundException('Véhicule non trouvé');
         }
-      
-        const type = await this.typeRepository.findOne({ where: { id: dto.typeId } });
-        const status = await this.statusRepository.findOne({ where: { id: dto.statusId } });
-      
-        if (!type || !status) {
-          throw new BadRequestException('Type ou Status non trouvé');
+        console.log('Véhicule récupéré :', vehicule);
+
+        // Modification du status
+        if (dto.statusId !== undefined) {
+            console.log('Status avant modification :', vehicule.status);
+            const status = await this.statusRepository.findOne({ where: { id: dto.statusId } });
+            if (!status) {
+                throw new BadRequestException('Status non trouvé');
+            }
+            vehicule.status = status;
+            console.log('Status après modification :', vehicule.status);
         }
+
+        // Modification du type
+        if (dto.typeId !== undefined) {
+            console.log('Type avant modification :', vehicule.type);
+            const type = await this.typeRepository.findOne({ where: { id: dto.typeId } });
+            if (!type) {
+                throw new BadRequestException('Type non trouvé');
+            }
+            vehicule.type = type;
+            console.log('Type après modification :', vehicule.type);
+        }
+
 
         vehicule.nom = dto.nom || vehicule.nom;
         vehicule.marque = dto.marque || vehicule.marque;
         vehicule.modele = dto.modele || vehicule.modele;
         vehicule.immatriculation = dto.immatriculation || vehicule.immatriculation;
         vehicule.nombrePlace = dto.nombrePlace || vehicule.nombrePlace;
-        vehicule.type = type;
-        vehicule.status = status;
         vehicule.imageUrl = imageUrl || vehicule.imageUrl;
-        
-      
-        return await this.vehiculeRepository.save(vehicule);
-      }
+
+        console.log('Véhicule avant sauvegarde :', vehicule);
+        const result = await this.vehiculeRepository.save(vehicule);
+        console.log('Véhicule après sauvegarde :', result);
+    
+        return result;
+    }
       
       
 

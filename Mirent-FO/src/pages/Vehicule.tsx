@@ -22,7 +22,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { Delete, Search, Edit, Add } from "@mui/icons-material";
-import { deleteVehicle, fetchVehicles, Vehicle } from "../redux/slices/vehiclesSlice";
+import { deleteVehicle, fetchVehicles, fetchVehicleStatuses, fetchVehicleTypes, Vehicle, VehicleStatus, VehicleType } from "../redux/slices/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 import { useSelector } from "react-redux";
 import AddVehicle from "../Components/AddVehicle";
@@ -30,7 +30,9 @@ import EditVehicle from "../Components/EditVehicle";
 
 const VehiclesList: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { vehicles, loading, error } = useSelector((state: any) => state.vehicles);
+  const { vehicles, loading, error, vehiclesType, vehiclesStatus } = useSelector((state: any) => state.vehicles);
+  const [vehicleTypesRedux, setVehicleTypesRedux] = useState<VehicleType[]>(vehiclesType);
+  const [vehicleStatusesRedux, setVehicleStatusesRedux] = useState<VehicleStatus[]>(vehiclesStatus);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(6);
@@ -45,37 +47,40 @@ const VehiclesList: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchVehicles());
-
-    const fetchVehicleTypes = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/type");
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          const types = data.map((item) => item.type);
-          setVehicleTypes(types);
-        }
-      } catch (error) {
-        console.error("Error fetching vehicle types:", error);
-      }
-    };
-
-    fetchVehicleTypes();
+    dispatch(fetchVehicleTypes());
+    dispatch(fetchVehicleStatuses());
   }, [dispatch]);
+
+  useEffect(() => {
+    setVehicleTypesRedux(vehiclesType);
+    setVehicleStatusesRedux(vehiclesStatus);
+
+    if (vehiclesType && vehiclesType.length > 0) {
+      setVehicleTypes(vehiclesType.map((t: VehicleType) => t.type));
+    }
+  }, [vehiclesType, vehiclesStatus]);
+
+  useEffect(() => {
+    console.log("Vehicles from Redux:", vehicles); 
+  }, [vehicles]);
 
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((veh: any) => {
-      const lowercasedSearch = search.toLowerCase();
-      return (
-        (veh.nom.toLowerCase().includes(lowercasedSearch) ||
-          veh.marque.toLowerCase().includes(lowercasedSearch) ||
-          veh.modele.toLowerCase().includes(lowercasedSearch) ||
-          veh.immatriculation.toLowerCase().includes(lowercasedSearch) ||
-          veh.type?.type.toLowerCase().includes(lowercasedSearch) ||
-          veh.status?.status.toLowerCase().includes(lowercasedSearch)) &&
-        (filterType ? veh.type?.type === filterType : true)
-      );
+        const lowercasedSearch = search.toLowerCase();
+        const typeName = vehicleTypesRedux.find(t => t.id === veh.type?.id)?.type || "";
+        const statusName = vehicleStatusesRedux.find(s => s.id === veh.status?.id)?.status || "";
+        return (
+            (veh.nom.toLowerCase().includes(lowercasedSearch) ||
+                veh.marque.toLowerCase().includes(lowercasedSearch) ||
+                veh.modele.toLowerCase().includes(lowercasedSearch) ||
+                veh.immatriculation.toLowerCase().includes(lowercasedSearch) ||
+                typeName.toLowerCase().includes(lowercasedSearch) ||
+                statusName.toLowerCase().includes(lowercasedSearch)) &&
+            (filterType ? typeName === filterType : true)
+        );
     });
-  }, [vehicles, search, filterType]);
+}, [vehicles, search, filterType, vehicleTypesRedux, vehicleStatusesRedux]);
+
 
   const handleEditClick = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
@@ -178,9 +183,9 @@ const VehiclesList: React.FC = () => {
         </Typography>
       ) : (
         <Grid container spacing={3}>
-          {filteredVehicles
-            .slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage)
-            .map((veh: any) => (
+              {filteredVehicles
+                .slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage)
+                .map((veh: any) => (
               <Grid item xs={12} sm={6} md={4} key={veh.id}>
                 <Paper
                   sx={{
@@ -289,16 +294,11 @@ const VehiclesList: React.FC = () => {
                         Immatriculation: {veh.immatriculation}
                       </Typography>
                         <Typography variant="body2" color="textSecondary">
-                        Type: {veh.type?.type}
+                        Type: {vehicleTypesRedux.find(t => t.id === veh.type?.id)?.type}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
-                        Status: {" "}
-                        <span
-                          style={{
-                          color: veh.status?.status === "Disponible" ? "green" : "red"
-                        }}
-                        >
-                         {veh.status?.status}
+                        Status: <span style={{ color: vehicleStatusesRedux.find(s => s.id === veh.status?.id)?.status === "Disponible" ? "green" : "red" }}>
+                        {vehicleStatusesRedux.find(s => s.id === veh.status?.id)?.status}
                         </span>
                         </Typography>
                     </Box>

@@ -1,19 +1,25 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { District } from "./district.entity";
+import { Prix } from "./prix.entity";
 
 @Entity()
 export class Region {
     @PrimaryGeneratedColumn()
-    id: number;
+    region_id: number;
 
     @Column()
-    name: string;
+    nom_region: string;
 
-    @Column('decimal')
-    price: number;
 
-    @OneToMany(() => District, district => district.region)
-    districts:  District[];
+    @OneToOne(() => District, { nullable: true })
+    @JoinColumn({ name: 'district_id' })
+    district: District;
+
+    @Column({ nullable: true })
+    district_id: number | null;
+  
+    @OneToMany(() => Prix, (prix) => prix.region)
+    prix: Prix[];
 }
 
 export default Region;

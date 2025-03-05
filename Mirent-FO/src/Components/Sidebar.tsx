@@ -14,8 +14,8 @@ import {
 } from "@mui/material";
 import {
   Home,
-  ShoppingCart, // Nouvelle icône pour "Commande"
-  ReceiptLong, // Autre option pour "Commande"
+  ShoppingCart, 
+  ReceiptLong, 
   DirectionsCar,
   People,
   ContactMail,
@@ -24,10 +24,11 @@ import {
   ExpandMore,
   AddShoppingCart,
 } from "@mui/icons-material";
+import PlaceIcon from '@mui/icons-material/Place';
 import { Link as RouterLink } from "react-router-dom";
 import logo from "../assets/horizontal.png";
 
-// Composant personnalisé pour combiner Link et ListItemButton
+
 const NavLinkButton = styled(({ to, selected, ...rest }: any) => (
   <RouterLink to={to} style={{ textDecoration: "none", color: "inherit" }}>
     <ListItemButton {...rest} />
@@ -63,7 +64,7 @@ const Sidebar: React.FC = () => {
         open
         PaperProps={{
           sx: {
-            width: "250px", // Largeur fixe de la sidebar
+            width: "250px", 
             background: "#F7FAFC",
             borderRight: "none",
             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
@@ -73,7 +74,7 @@ const Sidebar: React.FC = () => {
             flexDirection: "column",
             height: "100%",
             "@media (max-width: 600px)": {
-              width: "60px", // Sidebar rétrécie sur petits écrans
+              width: "60px", 
             },
           },
         }}
@@ -147,10 +148,10 @@ const Sidebar: React.FC = () => {
                   minWidth: "36px",
                 }}
               >
-                <ShoppingCart /> {/* Nouvelle icône pour "Commande" */}
+                <ShoppingCart /> 
               </ListItemIcon>
               <ListItemText
-                primary="Commande"
+                primary="Commandes"
                 primaryTypographyProps={{
                   fontSize: "14px",
                   fontWeight: "500",
@@ -185,12 +186,12 @@ const Sidebar: React.FC = () => {
                         color: "#004D99",
                       },
                       "@media (max-width: 600px)": {
-                        pl: 2, // Réduction du padding gauche sur petits écrans
+                        pl: 2, 
                       },
                     }}
                   >
                     <ListItemIcon>
-                      <ReceiptLong /> {/* Icône pour Proformat */}
+                      <ReceiptLong /> 
                     </ListItemIcon>
                     <ListItemText
                       primary="Proformat"
@@ -226,12 +227,12 @@ const Sidebar: React.FC = () => {
                         color: "#004D99",
                       },
                       "@media (max-width: 600px)": {
-                        pl: 2, // Réduction du padding gauche sur petits écrans
+                        pl: 2, 
                       },
                     }}
                   >
                     <ListItemIcon>
-                      <AddShoppingCart /> {/* Icône pour Devis */}
+                      <AddShoppingCart /> 
                     </ListItemIcon>
                     <ListItemText
                       primary="Devis"
@@ -267,12 +268,12 @@ const Sidebar: React.FC = () => {
                         color: "#004D99",
                       },
                       "@media (max-width: 600px)": {
-                        pl: 2, // Réduction du padding gauche sur petits écrans
+                        pl: 2, 
                       },
                     }}
                   >
                     <ListItemIcon>
-                      <ReceiptLong /> {/* Icône pour Facture */}
+                      <ReceiptLong /> 
                     </ListItemIcon>
                     <ListItemText
                       primary="Facture"
@@ -294,7 +295,7 @@ const Sidebar: React.FC = () => {
             </Collapse>
 
             {/* Liste des Véhicules */}
-            <Tooltip title="Liste des Véhicules" placement="right">
+            <Tooltip title="Gérer les Véhicules" placement="right">
               <NavLinkButton
                 to="/vehicules"
                 selected={window.location.pathname === "/vehicules"}
@@ -310,7 +311,7 @@ const Sidebar: React.FC = () => {
                   <DirectionsCar />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Liste des Véhicules"
+                  primary="Gérer les Véhicules"
                   primaryTypographyProps={{
                     fontSize: "14px",
                     fontWeight: "500",
@@ -344,6 +345,39 @@ const Sidebar: React.FC = () => {
                 </ListItemIcon>
                 <ListItemText
                   primary="Liste des Clients"
+                  primaryTypographyProps={{
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: "#004D99",
+                  }}
+                  sx={{
+                    display: {
+                      xs: "none",
+                      sm: "block",
+                    },
+                  }}
+                />
+              </NavLinkButton>
+            </Tooltip>
+
+            {/* Lieux de location */}
+            <Tooltip title="Lieux de Location" placement="right">
+              <NavLinkButton
+                to="/vehicules"
+                selected={window.location.pathname === "/vehicules"}
+                sx={{
+                  padding: "8px 16px",
+                  "& .MuiListItemIcon-root": {
+                    minWidth: "36px",
+                    color: "#004D99",
+                  },
+                }}
+              >
+                <ListItemIcon>
+                  <PlaceIcon/>
+                </ListItemIcon>
+                <ListItemText
+                  primary="Lieux de Location"
                   primaryTypographyProps={{
                     fontSize: "14px",
                     fontWeight: "500",

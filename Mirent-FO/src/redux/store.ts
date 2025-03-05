@@ -1,7 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
 import sidebarReducer from "./slices/SidebarSlice";
-import filterReducer from "./slices/filterSlice";
 import vehiclesReducer from "./slices/vehiclesSlice";
 import { create } from "zustand";
 import { Proforma } from "../types/Proforma";
@@ -21,7 +20,6 @@ export const store = configureStore({
     auth: authReducer,
     vehicles: vehiclesReducer,
     sidebar: sidebarReducer,
-    filter: filterReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

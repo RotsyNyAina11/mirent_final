@@ -1,19 +1,14 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Region } from "./region.entity";
+import { Prix } from "./prix.entity";
 
 @Entity()
 export class District{
     @PrimaryGeneratedColumn()
-    id: number;
-
+    district_id: number;
+  
     @Column()
-    name: string;
-
-    @Column('decimal', {nullable: true})
-    price?: number;
-
-    @ManyToOne(() => Region, region => region.districts)
-    region: Region;
+    nom_district: string;
 }
 
 export default District;

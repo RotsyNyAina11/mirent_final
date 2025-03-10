@@ -10,8 +10,13 @@ export const RegionsService = {
   },
 
   createFull: async (region: Omit<Region, 'id'>): Promise<Region> => {
-    const response = await axios.post(API_URL, region);
-    return response.data;
+    try {
+      const response = await axios.post(API_URL, region);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating region:', error);
+      throw error;
+    }
   },
 
   updateFull: async (id: number, region: Partial<Region>): Promise<Region> => {

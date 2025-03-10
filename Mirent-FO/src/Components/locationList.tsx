@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '../redux/store';
 import {
   Table,
@@ -54,6 +54,8 @@ const LocationList = () => {
   }));
 
   const dispatch = useDispatch<AppDispatch>();
+  const addRegionStatus = useSelector((state: any) => state.locations.status); 
+  const addRegionError = useSelector((state: any) => state.locations.error); 
   const [regions, setRegions] = useState<Region[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -116,21 +118,36 @@ const LocationList = () => {
   const handleSave = async () => {
     try {
       if (selectedRegion) {
+        // Modification 
         dispatch(
           updateRegion({
             id: selectedRegion.id,
-            region: { ...formValues, prix: { id: selectedRegion.prix.id, prix: prixValue } },
+            region: {
+              ...formValues,
+              prix: { id: selectedRegion.prix.id, prix: prixValue },
+            },
           })
         );
+        fetchRegions();
         toast.success('Région modifiée avec succès');
       } else {
-        dispatch(addRegion({ ...formValues, prix: { prix: prixValue } } as Region));
+        // Ajout
+        const newRegion = {
+          ...formValues,
+          prix: { prix: prixValue },
+        };
+        console.log('add region data: ', newRegion);
+        await dispatch(addRegion(newRegion as Region)).unwrap(); // Unwrap the promise
         toast.success('Région ajoutée avec succès');
       }
       fetchRegions();
       handleCloseDialog();
     } catch (err: any) {
-      toast.error(err.message || 'Erreur lors de la sauvegarde de la région');
+      if (addRegionStatus === 'failed' && addRegionError) {
+        toast.error(addRegionError); // Display error from Redux state
+      } else {
+        toast.error(err.message || 'Erreur lors de la sauvegarde de la région');
+      }
     }
   };
 

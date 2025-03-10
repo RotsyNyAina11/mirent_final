@@ -8,7 +8,6 @@ import { VehiclesModule } from './vehicles/vehicles.module';
 import { TypeModule } from './type/type.module';
 import { StatusModule } from './status/status.module';
 import { RegionsModule } from './regions/regions.module';
-import { DistrictsModule } from './districts/districts.module';
 import { PrixsModule } from './prixs/prixs.module';
 
 
@@ -20,13 +19,11 @@ import { PrixsModule } from './prixs/prixs.module';
     TypeModule,
     StatusModule,
     RegionsModule,
-    DistrictsModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'), 
       serveRoot: '/uploads', 
     }),
     RegionsModule,
-    DistrictsModule,
     PrixsModule,
   ],
 })

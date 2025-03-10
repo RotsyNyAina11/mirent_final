@@ -16,6 +16,8 @@ import Performat from "./pages/Commande";
 import Devis from "./pages/Devis";
 import Facturation from "./pages/FacturationPage";
 import ProformaList from "./pages/ProformaList";
+import LocationsPage from "./pages/LocationPage";
+
 
 
 const App: React.FC = () => {
@@ -103,6 +105,16 @@ const App: React.FC = () => {
           element={
             <MainLayout>
               <Facturation />
+            </MainLayout>
+          }
+        />
+
+        {/* Route pour la page des lieux */}
+        <Route
+          path="/lieux"
+          element={
+            <MainLayout>
+              <LocationsPage />
             </MainLayout>
           }
         />

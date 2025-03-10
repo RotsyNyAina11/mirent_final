@@ -15,7 +15,7 @@ import {
   Typography,
   SelectChangeEvent,
 } from "@mui/material";
-import { createVehicle, fetchVehicles, Vehicle } from "../redux/slices/vehiclesSlice";
+import { createVehicle, fetchVehicles, Vehicle } from "../redux/features/vehicle/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 import { toast } from "react-toastify"; 
 import { AiOutlineCar, AiOutlineTag, AiOutlineNumber, AiOutlineClose } from "react-icons/ai";

@@ -1,12 +1,12 @@
 import { Box, Button, Dialog, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { AiOutlineCar, AiOutlineClose, AiOutlineEdit, AiOutlineNumber, AiOutlineTag } from "react-icons/ai";
 import { CameraAltOutlined } from "@mui/icons-material";
-import { updateVehicle, Vehicle, fetchVehicleTypes, fetchVehicleStatuses } from "../redux/slices/vehiclesSlice";
+import { updateVehicle, Vehicle, fetchVehicleTypes, fetchVehicleStatuses } from "../redux/features/vehicle/vehiclesSlice";
 import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../redux/store";
 import { RootState } from "../redux/store";
-import { toast } from 'react-toastify';  // Importer react-toastify
+import { toast } from 'react-toastify';  
 
 interface EditVehicleProps {
     open: boolean;
@@ -35,11 +35,11 @@ const EditVehicle: React.FC<EditVehicleProps> = ({ open, onClose, vehicle }) => 
     const vehicleTypesError = useSelector((state: RootState) => state.vehicles.vehiclesTypeError);
     const vehicleStatusesError = useSelector((state: RootState) => state.vehicles.vehiclesStatusError);
 
-    const [type, setType] = useState<number>(vehicle.type.id); // Stocker l'ID
-    const [status, setStatus] = useState<number>(vehicle.status.id); // Stocker l'ID
+    const [type, setType] = useState<number>(vehicle.type.id); 
+    const [status, setStatus] = useState<number>(vehicle.status.id); 
 
     const [nom, setNom] = useState(vehicle.nom || "");
-    const [marque, setMarque] = useState(vehicle.marque || "");
+    const [marque, setMarque] = useState(vehicle.marque || ""); 
     const [modele, setModele] = useState(vehicle.modele || "");
     const [immatriculation, setImmatriculation] = useState(vehicle.immatriculation || "");
     const [nombrePlace, setNombrePlace] = useState(vehicle.nombrePlace || 0);

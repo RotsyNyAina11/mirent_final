@@ -1,135 +1,88 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Prix } from 'src/entities/prix.entity';
+import { Region } from 'src/entities/region.entity';
 import { Repository } from 'typeorm';
-import { Region } from 'src/entities/region.entity'; 
-import { Prix } from 'src/entities/prix.entity'; 
-import { District } from 'src/entities/district.entity'; 
-import { CreateRegionFullDto } from './create_region_full.dto';
-import { CreateDistrictDto } from 'src/districts/create_district.dto';
-import { UpdateRegionFullDto } from './update_region.dto';
+
 
 @Injectable()
-export class RegionsService {
-    constructor(
-        @InjectRepository(Region)
-        private regionRepository: Repository<Region>,
-        @InjectRepository(Prix)
-        private prixRepository: Repository<Prix>,
-        @InjectRepository(District)
-        private districtRepository: Repository<District>,
-    ) {}
+export class RegionService {
+  constructor(
+    @InjectRepository(Region)
+    private regionRepository: Repository<Region>,
+    @InjectRepository(Prix)
+    private prixRepository: Repository<Prix>,
+  ) {}
 
-    async createFull(createRegionFullDto: CreateRegionFullDto): Promise<Region> {
-        const region = this.regionRepository.create({
-            nom_region: createRegionFullDto.nom_region,
-        });
-        await this.regionRepository.save(region);
+  async findAll(): Promise<Region[]> {
+    return this.regionRepository.find({ relations: ['prix'] });
+  }
 
-        const prix = this.prixRepository.create({
-            region_id: region.region_id,
-            prix_location: createRegionFullDto.prix.prix_location,
-        });
-        await this.prixRepository.save(prix);
+  async create(region: Region): Promise<Region> {
+    const prix = this.prixRepository.create(region.prix);
+    await this.prixRepository.save(prix);
+    region.prix = prix;
+    return this.regionRepository.save(region);
+  }
 
-        if (createRegionFullDto.district && createRegionFullDto.district.nom_district) {
-            const district = this.districtRepository.create({
-                nom_district: createRegionFullDto.district.nom_district,
-            });
-            await this.districtRepository.save(district);
-
-            region.district_id = district.district_id;
-            await this.regionRepository.save(region);
-        }
-
-        return region;
+  async updatePrix(regionId: number, prixValue: number): Promise<Prix> {
+    const region = await this.regionRepository.findOne({ where: { id: regionId }, relations: ['prix'] });
+    if (!region) {
+      throw new Error('Region not found');
     }
 
-    async findAllWithDetails(): Promise<Region[]> {
-        return this.regionRepository.find({
-            relations: ['district', 'prix'], 
-        });
+    let prix = region.prix;
+    if (!prix) {
+      prix = this.prixRepository.create({ prix: prixValue, region: region });
+    } else {
+      prix.prix = prixValue;
     }
 
-    async findOneWithDetails(id: number): Promise<Region | null> {
-        return this.regionRepository.findOne({
-            where: { region_id: id },
-            relations: ['district', 'prix'], 
-        });
+    return this.prixRepository.save(prix);
+  }
+
+  async updateFull(regionId: number, updatedRegion: Partial<Region>): Promise<Region> {
+    const region = await this.regionRepository.findOne({ where: { id: regionId }, relations: ['prix'] });
+    if (!region) {
+      throw new Error('Region not found');
     }
 
-    async addDistrict(regionId: number, createDistrictDto: CreateDistrictDto): Promise<District> {
-        const district = this.districtRepository.create({
-            ...createDistrictDto,
-        });
-        await this.districtRepository.save(district);
-
-        const region = await this.regionRepository.findOneBy({region_id: regionId});
-
-        if(region){
-            region.district_id = district.district_id;
-            await this.regionRepository.save(region);
-        }
-
-        return district;
+    // Mise à jour des propriétés de la région
+    if (updatedRegion.nom_region) {
+      region.nom_region = updatedRegion.nom_region;
+    }
+    if (updatedRegion.nom_district !== undefined) {
+      region.nom_district = updatedRegion.nom_district;
     }
 
-    async updateFull(
-        regionId: number,
-        updateRegionFullDto: UpdateRegionFullDto,
-    ): Promise<Region | null> {
-        const region = await this.regionRepository.findOneBy({
-            region_id: regionId,
-        });
-        if (!region) {
-            throw new Error('Région non trouvée');
-        }
-
-        if (updateRegionFullDto.nom_region) {
-            region.nom_region = updateRegionFullDto.nom_region;
-            await this.regionRepository.save(region);
-        }
-
-        if (updateRegionFullDto.prix && updateRegionFullDto.prix.prix_location !== undefined) {
-            const prix = await this.prixRepository.findOneBy({
-                region_id: regionId,
-            });
-            if (prix) {
-                prix.prix_location = updateRegionFullDto.prix.prix_location;
-                await this.prixRepository.save(prix);
-            }
-        }
-
-        if (updateRegionFullDto.district && updateRegionFullDto.district.nom_district !== undefined) {
-            if (region.district_id) {
-                const district = await this.districtRepository.findOneBy({
-                    district_id: region.district_id,
-                });
-                if (district) {
-                    district.nom_district = updateRegionFullDto.district.nom_district;
-                    await this.districtRepository.save(district);
-                }
-            } else {
-                const district = this.districtRepository.create({
-                    nom_district: updateRegionFullDto.district.nom_district,
-                });
-                await this.districtRepository.save(district);
-                region.district_id = district.district_id;
-                await this.regionRepository.save(region);
-            }
-        }
-
-        if (updateRegionFullDto.deleteDistrict === true) {
-            if (region.district_id) {
-                await this.districtRepository.delete(region.district_id);
-                region.district_id = null;
-                await this.regionRepository.save(region);
-            }
-        }
-
-        return this.regionRepository.findOneBy({ region_id: regionId });
+    // Mise à jour du prix
+    if (updatedRegion.prix && updatedRegion.prix.prix !== undefined) {
+      if (region.prix) {
+        // Mise à jour du prix existant
+        region.prix.prix = updatedRegion.prix.prix;
+        await this.prixRepository.save(region.prix);
+      } else {
+        // Création d'un nouveau prix si inexistant
+        const newPrix = this.prixRepository.create({ prix: updatedRegion.prix.prix, region: region });
+        await this.prixRepository.save(newPrix);
+        region.prix = newPrix;
+      }
     }
 
-    async removeRegion(id: number): Promise<void> {
-        await this.regionRepository.delete(id);
+    return this.regionRepository.save(region);
+  }
+
+  async remove(regionId: number): Promise<void> {
+    const region = await this.regionRepository.findOne({ where: { id: regionId }, relations: ['prix'] });
+    if (!region) {
+      throw new Error('Region not found');
     }
+
+    //Suppression du prix associé
+    if (region.prix){
+      await this.prixRepository.remove(region.prix);
+    }
+    //Suppression de la région
+    await this.regionRepository.remove(region);
+  }
 }

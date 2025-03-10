@@ -1,45 +1,35 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
-import { RegionsService } from './regions.service';
-import { UpdateRegionFullDto } from './update_region.dto';
-import { CreateRegionFullDto } from './create_region_full.dto';
-import { CreateDistrictDto } from 'src/districts/create_district.dto';
+import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { RegionService } from './regions.service';
+import { Region } from 'src/entities/region.entity';
+import { Prix } from 'src/entities/prix.entity';
+
 
 @Controller('regions')
-export class RegionsController {
-  constructor(private readonly regionsService: RegionsService) {}
-
-  @Post()
-  create(@Body() createRegionFullDto: CreateRegionFullDto) {
-    return this.regionsService.createFull(createRegionFullDto);
-  }
+export class RegionController {
+  constructor(private regionService: RegionService) {}
 
   @Get()
-  findAllWithDetails() {
-    return this.regionsService.findAllWithDetails();
+  async findAll(): Promise<Region[]> {
+    return this.regionService.findAll();
   }
 
-  @Get(':id')
-  findOneWithDetails(@Param('id') id: string) {
-    return this.regionsService.findOneWithDetails(+id);
+  @Post()
+  async create(@Body() region: Region): Promise<Region> {
+    return this.regionService.create(region);
   }
 
-  @Post(':id/districts')
-  addDistrict(@Param('id') id: string, @Body() createDistrictDto: CreateDistrictDto) {
-    return this.regionsService.addDistrict(+id, createDistrictDto);
+  @Put(':id')
+  async updateFull(@Param('id') id: number, @Body() region: Partial<Region>): Promise<Region> {
+    return this.regionService.updateFull(id, region);
   }
 
-  @Patch(':id')
-  updateFull(
-    @Param('id') id: string,
-    @Body() updateRegionFullDto: UpdateRegionFullDto,
-  ) {
-    return this.regionsService.updateFull(+id, updateRegionFullDto);
+  @Put(':id/prix')
+  async updatePrix(@Param('id') id: number, @Body('prix') prix: number): Promise<Prix> {
+    return this.regionService.updatePrix(id, prix);
   }
-
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.regionsService.removeRegion(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    return this.regionService.remove(id);
   }
-
 }

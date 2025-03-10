@@ -22,7 +22,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { Delete, Search, Edit, Add } from "@mui/icons-material";
-import { deleteVehicle, fetchVehicles, fetchVehicleStatuses, fetchVehicleTypes, Vehicle, VehicleStatus, VehicleType } from "../redux/slices/vehiclesSlice";
+import { deleteVehicle, fetchVehicles, fetchVehicleStatuses, fetchVehicleTypes, Vehicle, VehicleStatus, VehicleType } from "../redux/features/vehicle/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 import { useSelector } from "react-redux";
 import AddVehicle from "../Components/AddVehicle";

@@ -1,17 +1,16 @@
 import { Module } from '@nestjs/common';
-import { RegionsService } from './regions.service';
-import { RegionsController } from './regions.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import District from 'src/entities/district.entity';
-import Region from 'src/entities/region.entity';
 import { Prix } from 'src/entities/prix.entity';
+import { Region } from 'src/entities/region.entity';
+import { RegionService } from './regions.service';
+import { RegionController } from './regions.controller';
 
 @Module({
       imports: [
-          TypeOrmModule.forFeature([District, Region, Prix]),
+          TypeOrmModule.forFeature([Region, Prix]),
           RegionsModule
       ],
-      controllers: [RegionsController],
-      providers: [RegionsService],
+      controllers: [RegionController],
+      providers: [RegionService],
 })
 export class RegionsModule {}

@@ -1,26 +1,15 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-  } from 'typeorm';
-import Region from './region.entity';
-import District from './district.entity';
-
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Region } from './region.entity';
 
 @Entity()
-export class Prix{
-    @PrimaryGeneratedColumn()
-    prix_id: number;
-  
-    @ManyToOne(() => Region, (region) => region.prix)
-    @JoinColumn({ name: 'region_id' })
-    region: Region;
-  
-    @Column()
-    region_id: number;
-  
-    @Column()
-    prix_location: number;
+export class Prix {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  prix: number;
+
+  @OneToOne(() => Region, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  region: Region;
 }

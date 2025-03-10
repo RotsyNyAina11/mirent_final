@@ -179,9 +179,13 @@ const CustomerManagement: React.FC = () => {
 
     try {
       if (editMode && selectedCustomer) {
+        console.log("Modification du client :", selectedCustomer.id, form);
+
         await dispatch(updateClient({ id: selectedCustomer.id, ...form }));
         setSnackbarMessage("Client modifié avec succès !");
       } else {
+        console.log("Ajout d'un nouveau client :", form);
+
         await dispatch(addClient(form));
         setSnackbarMessage("Client ajouté avec succès !");
       }
@@ -190,8 +194,11 @@ const CustomerManagement: React.FC = () => {
       handleCloseDialog();
       setSnackbarOpen(true);
     } catch (error) {
-      console.error("Erreur lors de l'ajout/modification du client :", error);
-      setSnackbarMessage("Une erreur s'est produite !");
+      console.error(
+        "Erreur lors de l'ajout ou de la modification du client :",
+        error
+      );
+      setSnackbarMessage("Une erreur est survenue !");
       setSnackbarOpen(true);
     }
   };

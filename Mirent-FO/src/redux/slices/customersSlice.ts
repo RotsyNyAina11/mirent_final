@@ -23,7 +23,7 @@ const initialState: ClientState = {
 
 // 🔄 **Async Thunks**
 export const fetchClients = createAsyncThunk(
-  "customers/fetchClients",
+  "clients/fetchClients",
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch("http://localhost:3000/clients"); // Replace with your API call

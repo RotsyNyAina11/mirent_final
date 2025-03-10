@@ -4,21 +4,35 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import 'reflect-metadata';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-
+import * as express from 'express';
+import * as cors from 'cors';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useLogger(new Logger());
 
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
+  // Activer CORS pour tout le backend
+  app.use(
+    cors({
+      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+    }),
+  );
+
+  // Middleware pour ajouter les en-têtes CORS aux fichiers statiques
+  app.use('/uploads', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Permet l'accès depuis n'importe où
+    res.header(
+      'Access-Control-Allow-Methods',
+      'GET,HEAD,PUT,PATCH,POST,DELETE',
+    );
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
   });
 
-  app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173', // URL du frontend
-
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
+  // Gérer les fichiers statiques avec Express
+  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
   // Ajout de la validation globale pour sécuriser les entrées
   app.useGlobalPipes(

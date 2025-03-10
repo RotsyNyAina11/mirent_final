@@ -41,6 +41,8 @@ var app_module_1 = require("./app.module");
 var common_1 = require("@nestjs/common");
 require("reflect-metadata");
 var path_1 = require("path");
+var express = require("express");
+var cors = require("cors");
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function () {
         var app, PORT;
@@ -50,14 +52,22 @@ function bootstrap() {
                 case 1:
                     app = _a.sent();
                     app.useLogger(new common_1.Logger());
-                    app.useStaticAssets(path_1.join(__dirname, '..', 'uploads'), {
-                        prefix: '/uploads/'
-                    });
-                    app.enableCors({
+                    // Activer CORS pour tout le backend
+                    app.use(cors({
                         origin: process.env.FRONTEND_URL || 'http://localhost:5173',
                         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+                        allowedHeaders: ['Content-Type', 'Authorization'],
                         credentials: true
+                    }));
+                    // Middleware pour ajouter les en-têtes CORS aux fichiers statiques
+                    app.use('/uploads', function (req, res, next) {
+                        res.header('Access-Control-Allow-Origin', '*'); // Permet l'accès depuis n'importe où
+                        res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+                        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+                        next();
                     });
+                    // Gérer les fichiers statiques avec Express
+                    app.use('/uploads', express.static(path_1.join(__dirname, '..', 'uploads')));
                     // Ajout de la validation globale pour sécuriser les entrées
                     app.useGlobalPipes(new common_1.ValidationPipe({
                         whitelist: true,

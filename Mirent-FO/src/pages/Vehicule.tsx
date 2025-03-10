@@ -22,7 +22,15 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { Delete, Search, Edit, Add } from "@mui/icons-material";
-import { deleteVehicle, fetchVehicles, fetchVehicleStatuses, fetchVehicleTypes, Vehicle, VehicleStatus, VehicleType } from "../redux/slices/vehiclesSlice";
+import {
+  deleteVehicle,
+  fetchVehicles,
+  fetchVehicleStatuses,
+  fetchVehicleTypes,
+  Vehicle,
+  VehicleStatus,
+  VehicleType,
+} from "../redux/slices/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 import { useSelector } from "react-redux";
 import AddVehicle from "../Components/AddVehicle";
@@ -30,9 +38,12 @@ import EditVehicle from "../Components/EditVehicle";
 
 const VehiclesList: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { vehicles, loading, error, vehiclesType, vehiclesStatus } = useSelector((state: any) => state.vehicles);
-  const [vehicleTypesRedux, setVehicleTypesRedux] = useState<VehicleType[]>(vehiclesType);
-  const [vehicleStatusesRedux, setVehicleStatusesRedux] = useState<VehicleStatus[]>(vehiclesStatus);
+  const { vehicles, loading, error, vehiclesType, vehiclesStatus } =
+    useSelector((state: any) => state.vehicles);
+  const [vehicleTypesRedux, setVehicleTypesRedux] =
+    useState<VehicleType[]>(vehiclesType);
+  const [vehicleStatusesRedux, setVehicleStatusesRedux] =
+    useState<VehicleStatus[]>(vehiclesStatus);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(6);
@@ -61,26 +72,27 @@ const VehiclesList: React.FC = () => {
   }, [vehiclesType, vehiclesStatus]);
 
   useEffect(() => {
-    console.log("Vehicles from Redux:", vehicles); 
+    console.log("Vehicles from Redux:", vehicles);
   }, [vehicles]);
 
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((veh: any) => {
-        const lowercasedSearch = search.toLowerCase();
-        const typeName = vehicleTypesRedux.find(t => t.id === veh.type?.id)?.type || "";
-        const statusName = vehicleStatusesRedux.find(s => s.id === veh.status?.id)?.status || "";
-        return (
-            (veh.nom.toLowerCase().includes(lowercasedSearch) ||
-                veh.marque.toLowerCase().includes(lowercasedSearch) ||
-                veh.modele.toLowerCase().includes(lowercasedSearch) ||
-                veh.immatriculation.toLowerCase().includes(lowercasedSearch) ||
-                typeName.toLowerCase().includes(lowercasedSearch) ||
-                statusName.toLowerCase().includes(lowercasedSearch)) &&
-            (filterType ? typeName === filterType : true)
-        );
+      const lowercasedSearch = search.toLowerCase();
+      const typeName =
+        vehicleTypesRedux.find((t) => t.id === veh.type?.id)?.type || "";
+      const statusName =
+        vehicleStatusesRedux.find((s) => s.id === veh.status?.id)?.status || "";
+      return (
+        (veh.nom.toLowerCase().includes(lowercasedSearch) ||
+          veh.marque.toLowerCase().includes(lowercasedSearch) ||
+          veh.modele.toLowerCase().includes(lowercasedSearch) ||
+          veh.immatriculation.toLowerCase().includes(lowercasedSearch) ||
+          typeName.toLowerCase().includes(lowercasedSearch) ||
+          statusName.toLowerCase().includes(lowercasedSearch)) &&
+        (filterType ? typeName === filterType : true)
+      );
     });
-}, [vehicles, search, filterType, vehicleTypesRedux, vehicleStatusesRedux]);
-
+  }, [vehicles, search, filterType, vehicleTypesRedux, vehicleStatusesRedux]);
 
   const handleEditClick = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
@@ -95,7 +107,7 @@ const VehiclesList: React.FC = () => {
 
   const isValidImageUrl = (url: string) => {
     try {
-      new URL(url, window.location.origin); 
+      new URL(url, window.location.origin);
       return true;
     } catch (_) {
       return false;
@@ -112,11 +124,15 @@ const VehiclesList: React.FC = () => {
       }}
     >
       {/* Titre */}
-      <Typography variant="h4" sx={{ fontWeight: "700", color: "#1976d2", marginBottom: 2 }}>
+      <Typography
+        variant="h4"
+        sx={{ fontWeight: "700", color: "#1976d2", marginBottom: 2 }}
+      >
         Liste des véhicules
       </Typography>
       <Typography variant="subtitle1" sx={{ color: "#666", marginBottom: 3 }}>
-        Recherchez, filtrez, modifiez ou supprimez les véhicules de votre agence.
+        Recherchez, filtrez, modifiez ou supprimez les véhicules de votre
+        agence.
       </Typography>
 
       {/* Barre de recherche et bouton d'ajout */}
@@ -153,7 +169,11 @@ const VehiclesList: React.FC = () => {
           variant="contained"
           color="primary"
           startIcon={<Add />}
-          sx={{ backgroundColor: "#1976D2", boxShadow: 3, "&:hover": { boxShadow: 6 } }}
+          sx={{
+            backgroundColor: "#1976D2",
+            boxShadow: 3,
+            "&:hover": { boxShadow: 6 },
+          }}
           onClick={() => setShowAddVehicle(true)}
         >
           Ajouter un véhicule
@@ -161,7 +181,10 @@ const VehiclesList: React.FC = () => {
       </Box>
 
       {showAddVehicle && (
-        <AddVehicle open={showAddVehicle} onClose={() => setShowAddVehicle(false)} />
+        <AddVehicle
+          open={showAddVehicle}
+          onClose={() => setShowAddVehicle(false)}
+        />
       )}
 
       {loading ? (
@@ -183,9 +206,9 @@ const VehiclesList: React.FC = () => {
         </Typography>
       ) : (
         <Grid container spacing={3}>
-              {filteredVehicles
-                .slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage)
-                .map((veh: any) => (
+          {filteredVehicles
+            .slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage)
+            .map((veh: any) => (
               <Grid item xs={12} sm={6} md={4} key={veh.id}>
                 <Paper
                   sx={{
@@ -194,7 +217,11 @@ const VehiclesList: React.FC = () => {
                     borderRadius: 2,
                     position: "relative",
                     transition: "all 0.3s ease",
-                    "&:hover": { boxShadow: 6, transform: "scale(1.05)", cursor: "pointer" },
+                    "&:hover": {
+                      boxShadow: 6,
+                      transform: "scale(1.05)",
+                      cursor: "pointer",
+                    },
                     backgroundColor: "#ffffff",
                   }}
                 >
@@ -205,7 +232,8 @@ const VehiclesList: React.FC = () => {
                       src={veh.imageUrl}
                       alt={veh.nom}
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "../assets/img-placeholder.jpg";
+                        (e.target as HTMLImageElement).src =
+                          "../assets/img-placeholder.jpg";
                       }}
                       sx={{
                         width: "100%",
@@ -260,7 +288,11 @@ const VehiclesList: React.FC = () => {
                     </Typography>
 
                     {/* Marque et modèle */}
-                    <Box display="flex" justifyContent="space-between" sx={{ marginBottom: 2 }}>
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      sx={{ marginBottom: 2 }}
+                    >
                       <Typography
                         variant="body1"
                         sx={{
@@ -293,14 +325,32 @@ const VehiclesList: React.FC = () => {
                       <Typography variant="body2" color="textSecondary">
                         Immatriculation: {veh.immatriculation}
                       </Typography>
-                        <Typography variant="body2" color="textSecondary">
-                        Type: {vehicleTypesRedux.find(t => t.id === veh.type?.id)?.type}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary">
-                        Status: <span style={{ color: vehicleStatusesRedux.find(s => s.id === veh.status?.id)?.status === "Disponible" ? "green" : "red" }}>
-                        {vehicleStatusesRedux.find(s => s.id === veh.status?.id)?.status}
+                      <Typography variant="body2" color="textSecondary">
+                        Type:{" "}
+                        {
+                          vehicleTypesRedux.find((t) => t.id === veh.type?.id)
+                            ?.type
+                        }
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Status:{" "}
+                        <span
+                          style={{
+                            color:
+                              vehicleStatusesRedux.find(
+                                (s) => s.id === veh.status?.id
+                              )?.status === "Disponible"
+                                ? "green"
+                                : "red",
+                          }}
+                        >
+                          {
+                            vehicleStatusesRedux.find(
+                              (s) => s.id === veh.status?.id
+                            )?.status
+                          }
                         </span>
-                        </Typography>
+                      </Typography>
                     </Box>
 
                     <Box display="flex" justifyContent="space-between">
@@ -336,7 +386,9 @@ const VehiclesList: React.FC = () => {
         rowsPerPage={rowsPerPage}
         page={currentPage}
         onPageChange={(_, newPage) => setCurrentPage(newPage)}
-        onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+        onRowsPerPageChange={(e) =>
+          setRowsPerPage(parseInt(e.target.value, 10))
+        }
         sx={{
           marginTop: 3,
           backgroundColor: "#fff",
@@ -350,7 +402,9 @@ const VehiclesList: React.FC = () => {
         open={openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}
       >
-        <DialogTitle>Êtes-vous sûr de vouloir supprimer ce véhicule ?</DialogTitle>
+        <DialogTitle>
+          Êtes-vous sûr de vouloir supprimer ce véhicule ?
+        </DialogTitle>
         <DialogActions>
           <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
             Annuler

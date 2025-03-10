@@ -17,6 +17,7 @@ import Devis from "./pages/Devis";
 import Facturation from "./pages/FacturationPage";
 //import ProformaList from "./pages/ProformaList";
 import ProformaForm from "./Components/ProformaForm";
+import Commande from "./pages/CommandePage";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -113,6 +114,15 @@ const App: React.FC = () => {
           element={
             <MainLayout>
               <Facturation />
+            </MainLayout>
+          }
+        />
+        {/* Route pour la page  sur la commande */}
+        <Route
+          path="/commande"
+          element={
+            <MainLayout>
+              <Commande />
             </MainLayout>
           }
         />

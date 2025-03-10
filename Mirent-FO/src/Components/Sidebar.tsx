@@ -359,11 +359,43 @@ const Sidebar: React.FC = () => {
               </NavLinkButton>
             </Tooltip>
 
-            {/* Contact */}
-            <Tooltip title="Contact" placement="right">
+            {/* Commande */}
+            <Tooltip title="Commande" placement="right">
+              <NavLinkButton
+                to="/commande"
+                selected={window.location.pathname === "/commande"}
+                sx={{
+                  padding: "8px 16px",
+                  "& .MuiListItemIcon-root": {
+                    minWidth: "36px",
+                    color: "#004D99",
+                  },
+                }}
+              >
+                <ListItemIcon>
+                  <ShoppingCart />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Commande"
+                  primaryTypographyProps={{
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: "#004D99",
+                  }}
+                  sx={{
+                    display: {
+                      xs: "none",
+                      sm: "block",
+                    },
+                  }}
+                />
+              </NavLinkButton>
+            </Tooltip>
+            {/*Contact*/}
+            <Tooltip title="Commande" placement="right">
               <NavLinkButton
                 to="/contact"
-                selected={window.location.pathname === "/contact"}
+                selected={window.location.pathname === "/conact"}
                 sx={{
                   padding: "8px 16px",
                   "& .MuiListItemIcon-root": {

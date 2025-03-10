@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// Définir le type de quote
 interface Quote {
   ref: string;
   voiture: string;
@@ -9,18 +8,20 @@ interface Quote {
   dateArrivee: string;
   destination: string;
   nombreJours: number;
-  carburant: number; // Modifier carburant pour être un nombre
+  carburant: number;
   prixUnitaire: number;
   prixTotal: number;
-  isInvoice: boolean; // Ajout du champ pour savoir si c'est une facture
+  isInvoice: boolean;
 }
 
 interface ProformaState {
   quotes: Quote[];
+  error: string | null;
 }
 
 const initialState: ProformaState = {
   quotes: [],
+  error: null,
 };
 
 const proformaSlice = createSlice({
@@ -30,24 +31,37 @@ const proformaSlice = createSlice({
     validateProforma: (state, action: PayloadAction<string>) => {
       const quote = state.quotes.find((q) => q.ref === action.payload);
       if (quote) {
-        quote.isInvoice = true; // Marquer le devis comme une facture
+        quote.isInvoice = true;
       }
     },
     addQuote: (state, action: PayloadAction<Quote>) => {
-      // Vérifier si un devis avec la même référence existe déjà
       const existingQuote = state.quotes.find(
         (quote) => quote.ref === action.payload.ref
       );
       if (!existingQuote) {
-        state.quotes.push(action.payload); // Ajouter le devis dans l'état
+        state.quotes.push(action.payload);
+        state.error = null;
       } else {
-        alert("Un devis avec cette référence existe déjà !");
+        state.error = "Un devis avec cette référence existe déjà !";
       }
     },
-
-    // Autres actions comme ajouter un devis, etc.
+    updateQuote: (state, action: PayloadAction<Quote>) => {
+      const index = state.quotes.findIndex(
+        (quote) => quote.ref === action.payload.ref
+      );
+      if (index !== -1) {
+        state.quotes[index] = action.payload;
+        state.error = null;
+      } else {
+        state.error = "Aucun devis trouvé avec cette référence !";
+      }
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
 });
 
-export const { validateProforma, addQuote } = proformaSlice.actions;
+export const { validateProforma, addQuote, clearError, updateQuote } =
+  proformaSlice.actions;
 export default proformaSlice.reducer;

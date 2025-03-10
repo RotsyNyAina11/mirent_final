@@ -15,10 +15,19 @@ import {
   Typography,
   SelectChangeEvent,
 } from "@mui/material";
-import { createVehicle, fetchVehicles, Vehicle } from "../redux/slices/vehiclesSlice";
+import {
+  createVehicle,
+  fetchVehicles,
+  Vehicle,
+} from "../redux/slices/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
-import { toast } from "react-toastify"; 
-import { AiOutlineCar, AiOutlineTag, AiOutlineNumber, AiOutlineClose } from "react-icons/ai";
+import { toast } from "react-toastify";
+import {
+  AiOutlineCar,
+  AiOutlineTag,
+  AiOutlineNumber,
+  AiOutlineClose,
+} from "react-icons/ai";
 import { CameraAltOutlined } from "@mui/icons-material";
 
 interface AddVehicleProps {
@@ -79,7 +88,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
         }
       } catch (err) {
         console.error("Erreur lors de la récupération des données:", err);
-        toast.error("Une erreur s'est produite lors du chargement des données.");
+        toast.error(
+          "Une erreur s'est produite lors du chargement des données."
+        );
       } finally {
         setIsLoading(false);
       }
@@ -96,21 +107,20 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
     }));
   };
 
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-        setImageFile(file);
-        setVehicle((prev) => ({
-            ...prev,
-            imageUrl: URL.createObjectURL(file),
-        }));
+      setImageFile(file);
+      setVehicle((prev) => ({
+        ...prev,
+        imageUrl: URL.createObjectURL(file),
+      }));
     } else {
-        setImageFile(null);
-        setVehicle((prev) => ({
-            ...prev,
-            imageUrl: "",
-        }));
+      setImageFile(null);
+      setVehicle((prev) => ({
+        ...prev,
+        imageUrl: "",
+      }));
     }
   };
 
@@ -129,12 +139,13 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
     }
   };
 
-
   const handleSelectStatus = (event: SelectChangeEvent) => {
     const value = event.target.value;
     if (!value) return;
 
-    const selectedStatus = vehicleStatuses.find((status) => status.status === value);
+    const selectedStatus = vehicleStatuses.find(
+      (status) => status.status === value
+    );
     if (selectedStatus) {
       setVehicle((prev) => {
         return {
@@ -174,17 +185,16 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
       formData.append("typeId", vehicle.type.id.toString());
       formData.append("statusId", vehicle.status.id.toString());
 
-      if (imageFile) { 
+      if (imageFile) {
         formData.append("image", imageFile);
-        console.log("Type de imageFile :", imageFile); 
+        console.log("Type de imageFile :", imageFile);
       }
 
       console.log("FormData avant l'envoi :", formData.get("image"));
 
-
       await dispatch(createVehicle(formData));
       toast.success("Véhicule ajouté avec succès !");
-      dispatch(fetchVehicles()); 
+      dispatch(fetchVehicles());
       onClose();
     } catch (err) {
       console.error("Erreur lors de l'ajout du véhicule:", err);
@@ -228,17 +238,16 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
         }}
       >
         <Grid container spacing={2}>
-         
           <Grid item xs={12}>
             <Typography variant="h6" gutterBottom fontWeight="bold">
               Informations générales
             </Typography>
           </Grid>
 
-             {/* Image */}
-             <Grid item xs={12}>
-             {vehicle.imageUrl && (
-              <Box  sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          {/* Image */}
+          <Grid item xs={12}>
+            {vehicle.imageUrl && (
+              <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
                 <img
                   src={vehicle.imageUrl}
                   alt="Preview"
@@ -276,7 +285,6 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
             </label>
           </Grid>
 
-
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -288,7 +296,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               helperText={errors.nom}
               InputProps={{
                 startAdornment: (
-                  <AiOutlineTag style={{ marginRight: "8px", color: "#1976D2" }} />
+                  <AiOutlineTag
+                    style={{ marginRight: "8px", color: "#1976D2" }}
+                  />
                 ),
               }}
             />
@@ -305,7 +315,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               helperText={errors.marque}
               InputProps={{
                 startAdornment: (
-                  <AiOutlineCar style={{ marginRight: "8px", color: "#1976D2" }} />
+                  <AiOutlineCar
+                    style={{ marginRight: "8px", color: "#1976D2" }}
+                  />
                 ),
               }}
             />
@@ -322,7 +334,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               helperText={errors.modele}
               InputProps={{
                 startAdornment: (
-                  <AiOutlineCar style={{ marginRight: "8px", color: "#1976D2" }} />
+                  <AiOutlineCar
+                    style={{ marginRight: "8px", color: "#1976D2" }}
+                  />
                 ),
               }}
             />
@@ -339,7 +353,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               helperText={errors.immatriculation}
               InputProps={{
                 startAdornment: (
-                  <AiOutlineNumber style={{ marginRight: "8px", color: "#1976D2" }} />
+                  <AiOutlineNumber
+                    style={{ marginRight: "8px", color: "#1976D2" }}
+                  />
                 ),
               }}
             />
@@ -369,7 +385,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               helperText={errors.nombrePlace}
               InputProps={{
                 startAdornment: (
-                  <AiOutlineNumber style={{ marginRight: "8px", color: "#1976D2" }} />
+                  <AiOutlineNumber
+                    style={{ marginRight: "8px", color: "#1976D2" }}
+                  />
                 ),
               }}
             />
@@ -451,7 +469,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
             color="primary"
             onClick={handleSubmit}
             disabled={isLoading || Object.keys(errors).length > 0}
-            startIcon={isLoading ? <CircularProgress size={16} /> : <AiOutlineCar />}
+            startIcon={
+              isLoading ? <CircularProgress size={16} /> : <AiOutlineCar />
+            }
             sx={{
               backgroundColor: "#1976D2",
               "&:hover": { backgroundColor: "#1565C0" },

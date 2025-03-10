@@ -23,10 +23,18 @@ const initialState: ClientState = {
 
 // 🔄 **Async Thunks**
 export const fetchClients = createAsyncThunk(
-  "clients/fetchClients",
-  async () => {
-    const response = await fetch("http://localhost:3000/clients");
-    return (await response.json()) as Customer[];
+  "customers/fetchClients",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch("http://localhost:3000/clients"); // Replace with your API call
+      if (!response.ok) {
+        return rejectWithValue("Failed to fetch clients.");
+      }
+      const data = await response.json();
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
   }
 );
 
@@ -86,6 +94,7 @@ export const deleteClient = createAsyncThunk(
 const clientSlice = createSlice({
   name: "clients",
   initialState,
+
   reducers: {},
   extraReducers: (builder) => {
     builder

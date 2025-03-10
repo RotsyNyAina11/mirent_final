@@ -76,20 +76,6 @@ const CustomerManagement: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAddOrEditCustomer = async () => {
-    if (editMode && selectedCustomer) {
-      await dispatch(updateClient({ id: selectedCustomer.id, ...form }));
-    } else {
-      await dispatch(addClient(form));
-    }
-    dispatch(fetchClients()); // Rafraîchir la liste des clients
-    handleCloseDialog();
-    setSnackbarMessage(
-      editMode ? "Client modifié avec succès !" : "Client ajouté avec succès !"
-    );
-    setSnackbarOpen(true);
-  };
-
   /**Fonction pour supprimer un client */
 
   const handleDeleteCustomer = (id: number) => {
@@ -150,6 +136,66 @@ const CustomerManagement: React.FC = () => {
     setPage(0); // Réinitialiser à la première page
   };
 
+  {
+    /*Gestion d'erreur*/
+  }
+
+  const [formErrors, setFormErrors] = useState({
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+
+  const validateForm = () => {
+    let isValid = true;
+    const errors = { lastName: "", email: "", phone: "" };
+
+    if (!form.lastName.trim()) {
+      errors.lastName = "Nom requis.";
+      isValid = false;
+    }
+
+    if (!form.email.trim()) {
+      errors.email = "Email requis.";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+      errors.email = "Email invalide.";
+      isValid = false;
+    }
+
+    if (!form.phone.trim()) {
+      errors.phone = "Téléphone requis.";
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
+  const handleAddOrEditCustomer = async () => {
+    if (!validateForm()) {
+      return; // Stop if form is invalid
+    }
+
+    try {
+      if (editMode && selectedCustomer) {
+        await dispatch(updateClient({ id: selectedCustomer.id, ...form }));
+        setSnackbarMessage("Client modifié avec succès !");
+      } else {
+        await dispatch(addClient(form));
+        setSnackbarMessage("Client ajouté avec succès !");
+      }
+
+      dispatch(fetchClients()); // Rafraîchir la liste des clients
+      handleCloseDialog();
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Erreur lors de l'ajout/modification du client :", error);
+      setSnackbarMessage("Une erreur s'est produite !");
+      setSnackbarOpen(true);
+    }
+  };
+
   return (
     <Box sx={{ maxWidth: "95%", margin: "auto", marginTop: 4 }}>
       <Box
@@ -161,7 +207,7 @@ const CustomerManagement: React.FC = () => {
         }}
       >
         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-          Liste des Clients
+          Clients
         </Typography>
 
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -221,6 +267,8 @@ const CustomerManagement: React.FC = () => {
                 name="lastName"
                 label="Nom"
                 type="text"
+                error={!!formErrors.lastName} // Indicate error
+                helperText={formErrors.lastName}
                 fullWidth
                 value={form.lastName}
                 onChange={handleInputChange}
@@ -239,6 +287,8 @@ const CustomerManagement: React.FC = () => {
                 name="email"
                 label="Email"
                 type="email"
+                error={!!formErrors.email} // Indicate error
+                helperText={formErrors.email}
                 fullWidth
                 value={form.email}
                 onChange={handleInputChange}
@@ -256,6 +306,8 @@ const CustomerManagement: React.FC = () => {
                 name="phone"
                 label="Téléphone"
                 type="text"
+                error={!!formErrors.phone} // Indicate error
+                helperText={formErrors.phone}
                 fullWidth
                 value={form.phone}
                 onChange={handleInputChange}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addQuote } from "../redux/slices/proformaSlice";
@@ -34,20 +34,17 @@ const ProformaForm = () => {
     prixTotal: 0,
   });
 
-  // Fonction pour valider le proforma et générer une facture
   const handleValidate = () => {
     if (Object.values(quote).some((value) => value === "" || value === 0)) {
       alert("Veuillez remplir tous les champs correctement !");
       return;
     }
 
-    // Logique pour valider le proforma et mettre à jour la facture
     const updatedInvoice = {
       ...quote,
-      status: "validée", // État de la facture
+      status: "validée",
     };
 
-    // Effectuer l'appel API pour valider le proforma et créer la facture (côté serveur)
     fetch("http://localhost:3000/api/invoices", {
       method: "POST",
       headers: {
@@ -55,20 +52,28 @@ const ProformaForm = () => {
       },
       body: JSON.stringify(updatedInvoice),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          // Gérer les réponses d'erreur du serveur
+          return response.json().then((errorData) => {
+            throw new Error(
+              errorData.message || "Erreur lors de la validation du proforma"
+            );
+          });
+        }
+        return response.json();
+      })
       .then((data) => {
         alert("Facture générée et proforma validé !");
-        printInvoice(data); // Appelez une fonction pour imprimer la facture après validation
+        printInvoice(data);
       })
       .catch((error) => {
         console.error("Erreur lors de la validation du proforma :", error);
-        alert("Erreur lors de la validation du proforma");
+        alert(error.message || "Erreur lors de la validation du proforma");
       });
   };
 
-  // Fonction pour imprimer la facture
   const printInvoice = (invoiceData: any) => {
-    // Ouvrir une nouvelle fenêtre pour l'impression
     const printWindow = window.open("", "_blank");
 
     if (!printWindow) {
@@ -76,10 +81,9 @@ const ProformaForm = () => {
       return;
     }
 
-    // Créer le contenu HTML pour la facture
     const invoiceContent = `
       <html>
-        <head><title>Facture</title></head>
+        <head><title>Facture N°: ${invoiceData.ref}</title></head>
         <body>
           <h1>Facture N°: ${invoiceData.ref}</h1>
           <p>Voiture: ${invoiceData.voiture}</p>
@@ -90,26 +94,28 @@ const ProformaForm = () => {
           <p>Nombre de jours: ${invoiceData.nombreJours}</p>
           <p>Carburant: ${invoiceData.carburant}</p>
           <p>Prix unitaire: ${invoiceData.prixUnitaire}€</p>
-          <p>Prix total: ${invoiceData.prixTotal}Ar</p>
+          <p>Prix total: ${invoiceData.prixTotal} Ar</p>
           <p>Status: ${invoiceData.status}</p>
         </body>
       </html>
     `;
 
-    // Attendre que la fenêtre soit prête avant de lui injecter le contenu
     printWindow.document.write(invoiceContent);
-    printWindow.document.close(); // Important de fermer le document
+    printWindow.document.close();
 
-    // Donner un peu de temps à la fenêtre avant de la demander à imprimer
     setTimeout(() => {
-      printWindow.print(); // Imprimer la fenêtre
-      printWindow.close(); // Fermer la fenêtre après l'impression
-    }, 500); // Le délai ici (500ms) peut être ajusté si nécessaire
+      try {
+        printWindow.print();
+        printWindow.close();
+      } catch (error) {
+        console.error("Erreur lors de l'impression :", error);
+        alert("Erreur lors de l'impression de la facture.");
+      }
+    }, 500);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
     setQuote((prevQuote) => ({
       ...prevQuote,
       [name]: [
@@ -118,9 +124,7 @@ const ProformaForm = () => {
         "prixUnitaire",
         "prixTotal",
       ].includes(name)
-        ? value
-          ? Number(value)
-          : 0
+        ? Number(value)
         : value,
     }));
   };
@@ -128,15 +132,18 @@ const ProformaForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("Quote à envoyer :", quote);
-
     if (Object.values(quote).some((value) => value === "" || value === 0)) {
       alert("Veuillez remplir tous les champs correctement !");
       return;
     }
 
-    dispatch(addQuote(quote));
-    navigate("/tableau_proforma");
+    try {
+      dispatch(addQuote(quote));
+      navigate("/tableau_proforma");
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de la quote :", error);
+      alert("Une erreur est survenue lors de l'envoi de la quote.");
+    }
   };
 
   return (

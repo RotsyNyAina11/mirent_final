@@ -9,6 +9,7 @@ import { TypeModule } from './type/type.module';
 import { StatusModule } from './status/status.module';
 import { RegionsModule } from './regions/regions.module';
 import { PrixsModule } from './prixs/prixs.module';
+import { ClientModule } from './client/client.module';
 
 
 @Module({
@@ -19,6 +20,7 @@ import { PrixsModule } from './prixs/prixs.module';
     TypeModule,
     StatusModule,
     RegionsModule,
+    ClientModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',

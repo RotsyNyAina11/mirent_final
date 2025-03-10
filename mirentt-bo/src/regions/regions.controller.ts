@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common'
 import { RegionService } from './regions.service';
 import { Region } from 'src/entities/region.entity';
 import { Prix } from 'src/entities/prix.entity';
+import { CreateRegionDto } from './create-region.dto';
 
 
 @Controller('regions')
@@ -14,8 +15,8 @@ export class RegionController {
   }
 
   @Post()
-  async create(@Body() region: Region): Promise<Region> {
-    return this.regionService.create(region);
+  async create(@Body() createRegionDto: CreateRegionDto): Promise<Region> {
+    return this.regionService.create(createRegionDto);
   }
 
   @Put(':id')

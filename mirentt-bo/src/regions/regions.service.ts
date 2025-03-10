@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Prix } from 'src/entities/prix.entity';
 import { Region } from 'src/entities/region.entity';
 import { Repository } from 'typeorm';
+import { CreateRegionDto } from './create-region.dto';
 
 
 @Injectable()
@@ -18,11 +19,27 @@ export class RegionService {
     return this.regionRepository.find({ relations: ['prix'] });
   }
 
-  async create(region: Region): Promise<Region> {
-    const prix = this.prixRepository.create(region.prix);
-    await this.prixRepository.save(prix);
-    region.prix = prix;
-    return this.regionRepository.save(region);
+  async create(createRegionDto: CreateRegionDto): Promise<Region> {
+    try {
+      const region = new Region();
+      region.nom_region = createRegionDto.nom_region;
+      region.nom_district = createRegionDto.nom_district;
+      const prix = this.prixRepository.create(createRegionDto.prix);
+      region.prix = prix;
+
+      console.log('Region received:', region);
+      console.log('Prix data:', region.prix);
+  
+      console.log('Prix created:', prix);
+  
+      await this.prixRepository.save(prix);
+      region.prix = prix;
+  
+      return this.regionRepository.save(region);
+    } catch (error) {
+      console.error('Error creating region:', error);
+      throw error; // Re-throw the error to be handled by the controller
+    }
   }
 
   async updatePrix(regionId: number, prixValue: number): Promise<Prix> {
@@ -47,7 +64,6 @@ export class RegionService {
       throw new Error('Region not found');
     }
 
-    // Mise à jour des propriétés de la région
     if (updatedRegion.nom_region) {
       region.nom_region = updatedRegion.nom_region;
     }
@@ -55,14 +71,11 @@ export class RegionService {
       region.nom_district = updatedRegion.nom_district;
     }
 
-    // Mise à jour du prix
     if (updatedRegion.prix && updatedRegion.prix.prix !== undefined) {
       if (region.prix) {
-        // Mise à jour du prix existant
         region.prix.prix = updatedRegion.prix.prix;
         await this.prixRepository.save(region.prix);
       } else {
-        // Création d'un nouveau prix si inexistant
         const newPrix = this.prixRepository.create({ prix: updatedRegion.prix.prix, region: region });
         await this.prixRepository.save(newPrix);
         region.prix = newPrix;
@@ -78,11 +91,9 @@ export class RegionService {
       throw new Error('Region not found');
     }
 
-    //Suppression du prix associé
-    if (region.prix){
+    if (region.prix) {
       await this.prixRepository.remove(region.prix);
     }
-    //Suppression de la région
     await this.regionRepository.remove(region);
   }
 }

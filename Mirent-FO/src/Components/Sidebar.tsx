@@ -60,7 +60,6 @@ const Sidebar: React.FC = () => {
     };
 
     return (
-        <>
             <Drawer
                 variant="persistent"
                 anchor="left"
@@ -81,7 +80,27 @@ const Sidebar: React.FC = () => {
                         },
                     },
                 }}
-            >
+
+              >
+
+          {/* Se Déconnecter */}
+          <Box flexGrow={1} />
+            <NavLinkButton
+              to="/logout"
+              sx={{
+
+                "&:hover": {
+                  backgroundColor: "#FFEBEB",
+                  color: "#D32F2F",
+                  borderRadius: "8px",
+                },
+                padding: "8px 16px",
+                "& .MuiListItemIcon-root": {
+                  minWidth: "36px",
+                  color: "#D32F2F",
+                },
+              }}
+            />
                 <Box display="flex" flexDirection="column" height="100%">
                     <Toolbar
                         sx={{
@@ -455,9 +474,8 @@ const Sidebar: React.FC = () => {
                           </NavLinkButton>
                       </Tooltip>
                   </Box>
-              </Drawer>
-          </>
+          </Drawer>
       );
   };
-  
+
   export default Sidebar;

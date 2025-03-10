@@ -20,8 +20,8 @@ import { PrixsModule } from './prixs/prixs.module';
     StatusModule,
     RegionsModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'), 
-      serveRoot: '/uploads', 
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
     RegionsModule,
     PrixsModule,

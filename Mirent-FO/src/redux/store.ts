@@ -5,7 +5,7 @@ import vehiclesReducer from "./features/vehicle/vehiclesSlice";
 import { create } from "zustand";
 import { Proforma } from "../types/Proforma";
 import locationReducer from '../redux/features/lieux/locationSlice'
-
+import customersReducer from "./features/clients/customersSlice";
 interface ProformaState {
   proformas: Proforma[];
   addProforma: (newProforma: Proforma) => void;
@@ -22,7 +22,9 @@ export const store = configureStore({
     auth: authReducer,
     vehicles: vehiclesReducer,
     sidebar: sidebarReducer,
+    customer: customersReducer,
     locations: locationReducer,
+
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

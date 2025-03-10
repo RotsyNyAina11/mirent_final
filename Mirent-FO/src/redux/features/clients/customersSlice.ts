@@ -1,71 +1,141 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Customer, Rental } from "../../../types/customer";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
-interface CustomersState {
-  customers: Customer[];
-  rentals: Rental[];
+interface Customer {
+  id: number;
+  lastName: string;
+  email: string;
+  phone: string;
+  logo: string; 
+}
+
+interface ClientState {
+  clients: Customer[];
   loading: boolean;
   error: string | null;
 }
 
-const initialState: CustomersState = {
-  customers: [
-    {
-      id: "1",
-      firstName: "Jean",
-      lastName: "Dupont",
-      email: "jean.dupont@email.com",
-      phone: "0612345678",
-      licenseNumber: "B123456789",
-      createdAt: "2024-02-20",
-    },
-    {
-      id: "2",
-      firstName: "Marie",
-      lastName: "Martin",
-      email: "marie.martin@email.com",
-      phone: "0687654321",
-      licenseNumber: "B987654321",
-      createdAt: "2024-02-21",
-    },
-  ],
-  rentals: [
-    {
-      id: "3",
-      customerId: "1",
-      vehicleId: "1",
-      startDate: "2024-02-25",
-      endDate: "2024-02-28",
-      totalPrice: 150,
-      status: "active",
-    },
-  ],
+// État initial
+const initialState: ClientState = {
+  clients: [],
   loading: false,
   error: null,
 };
 
-const customersSlice = createSlice({
-  name: "customers",
-  initialState,
-  reducers: {
-    addCustomer: (state, action: PayloadAction<Customer>) => {
-      state.customers.push(action.payload);
-    },
-    addRental: (state, action: PayloadAction<Rental>) => {
-      state.rentals.push(action.payload);
-    },
-    updateRentalStatus: (
-      state,
-      action: PayloadAction<{ id: string; status: Rental["status"] }>
-    ) => {
-      const rental = state.rentals.find((r) => r.id === action.payload.id);
-      if (rental) {
-        rental.status = action.payload.status;
+// 🔄 **Async Thunks**
+export const fetchClients = createAsyncThunk(
+  "customers/fetchClients",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch("http://localhost:3000/clients"); // Replace with your API call
+      if (!response.ok) {
+        return rejectWithValue("Failed to fetch clients.");
       }
-    },
+      const data = await response.json();
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const addClient = createAsyncThunk(
+  "clients/addClient",
+  async (client: Omit<Customer, "id">) => {
+    const formData = new FormData();
+    formData.append("lastName", client.lastName);
+    formData.append("email", client.email);
+    formData.append("phone", client.phone);
+
+    if (client.logo) {
+      const file = await fetch(client.logo).then((res) => res.blob());
+      formData.append("logo", file, "logo.jpg");
+    }
+
+    const response = await fetch("http://localhost:3000/clients", {
+      method: "POST",
+      body: formData,
+    });
+
+    return (await response.json()) as Customer;
+  }
+);
+
+export const updateClient = createAsyncThunk(
+  "clients/updateClient",
+  async (client: Customer) => {
+    const formData = new FormData();
+    formData.append("lastName", client.lastName);
+    formData.append("email", client.email);
+    formData.append("phone", client.phone);
+
+    if (client.logo) {
+      const file = await fetch(client.logo).then((res) => res.blob());
+      formData.append("logo", file, "logo.jpg");
+    }
+
+    const response = await fetch(`http://localhost:3000/clients/${client.id}`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    return (await response.json()) as Customer;
+  }
+);
+
+export const deleteClient = createAsyncThunk(
+  "clients/deleteClient",
+  async (id: number) => {
+    await fetch(`http://localhost:3000/clients/${id}`, { method: "DELETE" });
+    return id;
+  }
+);
+
+// **Slice Redux**
+const clientSlice = createSlice({
+  name: "customer",
+  initialState,
+
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchClients.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(
+        fetchClients.fulfilled,
+        (state, action: PayloadAction<Customer[]>) => {
+          state.loading = false;
+          state.clients = action.payload;
+        }
+      )
+      .addCase(fetchClients.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? "Erreur inconnue";
+      })
+      .addCase(
+        addClient.fulfilled,
+        (state, action: PayloadAction<Customer>) => {
+          state.clients.push(action.payload);
+        }
+      )
+      .addCase(
+        updateClient.fulfilled,
+        (state, action: PayloadAction<Customer>) => {
+          const index = state.clients.findIndex(
+            (c) => c.id === action.payload.id
+          );
+          if (index !== -1) {
+            state.clients[index] = action.payload;
+          }
+        }
+      )
+      .addCase(
+        deleteClient.fulfilled,
+        (state, action: PayloadAction<number>) => {
+          state.clients = state.clients.filter((c) => c.id !== action.payload);
+        }
+      );
   },
 });
 
-export const { addCustomer, addRental, updateRentalStatus } =
-  customersSlice.actions;
-export default customersSlice.reducer;
+export default clientSlice.reducer;

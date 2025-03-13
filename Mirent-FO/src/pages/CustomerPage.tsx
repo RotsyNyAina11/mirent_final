@@ -8,7 +8,10 @@ import {
   updateClient,
   deleteClient,
 } from "../redux/features/clients/customersSlice";
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4f2edb793ff7b8646129c6d5cebd0c79f5ac157f
 import {
   Table,
   TableBody,

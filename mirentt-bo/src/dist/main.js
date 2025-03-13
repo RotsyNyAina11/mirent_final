@@ -61,7 +61,7 @@ function bootstrap() {
                     }));
                     // Middleware pour ajouter les en-têtes CORS aux fichiers statiques
                     app.use('/uploads', function (req, res, next) {
-                        res.header('Access-Control-Allow-Origin', '*'); // Permet l'accès depuis n'importe où
+                        res.header('Access-Control-Allow-Origin', '*');
                         res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
                         res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
                         next();
@@ -71,8 +71,7 @@ function bootstrap() {
                     // Ajout de la validation globale pour sécuriser les entrées
                     app.useGlobalPipes(new common_1.ValidationPipe({
                         whitelist: true,
-                        forbidNonWhitelisted: true,
-                        transform: true
+                        forbidNonWhitelisted: true
                     }));
                     PORT = process.env.PORT || 3000;
                     return [4 /*yield*/, app.listen(PORT)];

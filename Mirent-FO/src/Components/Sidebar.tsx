@@ -450,6 +450,7 @@ const Sidebar: React.FC = () => {
           </List>
 
           <Box flexGrow={1} />
+
           <Divider sx={{ my: 1, borderColor: "#e0e0e0" }} />
           <Tooltip title="Se Déconnecter" placement="right">
             <NavLinkButton

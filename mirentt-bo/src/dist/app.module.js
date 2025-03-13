@@ -16,9 +16,10 @@ var path_1 = require("path");
 var vehicles_module_1 = require("./vehicles/vehicles.module");
 var type_module_1 = require("./type/type.module");
 var status_module_1 = require("./status/status.module");
-var client_module_1 = require("./client/client.module");
 var regions_module_1 = require("./regions/regions.module");
 var prixs_module_1 = require("./prixs/prixs.module");
+var client_module_1 = require("./client/client.module");
+var proforma_module_1 = require("./proforma/proforma.module");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -30,6 +31,7 @@ var AppModule = /** @class */ (function () {
                 vehicles_module_1.VehiclesModule,
                 type_module_1.TypeModule,
                 status_module_1.StatusModule,
+                regions_module_1.RegionsModule,
                 client_module_1.ClientModule,
                 serve_static_1.ServeStaticModule.forRoot({
                     rootPath: path_1.join(__dirname, '..', 'uploads'),
@@ -37,6 +39,7 @@ var AppModule = /** @class */ (function () {
                 }),
                 regions_module_1.RegionsModule,
                 prixs_module_1.PrixsModule,
+                proforma_module_1.ProformaModule,
             ]
         })
     ], AppModule);

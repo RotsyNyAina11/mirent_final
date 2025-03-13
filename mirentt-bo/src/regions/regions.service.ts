@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Prix } from 'src/entities/prix.entity';
 import { Region } from 'src/entities/region.entity';
 import { Repository } from 'typeorm';
-import { CreateRegionDto } from './create_region.dto';
+
+import { CreateRegionDto } from './create-region.dto';
 
 @Injectable()
 export class RegionService {
@@ -88,6 +89,7 @@ export class RegionService {
           prix: updatedRegion.prix.prix,
           region: region,
         });
+
         await this.prixRepository.save(newPrix);
         region.prix = newPrix;
       }

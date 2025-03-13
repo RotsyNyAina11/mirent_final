@@ -7,6 +7,7 @@ import sidebarReducer from "./features/sidebar/SidebarSlice";
 import vehiclesReducer from "./features/vehicle/vehiclesSlice";
 import { create } from "zustand";
 import { Proforma } from "../types/Proforma";
+
 import locationReducer from "../redux/features/lieux/locationSlice";
 
 interface ProformaState {

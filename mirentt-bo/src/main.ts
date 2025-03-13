@@ -22,7 +22,7 @@ async function bootstrap() {
 
   // Middleware pour ajouter les en-têtes CORS aux fichiers statiques
   app.use('/uploads', (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); // Permet l'accès depuis n'importe où
+    res.header('Access-Control-Allow-Origin', '*');
     res.header(
       'Access-Control-Allow-Methods',
       'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -37,13 +37,13 @@ async function bootstrap() {
   // Ajout de la validation globale pour sécuriser les entrées
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Supprime les champs non définis dans le DTO
-      forbidNonWhitelisted: true, // Rejette les requêtes avec des champs non autorisés
-      transform: true, // Transforme les types en ceux définis dans le DTO
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      //transform: true,
     }),
   );
 
-  const PORT = process.env.PORT || 3000; // Utilisation de la variable d'environnement pour le port
+  const PORT = process.env.PORT || 3000;
 
   await app.listen(PORT);
   Logger.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);

@@ -19,8 +19,8 @@ import Facturation from "./pages/FacturationPage";
 //import ProformaList from "./pages/ProformaList";
 import ProformaForm from "./Components/ProformaForm";
 import Commande from "./pages/CommandePage";
+//import ProformaList from "./pages/ProformaList";
 
-import ProformaList from "./pages/ProformaList";
 import LocationsPage from "./pages/locationPage";
 
 const App: React.FC = () => {
@@ -123,6 +123,18 @@ const App: React.FC = () => {
         />
 
         {/* Route pour la page  sur la commande */}
+
+        {/* Route pour la page des lieux */}
+        <Route
+          path="/lieux"
+          element={
+            <MainLayout>
+              <LocationsPage />
+            </MainLayout>
+          }
+        />
+        {/* Route pour la page sur la commande */}
+
         <Route
           path="/commande"
           element={
@@ -141,7 +153,7 @@ const App: React.FC = () => {
           }
         />
         {/* Redirection par défaut vers /accueil */}
-        <Route path="" element={<Navigate to="/accueil" />} />
+        <Route path="*" element={<Navigate to="/accueil" />} />
       </Routes>
     </Router>
   );

@@ -8,8 +8,10 @@ var status_entity_1 = require("../entities/status.entity");
 var type_entity_1 = require("../entities/type.entity");
 var user_entity_1 = require("../entities/user.entity");
 var vehicle_entity_1 = require("../entities/vehicle.entity");
-var client_entity_1 = require("../entities/client.entity");
 var prix_entity_1 = require("src/entities/prix.entity");
+var client_entity_1 = require("../entities/client.entity");
+var proformat_item_entity_1 = require("src/entities/proformat-item.entity");
+var proforma_entity_1 = require("src/entities/proforma.entity");
 dotenv.config();
 exports.typeOrmConfig = {
     type: 'postgres',
@@ -27,6 +29,8 @@ exports.typeOrmConfig = {
         region_entity_1.Region,
         client_entity_1.Client,
         prix_entity_1.Prix,
+        proformat_item_entity_1.ProformaItem,
+        proforma_entity_1.Proforma,
     ],
     synchronize: true
 };

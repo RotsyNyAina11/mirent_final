@@ -16,6 +16,7 @@ interface OrderState {
   carburant: string;
   listePrix: string;
   condtionPaiement: string;
+  confirmed: boolean;
 }
 
 const initialState: OrderState = {
@@ -33,7 +34,8 @@ const initialState: OrderState = {
   destination: "",
   carburant: "",
   listePrix: "",
-  condtionPaiement: "30 jours après", // Corrected placement
+  condtionPaiement: "30 jours après",
+  confirmed: false, // Corrected placement
 };
 
 const commandeSlice = createSlice({
@@ -58,6 +60,13 @@ const commandeSlice = createSlice({
     setRentalEnd: (state, action: PayloadAction<string>) => {
       state.rentalEnd = action.payload;
     },
+    confirmOrder: (state, action: PayloadAction<string>) => {
+      // Prend un orderId
+      if (state.orderId === action.payload) {
+        // Vérifie si l'orderId correspond
+        state.confirmed = true;
+      }
+    },
 
     // Ajoutez d'autres reducers pour chaque champ si nécessaire
   },
@@ -70,6 +79,7 @@ export const {
   setRentalStart,
   setRentalEnd,
   setDuration,
+  confirmOrder,
   // Exportez d'autres actions si nécessaire
 } = commandeSlice.actions;
 

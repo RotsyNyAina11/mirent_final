@@ -1,5 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 interface Customer {
   id: number;
   lastName: string;
@@ -92,7 +91,7 @@ export const deleteClient = createAsyncThunk(
 
 // **Slice Redux**
 const clientSlice = createSlice({
-  name: "clients",
+  name: "customer",
   initialState,
 
   reducers: {},

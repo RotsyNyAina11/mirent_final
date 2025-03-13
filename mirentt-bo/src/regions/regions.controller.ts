@@ -10,7 +10,8 @@ import {
 import { RegionService } from './regions.service';
 import { Region } from 'src/entities/region.entity';
 import { Prix } from 'src/entities/prix.entity';
-import { CreateRegionDto } from './create_region.dto';
+
+import { CreateRegionDto } from './create-region.dto';
 
 @Controller('regions')
 export class RegionController {

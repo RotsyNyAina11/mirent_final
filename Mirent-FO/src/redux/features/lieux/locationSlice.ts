@@ -16,6 +16,7 @@ const initialState: RegionsState = {
 
 export const fetchRegions = createAsyncThunk(
   "regions/fetchRegions",
+
   async (_, { rejectWithValue }) => {
     try {
       return await RegionsService.findAllWithDetails();
@@ -80,6 +81,7 @@ const regionsSlice = createSlice({
       )
       .addCase(fetchRegions.rejected, (state, action) => {
         state.status = "failed";
+
         state.error = (action as any).payload || null;
       })
       .addCase(addRegion.fulfilled, (state, action: PayloadAction<Region>) => {

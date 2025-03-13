@@ -7,10 +7,11 @@ import { join } from 'path';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { TypeModule } from './type/type.module';
 import { StatusModule } from './status/status.module';
-import { ClientModule } from './client/client.module';
 
 import { RegionsModule } from './regions/regions.module';
 import { PrixsModule } from './prixs/prixs.module';
+import { ClientModule } from './client/client.module';
+import { ProformaModule } from './proforma/proforma.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PrixsModule } from './prixs/prixs.module';
     VehiclesModule,
     TypeModule,
     StatusModule,
+    RegionsModule,
     ClientModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
@@ -26,6 +28,7 @@ import { PrixsModule } from './prixs/prixs.module';
     }),
     RegionsModule,
     PrixsModule,
+    ProformaModule,
   ],
 })
 export class AppModule {}

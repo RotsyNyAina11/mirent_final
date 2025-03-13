@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "../redux/store";
+
 import {
   Table,
   TableBody,
@@ -54,6 +55,7 @@ const LocationList = () => {
   }));
 
   const dispatch = useDispatch<AppDispatch>();
+
   const addRegionStatus = useSelector((state: any) => state.locations.status);
   const addRegionError = useSelector((state: any) => state.locations.error);
   const [regions, setRegions] = useState<Region[]>([]);
@@ -121,6 +123,7 @@ const LocationList = () => {
     try {
       if (selectedRegion) {
         // Modification
+
         dispatch(
           updateRegion({
             id: selectedRegion.id,
@@ -131,6 +134,7 @@ const LocationList = () => {
           })
         );
         fetchRegions();
+
         toast.success("Région modifiée avec succès");
       } else {
         // Ajout
@@ -138,6 +142,7 @@ const LocationList = () => {
           ...formValues,
           prix: { prix: prixValue },
         };
+
         console.log("add region data: ", newRegion);
         await dispatch(addRegion(newRegion as Region)).unwrap(); // Unwrap the promise
         toast.success("Région ajoutée avec succès");

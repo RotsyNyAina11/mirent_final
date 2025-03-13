@@ -22,7 +22,10 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { Delete, Search, Edit, Add } from "@mui/icons-material";
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4f2edb793ff7b8646129c6d5cebd0c79f5ac157f
 import {
   deleteVehicle,
   fetchVehicles,
@@ -333,6 +336,11 @@ const VehiclesList: React.FC = () => {
                             ?.type
                         }
                       </Typography>
+
+                      <Typography variant="body2" color="textSecondary">
+                        Place: {veh.nombrePlace}
+                      </Typography>
+
                       <Typography variant="body2" color="textSecondary">
                         Status:{" "}
                         <span

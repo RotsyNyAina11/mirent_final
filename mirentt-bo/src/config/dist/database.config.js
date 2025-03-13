@@ -3,13 +3,13 @@ exports.__esModule = true;
 exports.typeOrmConfig = void 0;
 var dotenv = require("dotenv");
 var blacklisted_token_entity_1 = require("../entities/blacklisted-token.entity");
-var district_entity_1 = require("../entities/district.entity");
 var region_entity_1 = require("../entities/region.entity");
 var status_entity_1 = require("../entities/status.entity");
 var type_entity_1 = require("../entities/type.entity");
 var user_entity_1 = require("../entities/user.entity");
 var vehicle_entity_1 = require("../entities/vehicle.entity");
 var client_entity_1 = require("../entities/client.entity");
+var prix_entity_1 = require("src/entities/prix.entity");
 dotenv.config();
 exports.typeOrmConfig = {
     type: 'postgres',
@@ -25,8 +25,8 @@ exports.typeOrmConfig = {
         type_entity_1.Type,
         status_entity_1.Status,
         region_entity_1.Region,
-        district_entity_1.District,
         client_entity_1.Client,
+        prix_entity_1.Prix,
     ],
     synchronize: true
 };

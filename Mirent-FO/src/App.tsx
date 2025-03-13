@@ -15,9 +15,13 @@ import Reservations from "./pages/reservation";
 import Performat from "./pages/ProformaTable";
 import Devis from "./pages/Devis";
 import Facturation from "./pages/FacturationPage";
+
 //import ProformaList from "./pages/ProformaList";
 import ProformaForm from "./Components/ProformaForm";
 import Commande from "./pages/CommandePage";
+
+import ProformaList from "./pages/ProformaList";
+import LocationsPage from "./pages/locationPage";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -117,12 +121,22 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
+
         {/* Route pour la page  sur la commande */}
         <Route
           path="/commande"
           element={
             <MainLayout>
               <Commande />
+            </MainLayout>
+          }
+        />
+        {/* Route pour la page des lieux */}
+        <Route
+          path="/lieux"
+          element={
+            <MainLayout>
+              <LocationsPage />
             </MainLayout>
           }
         />

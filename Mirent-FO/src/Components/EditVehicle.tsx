@@ -19,12 +19,13 @@ import {
   AiOutlineTag,
 } from "react-icons/ai";
 import { CameraAltOutlined } from "@mui/icons-material";
+
 import {
   updateVehicle,
   Vehicle,
   fetchVehicleTypes,
   fetchVehicleStatuses,
-} from "../redux/slices/vehiclesSlice";
+} from "../redux/features/vehicle/vehiclesSlice";
 import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../redux/store";
@@ -72,8 +73,8 @@ const EditVehicle: React.FC<EditVehicleProps> = ({
     (state: RootState) => state.vehicles.vehiclesStatusError
   );
 
-  const [type, setType] = useState<number>(vehicle.type.id); // Stocker l'ID
-  const [status, setStatus] = useState<number>(vehicle.status.id); // Stocker l'ID
+  const [type, setType] = useState<number>(vehicle.type.id);
+  const [status, setStatus] = useState<number>(vehicle.status.id);
 
   const [nom, setNom] = useState(vehicle.nom || "");
   const [marque, setMarque] = useState(vehicle.marque || "");
@@ -85,21 +86,6 @@ const EditVehicle: React.FC<EditVehicleProps> = ({
   const [image, setImage] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
-
-  useEffect(() => {
-    if (image) {
-      setPreviewImage(URL.createObjectURL(image));
-    } else {
-      setPreviewImage(null);
-    }
-  }, [image]);
-
-  useEffect(() => {
-    if (open) {
-      dispatch(fetchVehicleTypes());
-      dispatch(fetchVehicleStatuses());
-    }
-  }, [open, dispatch]);
 
   useEffect(() => {
     if (vehicleTypes.length > 0) {

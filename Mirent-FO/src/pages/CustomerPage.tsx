@@ -7,7 +7,8 @@ import {
   addClient,
   updateClient,
   deleteClient,
-} from "../redux/slices/customersSlice";
+} from "../redux/features/clients/customersSlice";
+
 import {
   Table,
   TableBody,
@@ -213,9 +214,7 @@ const CustomerManagement: React.FC = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-          Clients
-        </Typography>
+        <Typography>Gérer vos clients dans votre agence</Typography>
 
         <Box sx={{ display: "flex", gap: 1 }}>
           <TextField

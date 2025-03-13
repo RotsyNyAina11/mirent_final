@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import {
   Toolbar,
   Button,
@@ -23,12 +24,20 @@ import {
   Dialog,
   DialogActions,
   MenuItem,
+  InputAdornment,
+  Paper,
 } from "@mui/material";
 import { useAppDispatch } from "../hooks";
 
 import SendIcon from "@mui/icons-material/Send";
-import { setOrderDetails, setDuration } from "../redux/slices/commandeSlice";
-import { fetchClients } from "../redux/slices/customersSlice";
+import {
+  setOrderDetails,
+  setDuration,
+  confirmOrder,
+} from "../redux/features/commande/commandeSlice";
+import { fetchClients } from "../redux/features/clients/customersSlice";
+import { fetchRegions } from "../redux/features/lieux/locationSlice";
+import { Prix } from "../types/region";
 
 // Interface pour définir le type de données d'un client
 interface Client {
@@ -51,6 +60,24 @@ interface OrderLine {
   taxes: number;
   amount: number;
 }
+// interface pour definir le type de données d'une region
+
+interface Region {
+  id: number;
+  nom_region: string;
+  nom_district: string;
+  prix: Prix;
+}
+
+const ButtonActions = {
+  SEND_EMAIL: "SEND_EMAIL",
+  CONFIRM: "CONFIRM",
+  PREVIEW: "PREVIEW",
+  CANCEL: "CANCEL",
+  DEVIS: "DEVIS",
+  SENT: "SENT",
+  BON_COMMANDE: "BON_COMMANDE",
+};
 
 // Composant principal de la page de commande
 const OrderPage: React.FC = () => {
@@ -62,6 +89,7 @@ const OrderPage: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
 
   // Récupération des données depuis Redux
+  const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const state = useSelector((state: any) => state);
   console.log("State Redux :", state);
   // clients
@@ -74,6 +102,20 @@ const OrderPage: React.FC = () => {
   useEffect(() => {
     console.log("Fetching clients...");
     dispatch(fetchClients());
+  }, [dispatch]);
+
+  // charger les regions au montage
+  const regions = useSelector((state: any) => state.locations.regions);
+  const loadingRegion = useSelector((state: any) => state.locations.loading);
+
+  console.log("Regions chargées :", regions);
+  console.log("Erreur :", error);
+  if (loadingRegion) return <p>Chargement des régions...</p>;
+  if (!regions) return <p>Erreur : Aucune région trouvée.</p>;
+
+  useEffect(() => {
+    console.log("Fetching clients...");
+    dispatch(fetchRegions());
   }, [dispatch]);
 
   const [activeButtonIndex, setActiveButtonIndex] = useState<number | null>(
@@ -110,8 +152,53 @@ const OrderPage: React.FC = () => {
   }, [orderDetails.rentalStart, orderDetails.rentalEnd]);
 
   // Fonction pour gérer le clic sur un bouton dans la barre d'outils
-  const handleButtonClick = (index: number) => {
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+
+  /*const handleButtonClick = (index: number) => {
     setActiveButtonIndex(index);
+    if (index === 1) {
+      // Si le bouton "Confirmer" est cliqué
+      setConfirmationMessage("Commande confirmée !");
+      setTimeout(() => {
+        setConfirmationMessage(""); // Effacer le message après 3 secondes
+      }, 3000);
+    }
+  };*/
+
+  const handleButtonClick = (action: string, index?: number) => {
+    if (index !== undefined) {
+      setActiveButtonIndex(index);
+    }
+    switch (action) {
+      case ButtonActions.SEND_EMAIL:
+        console.log("Envoyer par email");
+        break;
+      case ButtonActions.CONFIRM:
+        console.log("Confirmer la commande");
+        setConfirmationMessage("Commande confirmée !");
+        setTimeout(() => {
+          setConfirmationMessage("");
+        }, 3000);
+        break;
+      case ButtonActions.PREVIEW:
+        console.log("Prévisualiser");
+        break;
+      case ButtonActions.CANCEL:
+        console.log("Annuler");
+        break;
+      case ButtonActions.DEVIS:
+        console.log("Devis");
+        setFormType("devis");
+        break;
+      case ButtonActions.SENT:
+        console.log("Envoyé");
+        break;
+      case ButtonActions.BON_COMMANDE:
+        console.log("Bon de commande");
+        break;
+      default:
+        break;
+    }
   };
 
   const handleClientChange = (
@@ -232,25 +319,42 @@ const OrderPage: React.FC = () => {
             <Button
               startIcon={<SendIcon />}
               variant={activeButtonIndex === 0 ? "contained" : "outlined"}
-              onClick={() => handleButtonClick(0)}
+              onClick={() => handleButtonClick(ButtonActions.SEND_EMAIL, 0)}
             >
               Envoyer par email
             </Button>
             <Button
               variant={activeButtonIndex === 1 ? "contained" : "outlined"}
-              onClick={() => handleButtonClick(1)}
+              onClick={() => handleButtonClick(ButtonActions.CONFIRM, 1)}
             >
               Confirmer
             </Button>
+            {confirmationMessage && (
+              <div
+                style={{
+                  position: "fixed",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  background: "lightgreen",
+                  padding: "20px",
+                  borderRadius: "8px",
+                  zIndex: 1000,
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                {confirmationMessage}
+              </div>
+            )}
             <Button
               variant={activeButtonIndex === 2 ? "contained" : "outlined"}
-              onClick={() => handleButtonClick(2)}
+              onClick={() => handleButtonClick(ButtonActions.PREVIEW, 2)}
             >
               Preview
             </Button>
             <Button
               variant={activeButtonIndex === 3 ? "contained" : "outlined"}
-              onClick={() => handleButtonClick(3)}
+              onClick={() => handleButtonClick(ButtonActions.CANCEL, 3)}
             >
               Annuler
             </Button>
@@ -261,25 +365,28 @@ const OrderPage: React.FC = () => {
           aria-label="outlined primary button group"
         >
           <Button
-            variant={activeButtonIndex === 5 ? "contained" : "outlined"}
-            onClick={() => setFormType("devis")}
+            variant={activeButtonIndex === 4 ? "contained" : "outlined"}
+            onClick={() => handleButtonClick(ButtonActions.DEVIS, 4)}
           >
             Devis
           </Button>
           <Button
             variant={activeButtonIndex === 5 ? "contained" : "outlined"}
-            onClick={() => handleButtonClick(5)}
+            onClick={() => handleButtonClick(ButtonActions.SENT, 5)}
           >
             Envoyé
           </Button>
           <Button
             variant={activeButtonIndex === 6 ? "contained" : "outlined"}
-            onClick={() => handleButtonClick(6)}
+            onClick={() => handleButtonClick(ButtonActions.BON_COMMANDE, 6)}
           >
             Bon de commande
           </Button>
         </ButtonGroup>
       </Toolbar>
+      <Typography variant="body1" paragraph sx={{ fontSize: "0.9rem" }}>
+        Ici, vous pouvez gérer les commandes de location de votre agence.
+      </Typography>
 
       {/* Affichage des erreurs */}
       {/* Message de chargement ou d'erreur */}
@@ -351,20 +458,80 @@ const OrderPage: React.FC = () => {
                       onChange={handleChange}
                     />
                     <Autocomplete
-                      options={destinations}
+                      options={Array.isArray(regions) ? regions : []}
+                      getOptionLabel={(region) =>
+                        region && region.nom_region ? region.nom_region : ""
+                      }
+                      value={
+                        Array.isArray(regions)
+                          ? regions.find(
+                              (region) =>
+                                region.nom_region === orderDetails.destination
+                            ) || null
+                          : null
+                      }
+                      onChange={(event, newValue) => {
+                        dispatch(
+                          setOrderDetails({
+                            destination: newValue ? newValue.nom_region : "",
+                          })
+                        );
+                      }}
                       renderInput={(params) => (
                         <TextField
                           {...params}
                           fullWidth
                           variant="standard"
-                          name="destination"
                           label="Destination"
-                          value={orderDetails.destination}
-                          onChange={handleChange}
+                          InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                              <>
+                                {params.InputProps.endAdornment}
+                                <InputAdornment position="end">
+                                  <LocationOnIcon color="action" />
+                                </InputAdornment>
+                              </>
+                            ),
+                          }}
                         />
                       )}
+                      PaperComponent={(props) => (
+                        <Paper
+                          elevation={3}
+                          sx={{ borderRadius: 2, overflow: "hidden" }}
+                          {...props}
+                        />
+                      )}
+                      renderOption={(props, option, { selected }) => (
+                        <li
+                          {...props}
+                          style={{
+                            padding: "10px",
+                            backgroundColor: selected
+                              ? "#f0f0f0"
+                              : "transparent",
+                            cursor: "pointer",
+                            borderBottom: "1px solid #ddd",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <LocationOnIcon color="primary" sx={{ mr: 1 }} />
+                          <Box display="flex" flexDirection="column">
+                            <Typography
+                              variant="body1"
+                              fontWeight={selected ? "bold" : "normal"}
+                            >
+                              {option.nom_region}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {option.nom_district} - {option.prix?.prix} Ar
+                            </Typography>
+                          </Box>
+                        </li>
+                      )}
                     />
-
                     <Box sx={{ display: "flex", gap: 2 }}>
                       <TextField
                         fullWidth
@@ -434,7 +601,7 @@ const OrderPage: React.FC = () => {
                     />
                     <TextField
                       fullWidth
-                      variant="standard"
+                      variant="filled"
                       name="expiration"
                       value={orderDetails.expiration}
                       label="Expiration"
@@ -463,11 +630,14 @@ const OrderPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Produit</TableCell>
-                  <TableCell>Quantité</TableCell>
-                  <TableCell>Prix unitaire</TableCell>
-                  <TableCell>Taxes</TableCell>
-                  <TableCell>Montant</TableCell>
+                  <TableCell>Voiture</TableCell>
+                  <TableCell>Marque</TableCell>
+                  <TableCell>Modèle </TableCell>
+                  <TableCell>Immatriculation</TableCell>
+                  <TableCell>Nombre de place</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell

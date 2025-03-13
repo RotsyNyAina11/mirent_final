@@ -19,7 +19,7 @@ import {
   createVehicle,
   fetchVehicles,
   Vehicle,
-} from "../redux/slices/vehiclesSlice";
+} from "../redux/features/vehicle/vehiclesSlice";
 import { useAppDispatch } from "../hooks";
 import { toast } from "react-toastify";
 import {

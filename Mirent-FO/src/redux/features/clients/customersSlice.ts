@@ -1,11 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Customer {
   id: number;
   lastName: string;
   email: string;
   phone: string;
-  logo: string; // Stocke l'URL du logo
+  logo: string;
 }
 
 interface ClientState {
@@ -26,7 +26,7 @@ export const fetchClients = createAsyncThunk(
   "clients/fetchClients",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/clients"); // Replace with your API call
+      const response = await fetch("http://localhost:3000/clients");
       if (!response.ok) {
         return rejectWithValue("Failed to fetch clients.");
       }

@@ -35,13 +35,13 @@ async function bootstrap() {
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
   // Ajout de la validation globale pour sécuriser les entrées
-  app.useGlobalPipes(
+ app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, 
-      forbidNonWhitelisted: true, 
-      transform: true, 
+     whitelist: true, 
+     forbidNonWhitelisted: true, 
+      //transform: true, 
     }),
-  );
+ );
 
   const PORT = process.env.PORT || 3000; 
 

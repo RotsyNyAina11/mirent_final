@@ -130,7 +130,7 @@ const Accueil: React.FC = () => {
         }
       } catch (error) {
         console.error(
-          "Erreur lors de la récupération des clients disponibles",
+          "Erreur lors de la récupération des nomres de clients",
           error
         );
         setAvailableClientsCount(null);
@@ -220,7 +220,7 @@ const Accueil: React.FC = () => {
                 <Person />
               </IconButton>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                Clients disponibles
+                Total  Clients
               </Typography>
               {availableClientsCount !== null ? (
                 <Typography variant="h4" color="text.primary">

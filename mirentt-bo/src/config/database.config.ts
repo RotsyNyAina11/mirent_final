@@ -9,6 +9,8 @@ import { User } from '../entities/user.entity';
 import { Vehicule } from '../entities/vehicle.entity';
 import { Prix } from 'src/entities/prix.entity';
 import { Client } from '../entities/client.entity';
+import { ProformaItem } from 'src/entities/proformat-item.entity';
+import { Proforma } from 'src/entities/proforma.entity';
 
 
 dotenv.config();
@@ -28,7 +30,9 @@ export const typeOrmConfig: DataSourceOptions = {
     Status,
     Region,
     Client,
-    Prix
+    Prix,
+    ProformaItem,
+    Proforma
   ],
   synchronize: true,
 };

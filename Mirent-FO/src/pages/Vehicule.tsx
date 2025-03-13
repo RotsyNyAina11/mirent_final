@@ -332,6 +332,11 @@ const VehiclesList: React.FC = () => {
                             ?.type
                         }
                       </Typography>
+
+                      <Typography variant="body2" color="textSecondary">
+                        Place: {veh.nombrePlace}
+                      </Typography>
+
                       <Typography variant="body2" color="textSecondary">
                         Status:{" "}
                         <span

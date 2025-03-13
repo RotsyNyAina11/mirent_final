@@ -10,6 +10,7 @@ import { StatusModule } from './status/status.module';
 import { RegionsModule } from './regions/regions.module';
 import { PrixsModule } from './prixs/prixs.module';
 import { ClientModule } from './client/client.module';
+import { ProformaModule } from './proforma/proforma.module';
 
 
 @Module({
@@ -27,6 +28,7 @@ import { ClientModule } from './client/client.module';
     }),
     RegionsModule,
     PrixsModule,
+    ProformaModule,
   ],
 })
 export class AppModule {}

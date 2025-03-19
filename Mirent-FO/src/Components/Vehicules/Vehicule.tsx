@@ -22,10 +22,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { Delete, Search, Edit, Add } from "@mui/icons-material";
-<<<<<<< HEAD
 
-=======
->>>>>>> 4f2edb793ff7b8646129c6d5cebd0c79f5ac157f
 import {
   deleteVehicle,
   fetchVehicles,
@@ -34,11 +31,11 @@ import {
   Vehicle,
   VehicleStatus,
   VehicleType,
-} from "../redux/features/vehicle/vehiclesSlice";
-import { useAppDispatch } from "../hooks";
+} from "../../redux/features/vehicle/vehiclesSlice";
+import { useAppDispatch } from "../../hooks";
 import { useSelector } from "react-redux";
-import AddVehicle from "../Components/AddVehicle";
-import EditVehicle from "../Components/EditVehicle";
+import AddVehicle from "./AddVehicle";
+import EditVehicle from "./EditVehicle";
 
 const VehiclesList: React.FC = () => {
   const dispatch = useAppDispatch();

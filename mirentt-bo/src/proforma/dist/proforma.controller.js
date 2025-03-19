@@ -1,4 +1,13 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,54 +45,43 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var core_1 = require("@nestjs/core");
-var app_module_1 = require("./app.module");
+exports.ProformaController = void 0;
 var common_1 = require("@nestjs/common");
-var all_eceptionfilters_1 = require("./filters/all-eceptionfilters");
-require("reflect-metadata");
-var path_1 = require("path");
-var express = require("express");
-var cors = require("cors");
-function bootstrap() {
-    return __awaiter(this, void 0, void 0, function () {
-        var app, PORT, logger;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule)];
-                case 1:
-                    app = _a.sent();
-                    app.useLogger(new common_1.Logger());
-                    // Activer CORS pour tout le backend
-                    app.use(cors({
-                        origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-                        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-                        allowedHeaders: ['Content-Type', 'Authorization'],
-                        credentials: true
-                    }));
-                    // Middleware pour ajouter les en-têtes CORS aux fichiers statiques
-                    app.use('/uploads', function (req, res, next) {
-                        res.header('Access-Control-Allow-Origin', '*');
-                        res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
-                        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-                        next();
-                    });
-                    // Gérer les fichiers statiques avec Express
-                    app.use('/uploads', express.static(path_1.join(__dirname, '..', 'uploads')));
-                    // Ajout de la validation globale pour sécuriser les entrées
-                    app.useGlobalPipes(new common_1.ValidationPipe({
-                        whitelist: true,
-                        forbidNonWhitelisted: true
-                    }));
-                    PORT = process.env.PORT || 3000;
-                    logger = new common_1.Logger('Main');
-                    app.useGlobalFilters(new all_eceptionfilters_1.AllExceptionsFilter());
-                    return [4 /*yield*/, app.listen(PORT)];
-                case 2:
-                    _a.sent();
-                    common_1.Logger.log("\uD83D\uDE80 Serveur d\u00E9marr\u00E9 sur http://localhost:" + PORT);
-                    return [2 /*return*/];
-            }
+var ProformaController = /** @class */ (function () {
+    function ProformaController(proformaService) {
+        this.proformaService = proformaService;
+    }
+    ProformaController.prototype.create = function (createProformaDto) {
+        return this.proformaService.create(createProformaDto);
+    };
+    ProformaController.prototype.findOne = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.proformaService.findOne(id)];
+            });
         });
-    });
-}
-bootstrap();
+    };
+    ProformaController.prototype.findAll = function () {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.proformaService.findAll()];
+            });
+        });
+    };
+    __decorate([
+        common_1.Post(),
+        __param(0, common_1.Body())
+    ], ProformaController.prototype, "create");
+    __decorate([
+        common_1.Get(':id'),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], ProformaController.prototype, "findOne");
+    __decorate([
+        common_1.Get()
+    ], ProformaController.prototype, "findAll");
+    ProformaController = __decorate([
+        common_1.Controller('proforma')
+    ], ProformaController);
+    return ProformaController;
+}());
+exports.ProformaController = ProformaController;

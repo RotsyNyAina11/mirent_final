@@ -1,5 +1,12 @@
 // proforma-item.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
 import { Vehicule } from './vehicle.entity';
 import { Proforma } from './proforma.entity';
 import { Region } from './region.entity';

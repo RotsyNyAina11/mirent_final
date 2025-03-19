@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './filters/all-eceptionfilters';
 import 'reflect-metadata';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -44,6 +45,8 @@ async function bootstrap() {
   );
 
   const PORT = process.env.PORT || 3000;
+  const logger = new Logger('Main');
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(PORT);
   Logger.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);

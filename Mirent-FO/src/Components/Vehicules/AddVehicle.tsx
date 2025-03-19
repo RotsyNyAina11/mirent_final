@@ -15,16 +15,14 @@ import {
   Typography,
   SelectChangeEvent,
 } from "@mui/material";
-<<<<<<< HEAD
+
 import {
   createVehicle,
   fetchVehicles,
   Vehicle,
-} from "../redux/features/vehicle/vehiclesSlice";
-=======
-import { createVehicle, fetchVehicles, Vehicle } from "../redux/features/vehicle/vehiclesSlice";
->>>>>>> 4f2edb793ff7b8646129c6d5cebd0c79f5ac157f
-import { useAppDispatch } from "../hooks";
+} from "../../redux/features/vehicle/vehiclesSlice";
+
+import { useAppDispatch } from "../../hooks";
 import { toast } from "react-toastify";
 import {
   AiOutlineCar,

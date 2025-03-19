@@ -19,26 +19,20 @@ import {
   AiOutlineTag,
 } from "react-icons/ai";
 import { CameraAltOutlined } from "@mui/icons-material";
-<<<<<<< HEAD
 
 import {
   updateVehicle,
   Vehicle,
   fetchVehicleTypes,
   fetchVehicleStatuses,
-} from "../redux/features/vehicle/vehiclesSlice";
-=======
-import { updateVehicle, Vehicle, fetchVehicleTypes, fetchVehicleStatuses } from "../redux/features/vehicle/vehiclesSlice";
->>>>>>> 4f2edb793ff7b8646129c6d5cebd0c79f5ac157f
+} from "../../redux/features/vehicle/vehiclesSlice";
+
 import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../redux/store";
-import { RootState } from "../redux/store";
-<<<<<<< HEAD
-import { toast } from "react-toastify"; // Importer react-toastify
-=======
-import { toast } from 'react-toastify';  
->>>>>>> 4f2edb793ff7b8646129c6d5cebd0c79f5ac157f
+import { AppDispatch } from "../../redux/store";
+import { RootState } from "../../redux/store";
+
+import { toast } from "react-toastify";
 
 interface EditVehicleProps {
   open: boolean;
@@ -81,13 +75,8 @@ const EditVehicle: React.FC<EditVehicleProps> = ({
     (state: RootState) => state.vehicles.vehiclesStatusError
   );
 
-<<<<<<< HEAD
   const [type, setType] = useState<number>(vehicle.type.id);
   const [status, setStatus] = useState<number>(vehicle.status.id);
-=======
-  const [type, setType] = useState<number>(vehicle.type.id); 
-  const [status, setStatus] = useState<number>(vehicle.status.id); 
->>>>>>> 4f2edb793ff7b8646129c6d5cebd0c79f5ac157f
 
   const [nom, setNom] = useState(vehicle.nom || "");
   const [marque, setMarque] = useState(vehicle.marque || "");
@@ -100,10 +89,6 @@ const EditVehicle: React.FC<EditVehicleProps> = ({
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 4f2edb793ff7b8646129c6d5cebd0c79f5ac157f
   useEffect(() => {
     if (vehicleTypes.length > 0) {
       console.log("Vehicle Types:", vehicleTypes);

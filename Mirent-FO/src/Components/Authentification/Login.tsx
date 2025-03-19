@@ -9,7 +9,7 @@ import {
   Alert,
   Collapse,
 } from "@mui/material";
-import loginHorizontal from "../assets/horizontal.png";
+import loginHorizontal from "../../assets/horizontal.png";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -36,7 +36,7 @@ const Login: React.FC = () => {
       if (response.data.success) {
         setSuccess(true);
         setTimeout(() => {
-          window.location.href = "/acceuil"; 
+          window.location.href = "/acceuil";
         }, 2000);
       } else {
         setError("Identifiants incorrects.");
@@ -78,7 +78,7 @@ const Login: React.FC = () => {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#FAFAFA", 
+          backgroundColor: "#FAFAFA",
           boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
         }}
         data-mss-disabled="true"
@@ -129,7 +129,9 @@ const Login: React.FC = () => {
               variant="outlined"
               required
               error={!!error && !email}
-              helperText={!!error && !email ? "Veuillez entrer un e-mail valide." : ""}
+              helperText={
+                !!error && !email ? "Veuillez entrer un e-mail valide." : ""
+              }
             />
             <TextField
               label="Mot de passe"
@@ -141,7 +143,9 @@ const Login: React.FC = () => {
               variant="outlined"
               required
               error={!!error && !password}
-              helperText={!!error && !password ? "Veuillez entrer un mot de passe." : ""}
+              helperText={
+                !!error && !password ? "Veuillez entrer un mot de passe." : ""
+              }
             />
             <Button
               type="submit"

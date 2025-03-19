@@ -6,19 +6,20 @@ import {
   Navigate,
 } from "react-router-dom";
 import { Grid, Box } from "@mui/material";
-import Accueil from "./pages/Accueil";
-import VehiclesList from "./pages/Vehicule";
-import Sidebar from "./Components/Sidebar";
-import Login from "./Components/Login";
-import ClientList from "./pages/CustomerPage";
+import Accueil from "./Components/Accueil/Accueil";
+import VehiclesList from "./Components/Vehicules/Vehicule";
+import Sidebar from "./Components/Sidebar/Sidebar";
+import Login from "./Components/Authentification/Login";
+import ClientList from "./Components/Clients/Customer";
 import Reservations from "./pages/reservation";
-import Performat from "./pages/ProformaTable";
-import Devis from "./pages/Devis";
-import Facturation from "./pages/FacturationPage";
+import Performat from "./Components/Proforma/ProformaTable";
+import Devis from "./Components/Devis/Devis";
+import Facturation from "./Components/Proforma/Facturation";
+import DetailClientPage from "./pages/ClientPage";
 
 //import ProformaList from "./pages/ProformaList";
-import ProformaForm from "./Components/ProformaForm";
-import Commande from "./pages/CommandePage";
+import ProformaForm from "./Components/Proforma/ProformaForm";
+import Commande from "./Components/Commandes/CommandePage";
 //import ProformaList from "./pages/ProformaList";
 
 import LocationsPage from "./pages/locationPage";
@@ -75,6 +76,17 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
+
+        {/* Route pour la liste des clients avec Sidebar */}
+        <Route
+          path="/clients/:id"
+          element={
+            <MainLayout>
+              <DetailClientPage />
+            </MainLayout>
+          }
+        />
+
         {/* Route pour la page de reservation */}
         <Route
           path="/reservations"

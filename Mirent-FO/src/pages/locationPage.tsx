@@ -1,6 +1,6 @@
-import React from 'react';
-import { Container } from '@mui/material';
-import LocationList from '../Components/locationList';
+import React from "react";
+import { Container } from "@mui/material";
+import LocationList from "../Components/Location/locationList";
 
 const LocationsPage: React.FC = () => {
   return (

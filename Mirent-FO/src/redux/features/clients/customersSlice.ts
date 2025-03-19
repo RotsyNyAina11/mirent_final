@@ -1,11 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-interface Customer {
-  id: number;
-  lastName: string;
-  email: string;
-  phone: string;
-  logo: string;
-}
+import { Customer, Contract } from "../../../types/clientDetail";
 
 interface ClientState {
   clients: Customer[];
@@ -13,24 +7,22 @@ interface ClientState {
   error: string | null;
 }
 
-// État initial
 const initialState: ClientState = {
   clients: [],
   loading: false,
   error: null,
 };
 
-// 🔄 **Async Thunks**
+// 🛠️ **Async Thunks**
 export const fetchClients = createAsyncThunk(
   "clients/fetchClients",
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch("http://localhost:3000/clients");
       if (!response.ok) {
-        return rejectWithValue("Failed to fetch clients.");
+        throw new Error("Failed to fetch clients.");
       }
-      const data = await response.json();
-      return data;
+      return await response.json();
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -39,53 +31,114 @@ export const fetchClients = createAsyncThunk(
 
 export const addClient = createAsyncThunk(
   "clients/addClient",
-  async (client: Omit<Customer, "id">) => {
-    const formData = new FormData();
-    formData.append("lastName", client.lastName);
-    formData.append("email", client.email);
-    formData.append("phone", client.phone);
+  async (client: Omit<Customer, "id" | "contracts">, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("lastName", client.lastName);
+      formData.append("email", client.email);
+      formData.append("phone", client.phone);
 
-    if (client.logo) {
-      const file = await fetch(client.logo).then((res) => res.blob());
-      formData.append("logo", file, "logo.jpg");
+      if (client.logo) {
+        const file = await fetch(client.logo).then((res) => res.blob());
+        formData.append("logo", file, "logo.jpg");
+      }
+
+      const response = await fetch("http://localhost:3000/clients", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add client.");
+      }
+
+      return (await response.json()) as Customer;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
     }
-
-    const response = await fetch("http://localhost:3000/clients", {
-      method: "POST",
-      body: formData,
-    });
-
-    return (await response.json()) as Customer;
   }
 );
 
 export const updateClient = createAsyncThunk(
   "clients/updateClient",
-  async (client: Customer) => {
-    const formData = new FormData();
-    formData.append("lastName", client.lastName);
-    formData.append("email", client.email);
-    formData.append("phone", client.phone);
+  async (client: Customer, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("lastName", client.lastName);
+      formData.append("email", client.email);
+      formData.append("phone", client.phone);
 
-    if (client.logo) {
-      const file = await fetch(client.logo).then((res) => res.blob());
-      formData.append("logo", file, "logo.jpg");
+      if (client.logo) {
+        const file = await fetch(client.logo).then((res) => res.blob());
+        formData.append("logo", file, "logo.jpg");
+      }
+
+      const response = await fetch(
+        `http://localhost:3000/clients/${client.id}`,
+        {
+          method: "PUT",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update client.");
+      }
+
+      return (await response.json()) as Customer;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
     }
-
-    const response = await fetch(`http://localhost:3000/clients/${client.id}`, {
-      method: "PUT",
-      body: formData,
-    });
-
-    return (await response.json()) as Customer;
   }
 );
 
 export const deleteClient = createAsyncThunk(
   "clients/deleteClient",
-  async (id: number) => {
-    await fetch(`http://localhost:3000/clients/${id}`, { method: "DELETE" });
-    return id;
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`http://localhost:3000/clients/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete client.");
+      }
+
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// 📝 **Gestion des contrats**
+export const addContract = createAsyncThunk(
+  "clients/addContract",
+  async (
+    {
+      clientId,
+      contract,
+    }: { clientId: number; contract: Omit<Contract, "id"> },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/clients/${clientId}/contracts`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(contract),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to add contract.");
+      }
+
+      return { clientId, contract: await response.json() };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
   }
 );
 
@@ -99,6 +152,7 @@ const clientSlice = createSlice({
     builder
       .addCase(fetchClients.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(
         fetchClients.fulfilled,
@@ -109,7 +163,7 @@ const clientSlice = createSlice({
       )
       .addCase(fetchClients.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message ?? "Erreur inconnue";
+        state.error = action.payload as string;
       })
       .addCase(
         addClient.fulfilled,
@@ -132,6 +186,20 @@ const clientSlice = createSlice({
         deleteClient.fulfilled,
         (state, action: PayloadAction<number>) => {
           state.clients = state.clients.filter((c) => c.id !== action.payload);
+        }
+      )
+      .addCase(
+        addContract.fulfilled,
+        (
+          state,
+          action: PayloadAction<{ clientId: number; contract: Contract }>
+        ) => {
+          const client = state.clients.find(
+            (c) => c.id === action.payload.clientId
+          );
+          if (client) {
+            client.contracts.push(action.payload.contract);
+          }
         }
       );
   },

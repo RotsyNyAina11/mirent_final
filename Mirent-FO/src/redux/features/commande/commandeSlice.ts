@@ -1,86 +1,90 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface OrderState {
-  orderId: string;
-  clientName: string;
-  clientCountry: string;
-  expiration: string;
-  priceList: string;
-  paymentTerms: string;
-  rentalStart: string;
-  rentalEnd: string;
-  duration: string;
-  reference: string;
-  voiture: string;
-  destination: string;
-  carburant: string;
-  listePrix: string;
-  condtionPaiement: string;
-  confirmed: boolean;
+interface ProformaItem {
+  id: number;
+  proforma: string;
+  vehicleId: number;
+  regionId: number;
+  prixId: number;
+  dateDepart: string;
+  dateRetour: string;
+  nombreJours: number; // Changed to number
+  // destination: string;
+  subTotal: number; // Changed to number
+  lastaName?: string; // Added clientName property
+  reference?: string; // Added reference property
+  orderId?: string; // Added orderId property
+  confirmed?: boolean; // Added confirmed property
+  items?: ProformaItem[]; // Added items property
 }
 
-const initialState: OrderState = {
-  orderId: "",
-  clientName: "",
-  clientCountry: "",
-  expiration: "",
-  priceList: "",
-  paymentTerms: "",
-  rentalStart: "",
-  rentalEnd: "",
-  duration: "",
-  reference: "",
-  voiture: "",
-  destination: "",
-  carburant: "",
-  listePrix: "",
-  condtionPaiement: "30 jours après",
-  confirmed: false, // Corrected placement
+const initialState: ProformaItem = {
+  id: 0,
+  proforma: "",
+  vehicleId: 0,
+  regionId: 0,
+  prixId: 0,
+  dateDepart: "",
+  dateRetour: "",
+  nombreJours: 0,
+  //destination: "",
+  subTotal: 0, // Added subTotal with a default value
+  items: [], // Initialized items as an empty array
 };
 
+interface Proforma {
+  id: number;
+  proformaNumber: string;
+  contractReference: string;
+  date: Date;
+  clientId: number;
+  totalAmount: number;
+  notes: string;
+  items: ProformaItem[];
+}
 const commandeSlice = createSlice({
   name: "commande",
   initialState,
   reducers: {
-    setOrderDetails: (state, action: PayloadAction<Partial<OrderState>>) => {
+    setOrderDetails: (state, action: PayloadAction<Partial<ProformaItem>>) => {
+      // Modified type
       Object.assign(state, action.payload);
     },
     setDuration: (state, action: PayloadAction<string>) => {
-      state.duration = action.payload;
+      state.nombreJours = parseInt(action.payload, 10);
     },
-    setClientName: (state, action: PayloadAction<string>) => {
-      state.clientName = action.payload;
-    },
+
     setReference: (state, action: PayloadAction<string>) => {
       state.reference = action.payload;
     },
     setRentalStart: (state, action: PayloadAction<string>) => {
-      state.rentalStart = action.payload;
+      state.dateDepart = action.payload; // Modified to dateDepart
     },
     setRentalEnd: (state, action: PayloadAction<string>) => {
-      state.rentalEnd = action.payload;
+      state.dateRetour = action.payload; // Modified to dateRetour
     },
     confirmOrder: (state, action: PayloadAction<string>) => {
-      // Prend un orderId
       if (state.orderId === action.payload) {
-        // Vérifie si l'orderId correspond
         state.confirmed = true;
+      } else {
+        console.error(`Order ID ${action.payload} does not match.`);
       }
     },
-
-    // Ajoutez d'autres reducers pour chaque champ si nécessaire
+    addItem: (state, action: PayloadAction<ProformaItem>) => {
+      if (state.items) {
+        state.items.push(action.payload);
+      }
+    },
   },
 });
 
 export const {
   setOrderDetails,
-  setClientName,
   setReference,
   setRentalStart,
   setRentalEnd,
   setDuration,
   confirmOrder,
-  // Exportez d'autres actions si nécessaire
 } = commandeSlice.actions;
 
 export default commandeSlice.reducer;

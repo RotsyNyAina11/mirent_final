@@ -23,10 +23,12 @@ import {
   ExpandLess,
   ExpandMore,
   AddShoppingCart,
+  FormatListBulleted,
+  ManageAccounts,
 } from "@mui/icons-material";
 import PlaceIcon from "@mui/icons-material/Place";
 import { Link as RouterLink } from "react-router-dom";
-import logo from "../assets/horizontal.png";
+import logo from "../../assets/horizontal.png";
 
 const primaryColor = "#1976d2"; // Couleur primaire
 const secondaryColor = "#e3f2fd"; // Couleur secondaire (hover, selected)
@@ -57,6 +59,12 @@ const Sidebar: React.FC = () => {
 
   const handleCommandeClick = () => {
     setOpenCommande(!openCommande);
+  };
+
+  const [openClient, setOpenClient] = useState(false);
+
+  const handleClientClick = () => {
+    setOpenClient(!openClient);
   };
 
   return (
@@ -320,37 +328,113 @@ const Sidebar: React.FC = () => {
               </NavLinkButton>
             </Tooltip>
 
-            <Tooltip title="Gérer les Clients" placement="right">
-              <NavLinkButton
-                to="/clients"
-                selected={window.location.pathname === "/clients"}
+            <ListItemButton onClick={handleClientClick}>
+              <ListItemIcon
                 sx={{
-                  padding: "8px 16px",
-                  "& .MuiListItemIcon-root": {
-                    minWidth: "36px",
-                    color: iconColor,
-                  },
+                  color: iconColor,
+                  minWidth: "36px",
                 }}
               >
-                <ListItemIcon>
-                  <People />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Gérer les Clients"
-                  primaryTypographyProps={{
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color: textColor,
-                  }}
-                  sx={{
-                    display: {
-                      xs: "none",
-                      sm: "block",
-                    },
-                  }}
-                />
-              </NavLinkButton>
-            </Tooltip>
+                <People />
+              </ListItemIcon>
+              <ListItemText
+                primary="Clients"
+                primaryTypographyProps={{
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  color: textColor,
+                }}
+                sx={{
+                  display: {
+                    xs: "none",
+                    sm: "block",
+                  },
+                }}
+              />
+              {openClient ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={openClient} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <Tooltip title="Liste des clients" placement="right">
+                  <NavLinkButton
+                    to="/clients"
+                    selected={window.location.pathname === "/clients"}
+                    sx={{
+                      pl: 6,
+                      pr: 4,
+                      py: 1,
+                      "& .MuiListItemText-root": {
+                        paddingLeft: "8px",
+                      },
+                      "& .MuiListItemIcon-root": {
+                        minWidth: "36px",
+                        color: iconColor,
+                      },
+                      "@media (max-width: 600px)": {
+                        pl: 2,
+                      },
+                    }}
+                  >
+                    <ListItemIcon>
+                      <FormatListBulleted />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Liste des clients"
+                      primaryTypographyProps={{
+                        fontSize: "13px",
+                        fontWeight: "500",
+                        color: textColor,
+                      }}
+                      sx={{
+                        display: {
+                          xs: "none",
+                          sm: "block",
+                        },
+                      }}
+                    />
+                  </NavLinkButton>
+                </Tooltip>
+                <Tooltip title="Details contrat clients" placement="right">
+                  <NavLinkButton
+                    to="/clients/:id"
+                    selected={window.location.pathname === "/clients/:id"}
+                    sx={{
+                      pl: 6,
+                      pr: 4,
+                      py: 1,
+                      "& .MuiListItemText-root": {
+                        paddingLeft: "8px",
+                      },
+                      "& .MuiListItemIcon-root": {
+                        minWidth: "36px",
+                        color: iconColor,
+                      },
+                      "@media (max-width: 600px)": {
+                        pl: 2,
+                      },
+                    }}
+                  >
+                    <ListItemIcon>
+                      <ManageAccounts />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Details contrat clients"
+                      primaryTypographyProps={{
+                        fontSize: "13px",
+                        fontWeight: "500",
+                        color: textColor,
+                      }}
+                      sx={{
+                        display: {
+                          xs: "none",
+                          sm: "block",
+                        },
+                      }}
+                    />
+                  </NavLinkButton>
+                </Tooltip>
+              </List>
+            </Collapse>
 
             <Tooltip title="Lieux de Location" placement="right">
               <NavLinkButton
@@ -416,7 +500,7 @@ const Sidebar: React.FC = () => {
               </NavLinkButton>
             </Tooltip>
 
-            <Tooltip title="Contact" placement="right">
+            <Tooltip title="Commandes" placement="right">
               <NavLinkButton
                 to="/commande"
                 selected={window.location.pathname === "/commande"}

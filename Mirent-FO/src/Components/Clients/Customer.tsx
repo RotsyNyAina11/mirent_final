@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../redux/store";
+import { RootState, AppDispatch } from "../../redux/store";
 import { Edit, Delete } from "@mui/icons-material";
 import {
   fetchClients,
   addClient,
   updateClient,
   deleteClient,
-} from "../redux/features/clients/customersSlice";
-<<<<<<< HEAD
+} from "../../redux/features/clients/customersSlice";
 
-=======
->>>>>>> 4f2edb793ff7b8646129c6d5cebd0c79f5ac157f
 import {
   Table,
   TableBody,
@@ -46,6 +43,7 @@ interface Customer {
   email: string;
   phone: string;
   logo: string;
+  contracts?: any[]; // Add the contracts property as optional
 }
 
 const CustomerManagement: React.FC = () => {
@@ -185,7 +183,13 @@ const CustomerManagement: React.FC = () => {
       if (editMode && selectedCustomer) {
         console.log("Modification du client :", selectedCustomer.id, form);
 
-        await dispatch(updateClient({ id: selectedCustomer.id, ...form }));
+        await dispatch(
+          updateClient({
+            id: selectedCustomer.id,
+            ...form,
+            contracts: selectedCustomer.contracts || [],
+          })
+        );
         setSnackbarMessage("Client modifié avec succès !");
       } else {
         console.log("Ajout d'un nouveau client :", form);

@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../redux/store";
+import { RootState } from "../../redux/store";
 import {
   Table,
   TableBody,
@@ -13,8 +13,8 @@ import {
   Typography,
 } from "@mui/material";
 
-import companyLogo from "../assets/horizontal.png"; // Logo de l’entreprise
-import clientLogo from "../assets/oms.png"; // Logo du client
+import companyLogo from "../../assets/horizontal.png"; // Logo de l’entreprise
+import clientLogo from "../../assets/oms.png"; // Logo du client
 
 const ProformaTable = () => {
   const quotes = useSelector((state: RootState) => state.proforma.quotes);

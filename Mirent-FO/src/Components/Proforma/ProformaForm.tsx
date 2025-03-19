@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addQuote } from "../redux/slices/proformaSlice";
+import { addQuote } from "../../redux/slices/proformaSlice";
 import { TextField, Button, Grid, Paper, Typography } from "@mui/material";
 
 interface Quote {

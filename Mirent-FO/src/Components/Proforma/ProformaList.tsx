@@ -9,7 +9,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { useProformaStore } from "../redux/store";
+import { useProformaStore } from "../../redux/store";
 
 const ProformaList: React.FC = () => {
   const { proformas } = useProformaStore();

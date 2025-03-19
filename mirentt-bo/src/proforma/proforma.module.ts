@@ -8,10 +8,14 @@ import { Vehicule } from 'src/entities/vehicle.entity';
 import { Region } from 'src/entities/region.entity';
 import { Prix } from 'src/entities/prix.entity';
 import { Status } from 'src/entities/status.entity';
+import { Client } from 'src/entities/client.entity';
+import { Type } from 'src/entities/type.entity';
+import { MailService } from 'src/mailer/mailer.service';
+import { PdfService } from 'src/pdf/pdf.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Proforma, ProformaItem, Vehicule, Region, Prix, Status])],
-    providers: [ProformaService],
+    imports: [TypeOrmModule.forFeature([Proforma, ProformaItem, Vehicule, Region, Prix, Status, Client,Type])],
+    providers: [ProformaService, MailService, PdfService],
     controllers: [ProformaController],
 })
 export class ProformaModule {}

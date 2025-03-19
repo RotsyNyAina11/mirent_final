@@ -38,7 +38,7 @@ export class RegionService {
       return this.regionRepository.save(region);
     } catch (error) {
       console.error('Error creating region:', error);
-      throw error; // Re-throw the error to be handled by the controller
+      throw error; 
     }
   }
 

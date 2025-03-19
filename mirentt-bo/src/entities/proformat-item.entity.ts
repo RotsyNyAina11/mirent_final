@@ -4,6 +4,7 @@ import { Vehicule } from './vehicle.entity';
 import { Proforma } from './proforma.entity';
 import { Region } from './region.entity';
 import { Prix } from './prix.entity';
+import { NumericTransformer } from '../numeric.transformer'; // Assurez-vous que le chemin est correct
 
 @Entity()
 export class ProformaItem {
@@ -35,6 +36,6 @@ export class ProformaItem {
   @Column({ type: 'integer' })
   nombreJours: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2, default: 0, transformer: new NumericTransformer() })
   subTotal: number;
 }

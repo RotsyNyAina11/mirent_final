@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Proforma } from './proforma.entity';
 
 @Entity()
 export class Client {
@@ -16,4 +17,7 @@ export class Client {
 
   @Column({ type: 'varchar', nullable: true })
   logo: string | null;
+
+  @OneToMany(() => Proforma, proforma => proforma.client)
+  proformas: Proforma[];
 }

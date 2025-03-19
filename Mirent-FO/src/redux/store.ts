@@ -6,6 +6,7 @@ import { create } from "zustand";
 import { Proforma } from "../types/Proforma";
 import locationReducer from '../redux/features/lieux/locationSlice'
 import customersReducer from "./features/clients/customersSlice";
+import proformaReducer from './features/proforma/proformaSlice';
 interface ProformaState {
   proformas: Proforma[];
   addProforma: (newProforma: Proforma) => void;
@@ -24,6 +25,7 @@ export const store = configureStore({
     sidebar: sidebarReducer,
     customer: customersReducer,
     locations: locationReducer,
+    proforma: proformaReducer,
 
   },
   middleware: (getDefaultMiddleware) =>

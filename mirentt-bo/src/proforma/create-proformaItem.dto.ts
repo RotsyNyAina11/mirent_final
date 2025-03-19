@@ -1,30 +1,35 @@
-// dto/create-proforma-item.dto.ts
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { Transform } from "class-transformer";
+import { IsDate, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
-export class CreateProformaItemDto {
+export class VehicleCriteria {
+  @IsOptional()
+  @IsString()
+  marque?: string;
+
+  @IsOptional()
+  @IsString()
+  modele?: string;
+
+  @IsOptional()
+  @IsString()
+  type?: string; 
+}
+
+export class CreateProformaItemByCriteriaDto {
   @IsNotEmpty()
-  @IsNumber()
-  vehicleId: number;
+  vehicleCriteria: VehicleCriteria;
 
   @IsNotEmpty()
-  @IsNumber()
-  regionId: number;
+  @IsString()
+  regionName: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  prixId: number;
-
-  @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
   dateDepart: Date;
 
   @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
   dateRetour: Date;
-
-  @IsNotEmpty()
-  @IsNumber()
-  nombreJours: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  subTotal: number;
 }

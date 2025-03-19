@@ -18,6 +18,7 @@ import Facturation from "./pages/FacturationPage";
 import ProformaForm from "./Components/ProformaForm";
 import Commande from "./pages/CommandePage";
 import LocationsPage from "./pages/locationPage";
+import ProformaPdf from "./Components/proformaPdf";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -133,6 +134,14 @@ const App: React.FC = () => {
           element={
             <MainLayout>
               <Commande />
+            </MainLayout>
+          }
+        />
+                <Route
+          path="/proforma-pdf"
+          element={
+            <MainLayout>
+              <ProformaPdf />
             </MainLayout>
           }
         />

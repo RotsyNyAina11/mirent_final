@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { selectProforma } from '../redux/features/proforma/proformaSelector';
+import { selectProforma } from '../../redux/features/proforma/proformaSelector';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({

@@ -21,7 +21,7 @@ import {
   Skeleton,
   InputAdornment,
 } from "@mui/material";
-import { Delete, Search, Edit, Add } from "@mui/icons-material";
+import { Delete, Search, Edit, Add, DirectionsCar, LocalShipping, TwoWheeler } from "@mui/icons-material"; // Nouveaux logos ajoutés
 import {
   deleteVehicle,
   fetchVehicles,
@@ -30,11 +30,31 @@ import {
   Vehicle,
   VehicleStatus,
   VehicleType,
-} from "../redux/features/vehicle/vehiclesSlice";
-import { useAppDispatch } from "../hooks";
+} from "../../redux/features/vehicle/vehiclesSlice";
+import { useAppDispatch } from "../../hooks";
 import { useSelector } from "react-redux";
-import AddVehicle from "../Components/AddVehicle";
-import EditVehicle from "../Components/EditVehicle";
+import AddVehicle from "./AddVehicle";
+import EditVehicle from "./EditVehicle";
+import { styled } from '@mui/material/styles';
+
+// Styles personnalisés
+const StyledBox = styled(Box)(({ theme }) => ({
+  backgroundColor: '#fff',
+  padding: theme.spacing(3),
+  borderRadius: theme.spacing(1),
+  marginBottom: theme.spacing(3),
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+}));
+
+const DashboardCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderRadius: theme.spacing(1),
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  transition: 'transform 0.2s ease-in-out',
+  '&:hover': {
+    transform: 'scale(1.02)',
+  },
+}));
 
 const VehiclesList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -65,15 +85,10 @@ const VehiclesList: React.FC = () => {
   useEffect(() => {
     setVehicleTypesRedux(vehiclesType);
     setVehicleStatusesRedux(vehiclesStatus);
-
     if (vehiclesType && vehiclesType.length > 0) {
       setVehicleTypes(vehiclesType.map((t: VehicleType) => t.type));
     }
   }, [vehiclesType, vehiclesStatus]);
-
-  useEffect(() => {
-    console.log("Vehicles from Redux:", vehicles);
-  }, [vehicles]);
 
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((veh: any) => {
@@ -123,17 +138,32 @@ const VehiclesList: React.FC = () => {
         fontFamily: "'Poppins', sans-serif",
       }}
     >
-      {/* Titre */}
-      <Typography
-        variant="h4"
-        sx={{ fontWeight: "700", color: "#1976d2", marginBottom: 2 }}
-      >
-        Liste des véhicules
-      </Typography>
-      <Typography variant="subtitle1" sx={{ color: "#666", marginBottom: 3 }}>
-        Recherchez, filtrez, modifiez ou supprimez les véhicules de votre
-        agence.
-      </Typography>
+      {/* Section de bienvenue */}
+      <StyledBox>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+          }}
+        >
+          <DirectionsCar
+            sx={{
+              fontSize: "4rem",
+              color: "#1976d2",
+              marginBottom: 2,
+            }}
+          />
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+            Liste des véhicules
+          </Typography>
+          <Typography variant="subtitle1" paragraph>
+            Recherchez, filtrez, modifiez ou supprimez les véhicules de votre
+            agence.
+          </Typography>
+        </Box>
+      </StyledBox>
 
       {/* Barre de recherche et bouton d'ajout */}
       <Box display="flex" justifyContent="space-between" mb={3}>
@@ -169,34 +199,27 @@ const VehiclesList: React.FC = () => {
           variant="contained"
           color="primary"
           startIcon={<Add />}
+          onClick={() => setShowAddVehicle(true)}
           sx={{
             backgroundColor: "#1976D2",
-            boxShadow: 3,
-            "&:hover": { boxShadow: 6 },
+            "&:hover": { backgroundColor: "#1565C0" },
           }}
-          onClick={() => setShowAddVehicle(true)}
         >
           Ajouter un véhicule
         </Button>
       </Box>
 
-      {showAddVehicle && (
-        <AddVehicle
-          open={showAddVehicle}
-          onClose={() => setShowAddVehicle(false)}
-        />
-      )}
-
+      {/* Affichage des véhicules */}
       {loading ? (
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
           {[...Array(rowsPerPage)].map((_, idx) => (
             <Grid item xs={12} sm={6} md={4} key={idx}>
-              <Paper sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
+              <DashboardCard>
                 <Skeleton variant="rectangular" width="100%" height={150} />
                 <Skeleton variant="text" width="60%" sx={{ marginTop: 1 }} />
                 <Skeleton variant="text" width="40%" />
                 <Skeleton variant="text" width="80%" />
-              </Paper>
+              </DashboardCard>
             </Grid>
           ))}
         </Grid>
@@ -205,26 +228,12 @@ const VehiclesList: React.FC = () => {
           Erreur de chargement des données. Veuillez réessayer plus tard.
         </Typography>
       ) : (
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
           {filteredVehicles
             .slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage)
             .map((veh: any) => (
               <Grid item xs={12} sm={6} md={4} key={veh.id}>
-                <Paper
-                  sx={{
-                    padding: 3,
-                    boxShadow: 3,
-                    borderRadius: 2,
-                    position: "relative",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      boxShadow: 6,
-                      transform: "scale(1.05)",
-                      cursor: "pointer",
-                    },
-                    backgroundColor: "#ffffff",
-                  }}
-                >
+                <DashboardCard>
                   {/* Image avec gestion des erreurs */}
                   {veh.imageUrl && isValidImageUrl(veh.imageUrl) ? (
                     <Box
@@ -248,136 +257,86 @@ const VehiclesList: React.FC = () => {
                       }}
                     />
                   ) : (
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      align="center"
+                    <Box
                       sx={{
-                        py: 3,
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: 180,
                         backgroundColor: "#f5f5f5",
                         borderRadius: "8px",
-                        height: 130,
                       }}
                     >
-                      Aucune image disponible
-                    </Typography>
+                      <TwoWheeler sx={{ fontSize: "4rem", color: "#ccc" }} />
+                    </Box>
                   )}
-
+                  {/* Informations du véhicule */}
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: "bold", mt: 2 }}
+                  >
+                    {veh.nom}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: "#555" }}>
+                    {veh.marque} - {veh.modele}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Immatriculation: {veh.immatriculation}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Type:{" "}
+                    {
+                      vehicleTypesRedux.find((t) => t.id === veh.type?.id)
+                        ?.type
+                    }
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Place: {veh.nombrePlace}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Status:{" "}
+                    <span
+                      style={{
+                        color:
+                          vehicleStatusesRedux.find(
+                            (s) => s.id === veh.status?.id
+                          )?.status === "Disponible"
+                            ? "green"
+                            : "red",
+                      }}
+                    >
+                      {
+                        vehicleStatusesRedux.find(
+                          (s) => s.id === veh.status?.id
+                        )?.status
+                      }
+                    </span>
+                  </Typography>
+                  {/* Boutons de modification et suppression */}
                   <Box
                     sx={{
-                      padding: 2,
-                      backgroundColor: "#fff",
-                      boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
-                      transition: "all 0.3s ease",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 2,
                     }}
                   >
-                    {/* Titre du véhicule */}
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 600,
-                        color: "#333",
-                        marginBottom: 1,
-                        fontSize: "1.3rem",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                      }}
-                    >
-                      {veh.nom}
-                    </Typography>
-
-                    {/* Marque et modèle */}
-                    <Box
-                      display="flex"
-                      justifyContent="space-between"
-                      sx={{ marginBottom: 2 }}
-                    >
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: "#555",
-                          fontSize: "1.1rem",
-                          fontWeight: 500,
+                    <Tooltip title="Modifier le véhicule">
+                      <IconButton onClick={() => handleEditClick(veh)}>
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Supprimer le véhicule">
+                      <IconButton
+                        onClick={() => {
+                          setVehicleToDelete(veh);
+                          setOpenDeleteDialog(true);
                         }}
                       >
-                        {veh.marque}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: "#555",
-                          fontSize: "1.1rem",
-                          fontWeight: 500,
-                        }}
-                      >
-                        {veh.modele}
-                      </Typography>
-                    </Box>
-
-                    {/* Informations supplémentaires */}
-                    <Box
-                      display="grid"
-                      gridTemplateColumns="repeat(2, 1fr)"
-                      gap={2}
-                      sx={{ marginBottom: 2 }}
-                    >
-                      <Typography variant="body2" color="textSecondary">
-                        Immatriculation: {veh.immatriculation}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Type:{" "}
-                        {
-                          vehicleTypesRedux.find((t) => t.id === veh.type?.id)
-                            ?.type
-                        }
-                      </Typography>
-
-                      <Typography variant="body2" color="textSecondary">
-                        Place: {veh.nombrePlace}
-                      </Typography>
-
-                      <Typography variant="body2" color="textSecondary">
-                        Status:{" "}
-                        <span
-                          style={{
-                            color:
-                              vehicleStatusesRedux.find(
-                                (s) => s.id === veh.status?.id
-                              )?.status === "Disponible"
-                                ? "green"
-                                : "red",
-                          }}
-                        >
-                          {
-                            vehicleStatusesRedux.find(
-                              (s) => s.id === veh.status?.id
-                            )?.status
-                          }
-                        </span>
-                      </Typography>
-                    </Box>
-
-                    <Box display="flex" justifyContent="space-between">
-                      {/* Boutons de modification et suppression */}
-                      <Tooltip title="Modifier le véhicule">
-                        <IconButton onClick={() => handleEditClick(veh)}>
-                          <Edit />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Supprimer le véhicule">
-                        <IconButton
-                          onClick={() => {
-                            setVehicleToDelete(veh);
-                            setOpenDeleteDialog(true);
-                          }}
-                        >
-                          <Delete color="error" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
+                        <Delete color="error" />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
-                </Paper>
+                </DashboardCard>
               </Grid>
             ))}
         </Grid>
@@ -437,6 +396,14 @@ const VehiclesList: React.FC = () => {
           open={isEditOpen}
           onClose={() => setIsEditOpen(false)}
           vehicle={selectedVehicle}
+        />
+      )}
+
+      {/* Modal d'ajout de véhicule */}
+      {showAddVehicle && (
+        <AddVehicle
+          open={showAddVehicle}
+          onClose={() => setShowAddVehicle(false)}
         />
       )}
     </Box>

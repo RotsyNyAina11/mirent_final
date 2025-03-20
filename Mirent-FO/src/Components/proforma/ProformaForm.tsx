@@ -1,14 +1,14 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch } from '../redux/store';
+import type { AppDispatch } from '../../redux/store';
 import {
     setClientId,
     setDate,
     setContractReference,
     setNotes,
     createProforma,
-} from '../redux/features/proforma/proformaSlice';
-import { selectProforma } from '../redux/features/proforma/proformaSelector';
+} from '../../redux/features/proforma/proformaSlice';
+import { selectProforma } from '../../redux/features/proforma/proformaSelector';
 import {
     TextField,
     Button,

@@ -6,19 +6,21 @@ import {
   Navigate,
 } from "react-router-dom";
 import { Grid, Box } from "@mui/material";
-import Accueil from "./pages/Accueil";
-import VehiclesList from "./pages/Vehicule";
-import Sidebar from "./Components/Sidebar";
-import Login from "./Components/Login";
-import ClientList from "./pages/CustomerPage";
+import Sidebar from "./Components/sidebar/Sidebar";
+import Login from "./Components/login/Login";
+import ClientList from "./Components/clients/CustomerPage";
 import Reservations from "./pages/reservation";
 import Performat from "./pages/ProformaTable";
 import Devis from "./pages/Devis";
 import Facturation from "./pages/FacturationPage";
-import ProformaForm from "./Components/ProformaForm";
+import ProformaForm from "./Components/proforma/ProformaForm";
 import Commande from "./pages/CommandePage";
-import LocationsPage from "./pages/locationPage";
-import ProformaPdf from "./Components/proformaPdf";
+import LocationsPage from "./pages/lieux/locationPage";
+import ProformaPdf from "./Components/proforma/proformaPdf";
+import ContratPage from "./pages/contrat/contratPage";
+import Vehicule from "./pages/vehicules/vehiculePage";
+import ClientPage from "./pages/clients/ClientPage";
+import Home from "./pages/acceuil/HomePage";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -49,7 +51,7 @@ const App: React.FC = () => {
           path="/accueil"
           element={
             <MainLayout>
-              <Accueil />
+              <Home />
             </MainLayout>
           }
         />
@@ -59,7 +61,7 @@ const App: React.FC = () => {
           path="/vehicules"
           element={
             <MainLayout>
-              <VehiclesList />
+              <Vehicule />
             </MainLayout>
           }
         />
@@ -68,7 +70,7 @@ const App: React.FC = () => {
           path="/clients"
           element={
             <MainLayout>
-              <ClientList />
+              <ClientPage />
             </MainLayout>
           }
         />
@@ -137,11 +139,23 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
-                <Route
+
+
+        <Route
           path="/proforma-pdf"
           element={
             <MainLayout>
               <ProformaPdf />
+            </MainLayout>
+          }
+        />
+
+                {/* Route pour la page de Contrat */}
+        <Route
+          path="/contrats"
+          element={
+            <MainLayout>
+              <ContratPage />
             </MainLayout>
           }
         />

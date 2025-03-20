@@ -14,9 +14,10 @@ import {
   FormHelperText,
   Typography,
   SelectChangeEvent,
+  InputAdornment,
 } from "@mui/material";
-import { createVehicle, fetchVehicles, Vehicle } from "../redux/features/vehicle/vehiclesSlice";
-import { useAppDispatch } from "../hooks";
+import { createVehicle, fetchVehicles, Vehicle } from "../../redux/features/vehicle/vehiclesSlice";
+import { useAppDispatch } from "../../hooks";
 import { toast } from "react-toastify";
 import {
   AiOutlineCar,
@@ -44,7 +45,6 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
     status: { id: 0, status: "" },
     imageUrl: "",
   });
-
   const [vehicleTypes, setVehicleTypes] = useState<any[]>([]);
   const [vehicleStatuses, setVehicleStatuses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,28 +54,23 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
   useEffect(() => {
     const fetchVehicleData = async () => {
       setIsLoading(true);
-
       try {
         const [typesResponse, statusesResponse] = await Promise.all([
           fetch("http://localhost:3000/type"),
           fetch("http://localhost:3000/status"),
         ]);
-
         const [typesData, statusesData] = await Promise.all([
           typesResponse.json(),
           statusesResponse.json(),
         ]);
-
         setVehicleTypes(typesData);
         setVehicleStatuses(statusesData);
-
         if (typesData.length > 0 && vehicle.type.type === "") {
           setVehicle((prev) => ({
             ...prev,
             type: { id: typesData[0].id, type: typesData[0].type },
           }));
         }
-
         if (statusesData.length > 0 && vehicle.status.status === "") {
           setVehicle((prev) => ({
             ...prev,
@@ -84,14 +79,11 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
         }
       } catch (err) {
         console.error("Erreur lors de la récupération des données:", err);
-        toast.error(
-          "Une erreur s'est produite lors du chargement des données."
-        );
+        toast.error("Une erreur s'est produite lors du chargement des données.");
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchVehicleData();
   }, []);
 
@@ -123,38 +115,31 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
   const handleSelectType = (event: SelectChangeEvent) => {
     const value = event.target.value;
     if (!value) return;
-
     const selectedType = vehicleTypes.find((type) => type.type === value);
     if (selectedType) {
-      setVehicle((prev) => {
-        return {
-          ...prev,
-          type: { id: selectedType.id, type: selectedType.type },
-        };
-      });
+      setVehicle((prev) => ({
+        ...prev,
+        type: { id: selectedType.id, type: selectedType.type },
+      }));
     }
   };
 
   const handleSelectStatus = (event: SelectChangeEvent) => {
     const value = event.target.value;
     if (!value) return;
-
     const selectedStatus = vehicleStatuses.find(
       (status) => status.status === value
     );
     if (selectedStatus) {
-      setVehicle((prev) => {
-        return {
-          ...prev,
-          status: { id: selectedStatus.id, status: selectedStatus.status },
-        };
-      });
+      setVehicle((prev) => ({
+        ...prev,
+        status: { id: selectedStatus.id, status: selectedStatus.status },
+      }));
     }
   };
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
-
     if (!vehicle.nom) newErrors.nom = "Le nom est requis.";
     if (!vehicle.marque) newErrors.marque = "La marque est requise.";
     if (!vehicle.modele) newErrors.modele = "Le modèle est requis.";
@@ -162,14 +147,12 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
       newErrors.immatriculation = "L'immatriculation est requise.";
     if (vehicle.nombrePlace <= 0)
       newErrors.nombrePlace = "Le nombre de places doit être supérieur à 0.";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-
     setIsLoading(true);
     try {
       const formData = new FormData();
@@ -180,14 +163,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
       formData.append("nombrePlace", vehicle.nombrePlace.toString());
       formData.append("typeId", vehicle.type.id.toString());
       formData.append("statusId", vehicle.status.id.toString());
-
       if (imageFile) {
         formData.append("image", imageFile);
-        console.log("Type de imageFile :", imageFile);
       }
-
-      console.log("FormData avant l'envoi :", formData.get("image"));
-
       await dispatch(createVehicle(formData));
       toast.success("Véhicule ajouté avec succès !");
       dispatch(fetchVehicles());
@@ -220,7 +198,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
       <DialogTitle>
         <Box display="flex" alignItems="center" gap={1}>
           <AiOutlineCar size={24} color="#1976D2" />
-          Ajouter un véhicule
+          <Typography variant="h6" fontWeight="bold">
+            Ajouter un véhicule
+          </Typography>
         </Box>
       </DialogTitle>
       <Box
@@ -234,13 +214,7 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
         }}
       >
         <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom fontWeight="bold">
-              Informations générales
-            </Typography>
-          </Grid>
-
-          {/* Image */}
+          {/* Section Image */}
           <Grid item xs={12}>
             {vehicle.imageUrl && (
               <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
@@ -281,6 +255,12 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
             </label>
           </Grid>
 
+          {/* Informations générales */}
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom fontWeight="bold">
+              Informations générales
+            </Typography>
+          </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -292,14 +272,13 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               helperText={errors.nom}
               InputProps={{
                 startAdornment: (
-                  <AiOutlineTag
-                    style={{ marginRight: "8px", color: "#1976D2" }}
-                  />
+                  <InputAdornment position="start">
+                    <AiOutlineTag style={{ color: "#1976D2" }} />
+                  </InputAdornment>
                 ),
               }}
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -311,14 +290,13 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               helperText={errors.marque}
               InputProps={{
                 startAdornment: (
-                  <AiOutlineCar
-                    style={{ marginRight: "8px", color: "#1976D2" }}
-                  />
+                  <InputAdornment position="start">
+                    <AiOutlineCar style={{ color: "#1976D2" }} />
+                  </InputAdornment>
                 ),
               }}
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -330,14 +308,13 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               helperText={errors.modele}
               InputProps={{
                 startAdornment: (
-                  <AiOutlineCar
-                    style={{ marginRight: "8px", color: "#1976D2" }}
-                  />
+                  <InputAdornment position="start">
+                    <AiOutlineCar style={{ color: "#1976D2" }} />
+                  </InputAdornment>
                 ),
               }}
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -349,9 +326,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               helperText={errors.immatriculation}
               InputProps={{
                 startAdornment: (
-                  <AiOutlineNumber
-                    style={{ marginRight: "8px", color: "#1976D2" }}
-                  />
+                  <InputAdornment position="start">
+                    <AiOutlineNumber style={{ color: "#1976D2" }} />
+                  </InputAdornment>
                 ),
               }}
             />
@@ -363,7 +340,6 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               Détails supplémentaires
             </Typography>
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -381,14 +357,13 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               helperText={errors.nombrePlace}
               InputProps={{
                 startAdornment: (
-                  <AiOutlineNumber
-                    style={{ marginRight: "8px", color: "#1976D2" }}
-                  />
+                  <InputAdornment position="start">
+                    <AiOutlineNumber style={{ color: "#1976D2" }} />
+                  </InputAdornment>
                 ),
               }}
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>Type de véhicule</InputLabel>
@@ -412,7 +387,6 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
               )}
             </FormControl>
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>Statut</InputLabel>

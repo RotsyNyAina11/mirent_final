@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch } from '../redux/store';
+import type { AppDispatch } from '../../redux/store';
 import {
   Table,
   TableBody,
@@ -24,10 +24,10 @@ import {
   Toolbar,
 } from '@mui/material';
 import { Delete, Edit, Add, Search } from '@mui/icons-material';
-import { Region, Prix } from '../types/region';
-import { RegionsService } from '../services/regions.service';
+import { Region, Prix } from '../../types/region';
+import { RegionsService } from '../../services/regions.service';
 import { toast, ToastContainer } from 'react-toastify';
-import { addRegion, updateRegion } from '../redux/features/lieux/locationSlice';
+import { addRegion, updateRegion } from '../../redux/features/lieux/locationSlice';
 
 const LocationList = () => {
   const PrimaryButton = styled(Button)(({ theme }) => ({

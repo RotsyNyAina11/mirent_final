@@ -9,7 +9,7 @@ import {
   Alert,
   Collapse,
 } from "@mui/material";
-import loginHorizontal from "../assets/horizontal.png";
+import loginHorizontal from "../../assets/horizontal.png";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");

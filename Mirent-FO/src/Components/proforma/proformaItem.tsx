@@ -4,8 +4,8 @@ import {
     addItem,
     removeItem,
     clearItems,
-} from '../redux/features/proforma/proformaSlice';
-import { selectProforma } from '../redux/features/proforma/proformaSelector';
+} from '../../redux/features/proforma/proformaSlice';
+import { selectProforma } from '../../redux/features/proforma/proformaSelector';
 import {
     TextField,
     Button,

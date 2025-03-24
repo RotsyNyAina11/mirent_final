@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -7,128 +7,72 @@ import {
   Button,
   Avatar,
   IconButton,
-  useTheme,
-  CircularProgress,
+  Menu,
+  MenuItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Paper,
+  TableContainer,
+  Tooltip,
 } from "@mui/material";
-import { styled } from "@mui/system";
 import {
-  CarRental,
-  Person,
-  MonetizationOn,
-  PieChart,
-  Speed,
-  AttachMoney,
+  Dashboard as DashboardIcon,
+  CalendarToday as CalendarIcon,
+  DirectionsCar as CarIcon,
+  People as PeopleIcon,
+  BarChart as ChartIcon,
+  Settings as SettingsIcon,
+  Search as SearchIcon,
+  Notifications as NotificationsIcon,
+  Visibility as VisibilityIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  TrendingUp as TrendingUpIcon,
+  AttachMoney as MoneyIcon,
+  Percent as PercentIcon,
 } from "@mui/icons-material";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-} from "chart.js";
-import { Bar, Pie } from "react-chartjs-2";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-);
+// Interfaces pour les données
+interface Booking {
+  id: number;
+  client: string;
+  car: string;
+  startDate: string;
+  endDate: string;
+  status: "En cours" | "Confirmé" | "En attente";
+}
+interface Car {
+  id: number;
+  name: string;
+  status: string;
+  image: string;
+}
 
-// Styles
-export const StyledBox = styled(Box)({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  minHeight: "30vh",
-  backgroundColor: "#1976d2",
-  color: "#fff",
-  padding: "2rem 1.5rem",
-  textAlign: "center",
-  fontFamily: "'Roboto', sans-serif",
-});
+const App: React.FC = () => {
+  const [showNotifications, setShowNotifications] = useState<boolean>(false);
+  const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [availableVehiclesCount, setAvailableVehiclesCount] = useState<number | null>(null);
+  const [availableClientsCount, setAvailableClientsCount] = useState<number | null>(null);
 
-export const DashboardCard = styled(Paper)({
-  backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-  "&:hover": {
-    transform: "scale(1.02)",
-    boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.15)",
-  },
-  padding: "1.5rem",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  textAlign: "center",
-  position: "relative",
-});
-
-export const AvatarStyled = styled(Avatar)({
-  width: 60,
-  height: 60,
-  marginBottom: "1rem",
-  backgroundColor: "#fff",
-  color: "#1976d2",
-  fontSize: "1.5rem",
-  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-});
-
-export const ActionButton = styled(Button)({
-  padding: "0.8rem 1.2rem",
-  fontWeight: "600",
-  borderRadius: "4px",
-  fontSize: "0.9rem",
-  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-  transition: "background-color 0.3s ease, box-shadow 0.3s ease",
-  "&:hover": {
-    backgroundColor: "#1565c0",
-    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-  },
-});
-
-export const LoadingIndicator = styled(CircularProgress)({
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-});
-
-const Accueil: React.FC = () => {
-  const theme = useTheme();
-  const [availableVehiclesCount, setAvailableVehiclesCount] = useState<
-    number | null
-  >(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [availableClientsCount, setAvailableClientsCount] = useState<
-    number | null
-  >(null);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const fetchAvailableVehicles = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/vehicles/available-count"
-        );
+        const response = await fetch("http://localhost:3000/vehicles/available-count");
         const data = await response.json();
         setAvailableVehiclesCount(data);
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des véhicules disponibles",
-          error
-        );
-      } finally {
-        setLoading(false);
+        console.error("Erreur lors de la récupération des véhicules disponibles", error);
       }
     };
     fetchAvailableVehicles();
@@ -137,9 +81,7 @@ const Accueil: React.FC = () => {
   useEffect(() => {
     const fetchAvailableClients = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/clients/client-count"
-        );
+        const response = await fetch("http://localhost:3000/clients/client-count");
         const data = await response.json();
         if (response.ok) {
           setAvailableClientsCount(data);
@@ -148,294 +90,221 @@ const Accueil: React.FC = () => {
           setAvailableClientsCount(null);
         }
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des nombres de clients",
-          error
-        );
+        console.error("Erreur lors de la récupération des nombres de clients", error);
         setAvailableClientsCount(null);
       }
     };
     fetchAvailableClients();
   }, []);
 
-  // Exemple de données pour le graphique à barres
-  const chartData = {
-    labels: ["Véhicules", "Clients", "Locations"],
-    datasets: [
-      {
-        label: "Nombre",
-        data: [
-          availableVehiclesCount || 0,
-          availableClientsCount || 0,
-          42, // Exemple de nombre de locations
-        ],
-        backgroundColor: [
-          "rgba(25, 118, 210, 0.6)",
-          "rgba(255, 193, 7, 0.6)",
-          "rgba(76, 175, 80, 0.6)",
-        ],
-        borderColor: [
-          "rgba(25, 118, 210, 1)",
-          "rgba(255, 193, 7, 1)",
-          "rgba(76, 175, 80, 1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      title: {
-        display: true,
-        text: "Statistiques principales",
-      },
+  const recentBookings: Booking[] = [
+    {
+      id: 1,
+      client: "Antoine Dupont",
+      car: "Peugeot 3008",
+      startDate: "24/03/2025",
+      endDate: "26/03/2025",
+      status: "En cours",
     },
-  };
-
-  // Exemple de données pour le graphique circulaire
-  const pieChartData = {
-    labels: ["Disponibles", "Occupés"],
-    datasets: [
-      {
-        label: "Véhicules",
-        data: [availableVehiclesCount || 0, 10], // Exemple : 10 véhicules occupés
-        backgroundColor: ["#4CAF50", "#F44336"],
-        borderWidth: 0,
-      },
-    ],
-  };
-
-  const pieChartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "bottom" as const,
-      },
-      title: {
-        display: true,
-        text: "Répartition des véhicules",
-      },
+    {
+      id: 2,
+      client: "Marie Leclerc",
+      car: "Renault Captur",
+      startDate: "25/03/2025",
+      endDate: "28/03/2025",
+      status: "Confirmé",
     },
-  };
+    {
+      id: 3,
+      client: "Pierre Bernard",
+      car: "Citroën C4",
+      startDate: "26/03/2025",
+      endDate: "29/03/2025",
+      status: "En attente",
+    },
+  ];
+
+  const availableCars: Car[] = [
+    {
+      id: 1,
+      name: "Peugeot 208",
+      status: "Disponible",
+      image: "https://public.readdy.ai/ai/img_res/1f95fa58a2098a165a8a7af87f6f2cbb.jpg",
+    },
+    {
+      id: 2,
+      name: "Renault Clio",
+      status: "Disponible",
+      image: "https://public.readdy.ai/ai/img_res/284918923d6fcad08f717cc628eb3d99.jpg",
+    },
+  ];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      {/* Section de bienvenue */}
-      <StyledBox>
-        <AvatarStyled>
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            A
-          </Typography>
-        </AvatarStyled>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-          Bienvenue, Administrateur !
-        </Typography>
-        <Typography variant="subtitle1" paragraph>
-          Analysez vos données et gérez votre flotte efficacement.
-        </Typography>
-      </StyledBox>
+    <Box display="flex" height="100vh">
+      {/* Contenu principal */}
+      <Box flexGrow={1} overflow="auto">
 
-      {/* Section des statistiques principales */}
-      <Box sx={{ py: 4 }}>
-        <Typography
-          variant="h5"
-          align="center"
-          gutterBottom
-          sx={{ fontWeight: "bold", color: theme.palette.primary.main }}
-        >
-          Tableau de bord Analytique
-        </Typography>
-
-        {/* Graphique principal */}
-        <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={12} md={8}>
-            <DashboardCard>
-              <Bar options={chartOptions} data={chartData} />
-            </DashboardCard>
-          </Grid>
-
-          {/* Cartes principales */}
-          <Grid item xs={12} md={4}>
-            <Grid container spacing={2}>
-              {/* Véhicules disponibles */}
-              <Grid item xs={12} sm={6} md={12}>
-                <DashboardCard>
-                  <IconButton
-                    sx={{ fontSize: "2.5rem", color: theme.palette.primary.main }}
-                  >
-                    <CarRental />
-                  </IconButton>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                    Véhicules disponibles
-                  </Typography>
-                  {loading ? (
-                    <LoadingIndicator />
-                  ) : (
-                    <Typography variant="h4" color="text.primary">
-                      {availableVehiclesCount !== null
-                        ? availableVehiclesCount
-                        : "Erreur"}
-                    </Typography>
-                  )}
-                </DashboardCard>
-              </Grid>
-
-              {/* Total Clients */}
-              <Grid item xs={12} sm={6} md={12}>
-                <DashboardCard>
-                  <IconButton
-                    sx={{ fontSize: "2.5rem", color: theme.palette.warning.main }}
-                  >
-                    <Person />
-                  </IconButton>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                    Total Clients
-                  </Typography>
-                  {availableClientsCount !== null ? (
-                    <Typography variant="h4" color="text.primary">
-                      {availableClientsCount}
-                    </Typography>
-                  ) : (
-                    <Typography variant="h4" color="text.primary">
-                      Erreur
-                    </Typography>
-                  )}
-                </DashboardCard>
-              </Grid>
-
-              {/* Revenus totaux */}
-              <Grid item xs={12} sm={6} md={12}>
-                <DashboardCard>
-                  <IconButton
-                    sx={{ fontSize: "2.5rem", color: theme.palette.success.main }}
-                  >
-                    <MonetizationOn />
-                  </IconButton>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                    Revenus totaux
-                  </Typography>
-                  <Typography variant="h4" color="text.primary">
-                    2 000 000 Ar
-                  </Typography>
-                </DashboardCard>
-              </Grid>
+        {/* Contenu principal avec padding pour éviter le chevauchement */}
+        <Box p={4} pt={10}> {/* Ajout de padding-top pour compenser la hauteur de l'en-tête */}
+          {/* Widgets statistiques */}
+          <Grid container spacing={4} mb={4}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper elevation={3} sx={{ p: 3, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <CarIcon sx={{ fontSize: 40, color: "#1976D2", mb: 1 }} />
+                <Typography variant="body2" color="text.secondary">
+                  Véhicules disponibles
+                </Typography>
+                <Typography variant="h5">{availableVehiclesCount || "Chargement..."}</Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper elevation={3} sx={{ p: 3, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <PeopleIcon sx={{ fontSize: 40, color: "#FBC02D", mb: 1 }} />
+                <Typography variant="body2" color="text.secondary">
+                  Total Clients
+                </Typography>
+                <Typography variant="h5">{availableClientsCount || "Chargement..."}</Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper elevation={3} sx={{ p: 3, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <MoneyIcon sx={{ fontSize: 40, color: "#4CAF50", mb: 1 }} />
+                <Typography variant="body2" color="text.secondary">
+                  Revenus totaux
+                </Typography>
+                <Typography variant="h5">2 000 000 Ar</Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper elevation={3} sx={{ p: 3, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <PercentIcon sx={{ fontSize: 40, color: "#E91E63", mb: 1 }} />
+                <Typography variant="body2" color="text.secondary">
+                  Taux d'occupation
+                </Typography>
+                <Typography variant="h5">75%</Typography>
+              </Paper>
             </Grid>
           </Grid>
-        </Grid>
 
-        {/* Cartes secondaires */}
-        <Box sx={{ mt: 4 }}>
-          <Typography
-            variant="h6"
-            align="center"
-            gutterBottom
-            sx={{ fontWeight: "bold", color: theme.palette.text.secondary }}
-          >
-            Détails supplémentaires
-          </Typography>
-          <Grid container spacing={4} justifyContent="center">
-            {/* Répartition des véhicules */}
-            <Grid item xs={12} sm={6} md={4}>
-              <DashboardCard>
-                <IconButton
-                  sx={{ fontSize: "2.5rem", color: theme.palette.info.main }}
-                >
-                  <PieChart />
-                </IconButton>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                  Répartition des véhicules
+          {/* Graphique et véhicules disponibles */}
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={8}>
+              <Paper elevation={3} sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Performance <TrendingUpIcon sx={{ verticalAlign: "middle", ml: 1 }} />
                 </Typography>
-                <Pie options={pieChartOptions} data={pieChartData} />
-              </DashboardCard>
+                <Box
+                  sx={{
+                    height: 300,
+                    backgroundColor: "#f5f5f5",
+                    borderRadius: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    Graphique de performance
+                  </Typography>
+                </Box>
+              </Paper>
             </Grid>
-
-            {/* Taux d'occupation */}
-            <Grid item xs={12} sm={6} md={4}>
-              <DashboardCard>
-                <IconButton
-                  sx={{ fontSize: "2.5rem", color: theme.palette.warning.main }}
-                >
-                  <Speed />
-                </IconButton>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                  Taux d'occupation (est.)
+            <Grid item xs={12} md={4}>
+              <Paper elevation={3} sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Véhicules disponibles
                 </Typography>
-                <Typography variant="h4" color="text.primary">
-                  75%
-                </Typography>
-              </DashboardCard>
-            </Grid>
-
-            {/* Revenu moyen / location */}
-            <Grid item xs={12} sm={6} md={4}>
-              <DashboardCard>
-                <IconButton
-                  sx={{ fontSize: "2.5rem", color: theme.palette.success.main }}
-                >
-                  <AttachMoney />
-                </IconButton>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                  Revenu moyen / location
-                </Typography>
-                <Typography variant="h4" color="text.primary">
-                  50 000 Ar
-                </Typography>
-              </DashboardCard>
+                {availableCars.map((car) => (
+                  <Box key={car.id} display="flex" alignItems="center" gap={2} my={2}>
+                    <Avatar variant="rounded" src={car.image} />
+                    <Box>
+                      <Typography variant="subtitle1">{car.name}</Typography>
+                      <Typography variant="body2" color="success.main">
+                        {car.status}
+                      </Typography>
+                    </Box>
+                  </Box>
+                ))}
+              </Paper>
             </Grid>
           </Grid>
+
+          {/* Réservations récentes */}
+          <Paper elevation={3} sx={{ mt: 4, p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Réservations récentes
+            </Typography>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Client</TableCell>
+                    <TableCell>Véhicule</TableCell>
+                    <TableCell>Date début</TableCell>
+                    <TableCell>Date fin</TableCell>
+                    <TableCell>Statut</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {recentBookings.map((booking) => (
+                    <TableRow key={booking.id}>
+                      <TableCell>{booking.client}</TableCell>
+                      <TableCell>{booking.car}</TableCell>
+                      <TableCell>{booking.startDate}</TableCell>
+                      <TableCell>{booking.endDate}</TableCell>
+                      <TableCell>
+                        <Box
+                          component="span"
+                          sx={{
+                            px: 2,
+                            py: 0.5,
+                            borderRadius: "4px",
+                            fontSize: "0.8rem",
+                            backgroundColor:
+                              booking.status === "En cours"
+                                ? "#C8E6C9"
+                                : booking.status === "Confirmé"
+                                ? "#BBDEFB"
+                                : "#FFECB3",
+                            color:
+                              booking.status === "En cours"
+                                ? "#2E7D32"
+                                : booking.status === "Confirmé"
+                                ? "#1976D2"
+                                : "#FBC02D",
+                          }}
+                        >
+                          {booking.status}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Tooltip title="Voir">
+                          <IconButton>
+                            <VisibilityIcon color="info" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Modifier">
+                          <IconButton>
+                            <EditIcon color="primary" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Supprimer">
+                          <IconButton>
+                            <DeleteIcon color="error" />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
         </Box>
       </Box>
-
-      {/* Section des actions rapides */}
-      <Box sx={{ py: 4 }}>
-        <Typography
-          variant="h5"
-          align="center"
-          gutterBottom
-          sx={{ fontWeight: "bold", color: theme.palette.primary.main }}
-        >
-          Actions rapides
-        </Typography>
-        <Grid container spacing={3} justifyContent="center">
-          <Grid item xs={12} sm={6} md={3}>
-            <ActionButton
-              variant="contained"
-              color="primary"
-              fullWidth
-              href="/vehicules"
-            >
-              Gérer les véhicules
-            </ActionButton>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <ActionButton
-              variant="contained"
-              color="secondary"
-              fullWidth
-              href="/clients"
-            >
-              Gérer les clients
-            </ActionButton>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <ActionButton
-              variant="contained"
-              color="primary"
-              fullWidth
-              href="/reservations"
-            >
-              Voir les réservations
-            </ActionButton>
-          </Grid>
-        </Grid>
-      </Box>
-    </Container>
+    </Box>
   );
 };
 
-export default Accueil;
+export default App;

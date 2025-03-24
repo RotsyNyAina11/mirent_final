@@ -3,6 +3,7 @@ import ContractList from "../../Components/contrats/contratList";
 
 const ContratPage: React.FC = () => {
     return (
+        
         <Container>
             <Typography variant="h4" component="h1">
                 Suivi des Contrats

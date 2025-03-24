@@ -18,7 +18,7 @@ const SearchFilters: React.FC = () => {
         backgroundColor: "#ffffff",
         borderRadius: 2,
         boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-        flexWrap: "wrap", // Wrap elements on smaller screens
+        flexWrap: "wrap",
       }}
     >
       {/* Champ Ville */}

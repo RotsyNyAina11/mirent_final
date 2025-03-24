@@ -1,14 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
-import { Grid, Box } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import Sidebar from "./Components/sidebar/Sidebar";
 import Login from "./Components/login/Login";
-import ClientList from "./Components/clients/CustomerPage";
 import Reservations from "./pages/reservation";
 import Performat from "./pages/ProformaTable";
 import Devis from "./pages/Devis";
@@ -24,18 +23,29 @@ import Home from "./pages/acceuil/HomePage";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
-  const MainLayout: React.FC<{ children: React.ReactNode }> = ({
-    children,
-  }) => {
+  const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const isSmallScreen = useMediaQuery("(max-width: 900px)");
+    const [isCollapsed, setIsCollapsed] = useState(isSmallScreen);
+
+    useEffect(() => {
+      setIsCollapsed(isSmallScreen);
+    }, [isSmallScreen]);
+
     return (
-      <Grid container>
-        <Grid item xs={2}>
-          <Sidebar />
-        </Grid>
-        <Grid item xs={10}>
-          <Box p={3}>{children}</Box>
-        </Grid>
-      </Grid>
+      <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+        {/* Conteneur principal avec Sidebar et contenu */}
+        <Box display="flex" flexGrow={1} pt={7}> {/* Ajustement de pt pour la nouvelle hauteur de l'en-tête (56px) */}
+          {/* Sidebar (contient déjà l'en-tête) */}
+          <Box sx={{ width: isCollapsed ? "60px" : "250px", flexShrink: 0 }}>
+            <Sidebar onCollapseChange={setIsCollapsed} />
+          </Box>
+
+          {/* Contenu principal */}
+          <Box flexGrow={1} p={3}>
+            {children}
+          </Box>
+        </Box>
+      </Box>
     );
   };
 
@@ -43,7 +53,6 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         {/* Route pour la page de connexion */}
-        {/*<Route path="/" element={<Login />} />*/}
         <Route path="/login" element={<Login />} />
 
         {/* Route pour l'accueil avec Sidebar */}
@@ -92,7 +101,7 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
-        {/** Route pour la page Table proforma*/}
+        {/* Route pour la page Table proforma */}
         <Route
           path="/tableau_proforma"
           element={
@@ -140,7 +149,6 @@ const App: React.FC = () => {
           }
         />
 
-
         <Route
           path="/proforma-pdf"
           element={
@@ -150,7 +158,7 @@ const App: React.FC = () => {
           }
         />
 
-                {/* Route pour la page de Contrat */}
+        {/* Route pour la page de Contrat */}
         <Route
           path="/contrats"
           element={

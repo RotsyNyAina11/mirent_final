@@ -1,284 +1,168 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../redux/store";
+import {
+  setClientId,
+  setDate,
+  setContractReference,
+  setNotes,
+  createProforma,
+  ProformaItem,
+} from "../../redux/features/proforma/proformaSlice";
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Box,
+  Grid,
+  Alert,
+} from "@mui/material";
+import ProformaItemForm from "./proformaItem";
 import { useNavigate } from "react-router-dom";
-import { addQuote } from "../../redux/slices/proformaSlice";
-import { TextField, Button, Grid, Paper, Typography } from "@mui/material";
+import { v4 as uuidv4 } from "uuid";
 
-interface Quote {
-  ref: string;
-  voiture: string;
-  numeroVoiture: string;
-  destination: string;
-  dateDepart: string;
-  dateArrivee: string;
-  nombreJours: number;
-  carburant: number;
-  prixUnitaire: number;
-  prixTotal: number;
-}
+const ProformaForm: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    clientId,
+    date,
+    contractReference,
+    notes,
+    items,
+    createStatus,
+    error,
+  } = useSelector((state: RootState) => state.proforma);
 
-const ProformaForm = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const [quote, setQuote] = useState<Quote>({
-    ref: "",
-    voiture: "",
-    numeroVoiture: "",
-    destination: "",
-    dateDepart: "",
-    dateArrivee: "",
-    nombreJours: 0,
-    carburant: 0,
-    prixUnitaire: 0,
-    prixTotal: 0,
-  });
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
-  const handleValidate = () => {
-    if (Object.values(quote).some((value) => value === "" || value === 0)) {
-      alert("Veuillez remplir tous les champs correctement !");
-      return;
-    }
+    const calculateTotalAmount = (items: ProformaItem[]): number => {
+      return items.reduce((total, item) => {
+        return total + (item.prixId ?? 0);
+      }, 0);
+    };
+    const totalAmount = calculateTotalAmount(items);
 
-    const updatedInvoice = {
-      ...quote,
-      status: "validée",
+    const proformaNumber = `PROFORMA-${uuidv4()}`;
+
+    const proformaData = {
+      clientId,
+      date,
+      contractReference,
+      notes,
+      items,
+      totalAmount,
+      proformaNumber,
     };
 
-    fetch("http://localhost:3000/api/invoices", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedInvoice),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          // Gérer les réponses d'erreur du serveur
-          return response.json().then((errorData) => {
-            throw new Error(
-              errorData.message || "Erreur lors de la validation du proforma"
-            );
-          });
-        }
-        return response.json();
+    dispatch(createProforma(proformaData))
+      .unwrap()
+      .then(() => {
+        navigate("/pdf");
       })
-      .then((data) => {
-        alert("Facture générée et proforma validé !");
-        printInvoice(data);
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la validation du proforma :", error);
-        alert(error.message || "Erreur lors de la validation du proforma");
+      .catch((err) => {
+        setErrorMessage(
+          err.message || "Erreur lors de la création de la proforma."
+        );
       });
   };
 
-  const printInvoice = (invoiceData: any) => {
-    const printWindow = window.open("", "_blank");
-
-    if (!printWindow) {
-      alert("Impossible d'ouvrir la fenêtre d'impression.");
-      return;
-    }
-
-    const invoiceContent = `
-      <html>
-        <head><title>Facture N°: ${invoiceData.ref}</title></head>
-        <body>
-          <h1>Facture N°: ${invoiceData.ref}</h1>
-          <p>Voiture: ${invoiceData.voiture}</p>
-          <p>Numéro de Voiture: ${invoiceData.numeroVoiture}</p>
-          <p>Destination: ${invoiceData.destination}</p>
-          <p>Date de départ: ${invoiceData.dateDepart}</p>
-          <p>Date d'arrivée: ${invoiceData.dateArrivee}</p>
-          <p>Nombre de jours: ${invoiceData.nombreJours}</p>
-          <p>Carburant: ${invoiceData.carburant}</p>
-          <p>Prix unitaire: ${invoiceData.prixUnitaire}€</p>
-          <p>Prix total: ${invoiceData.prixTotal} Ar</p>
-          <p>Status: ${invoiceData.status}</p>
-        </body>
-      </html>
-    `;
-
-    printWindow.document.write(invoiceContent);
-    printWindow.document.close();
-
-    setTimeout(() => {
-      try {
-        printWindow.print();
-        printWindow.close();
-      } catch (error) {
-        console.error("Erreur lors de l'impression :", error);
-        alert("Erreur lors de l'impression de la facture.");
-      }
-    }, 500);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setQuote((prevQuote) => ({
-      ...prevQuote,
-      [name]: [
-        "nombreJours",
-        "carburant",
-        "prixUnitaire",
-        "prixTotal",
-      ].includes(name)
-        ? Number(value)
-        : value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (Object.values(quote).some((value) => value === "" || value === 0)) {
-      alert("Veuillez remplir tous les champs correctement !");
-      return;
-    }
-
-    try {
-      dispatch(addQuote(quote));
-      navigate("/tableau_proforma");
-    } catch (error) {
-      console.error("Erreur lors de l'envoi de la quote :", error);
-      alert("Une erreur est survenue lors de l'envoi de la quote.");
-    }
-  };
-
   return (
-    <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        Ajouter un devis
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Référence"
-              name="ref"
-              value={quote.ref}
-              onChange={handleChange}
-              required
-            />
+    <Box sx={{ mt: 4 }} maxWidth="100%">
+      <Container>
+        <Typography variant="h4" component="h1" align="center">
+          Création de Proforma
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <Grid container spacing={2}>
+            {errorMessage && (
+              <Grid item xs={12}>
+                <Alert severity="error">{errorMessage}</Alert>
+              </Grid>
+            )}
+            {error && (
+              <Grid item xs={12}>
+                <Alert severity="error">{error}</Alert>
+              </Grid>
+            )}
+            <Grid item xs={6} sm={3}>
+              <TextField
+                label="ID Client"
+                type="number"
+                value={clientId}
+                onChange={(e) => dispatch(setClientId(Number(e.target.value)))}
+                fullWidth
+                margin="normal"
+                focused
+                color="secondary"
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <TextField
+                label="Date"
+                type="date"
+                value={date}
+                onChange={(e) => dispatch(setDate(e.target.value))}
+                fullWidth
+                margin="normal"
+                focused
+                color="secondary"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <TextField
+                label="Référence du Contrat"
+                value={contractReference}
+                onChange={(e) => dispatch(setContractReference(e.target.value))}
+                fullWidth
+                margin="normal"
+                focused
+                color="secondary"
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <TextField
+                label="Notes"
+                multiline
+                rows={2}
+                value={notes}
+                onChange={(e) => dispatch(setNotes(e.target.value))}
+                fullWidth
+                margin="normal"
+                focused
+                color="secondary"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <ProformaItemForm />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Box mt={2}>
+                <Button
+                  type="submit"
+                  variant="outlined"
+                  color="primary"
+                  disabled={createStatus === "loading"}
+                  sx={{ marginRight: 2 }}
+                >
+                  {createStatus === "loading"
+                    ? "En cours..."
+                    : "Créer Proforma"}
+                </Button>
+              </Box>
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Voiture"
-              name="voiture"
-              value={quote.voiture}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Numéro de voiture"
-              name="numeroVoiture"
-              value={quote.numeroVoiture}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Destination"
-              name="destination"
-              value={quote.destination}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              type="date"
-              label="Date de départ"
-              name="dateDepart"
-              value={quote.dateDepart}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              type="date"
-              label="Date d'arrivée"
-              name="dateArrivee"
-              value={quote.dateArrivee}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              type="number"
-              label="Nombre de jours"
-              name="nombreJours"
-              value={quote.nombreJours}
-              onChange={handleChange}
-              required
-              inputProps={{ min: 1 }} // Ensuring at least 1 day
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              type="number"
-              label="Carburant"
-              name="carburant"
-              value={quote.carburant}
-              onChange={handleChange}
-              required
-              inputProps={{ min: 0 }} // Ensure non-negative value
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              type="number"
-              label="Prix unitaire"
-              name="prixUnitaire"
-              value={quote.prixUnitaire}
-              onChange={handleChange}
-              required
-              inputProps={{ min: 0 }} // Ensure non-negative value
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              type="number"
-              label="Prix total"
-              name="prixTotal"
-              value={quote.prixTotal}
-              onChange={handleChange}
-              required
-              inputProps={{ min: 0 }} // Ensure non-negative value
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button variant="contained" color="secondary" type="submit">
-              Ajouter
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleValidate}
-              style={{ marginLeft: "10px" }}
-            >
-              Valider le proforma
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
-    </Paper>
+        </form>
+      </Container>
+    </Box>
   );
 };
 

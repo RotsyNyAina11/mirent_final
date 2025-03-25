@@ -16,13 +16,12 @@ import Performat from "./Components/Proforma/ProformaTable";
 import Devis from "./Components/Devis/Devis";
 import Facturation from "./Components/Proforma/Facturation";
 import DetailClientPage from "./pages/ClientPage";
-
-//import ProformaList from "./pages/ProformaList";
+import Proforma from "./Components/Proforma/proformaPdf";
 import ProformaForm from "./Components/Proforma/ProformaForm";
-import Commande from "./Components/Commandes/CommandePage";
-//import ProformaList from "./pages/ProformaList";
+import Commande from "./pages/CommandePage";
 
 import LocationsPage from "./pages/locationPage";
+import ProformaPage from "./pages/ProformaPage";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -101,7 +100,7 @@ const App: React.FC = () => {
           path="/proformat"
           element={
             <MainLayout>
-              <ProformaForm />
+              <ProformaPage />
             </MainLayout>
           }
         />
@@ -114,7 +113,15 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
-
+        {/** Route pour la page Form proforma*/}
+        <Route
+          path="/form_proforma"
+          element={
+            <MainLayout>
+              <ProformaForm />
+            </MainLayout>
+          }
+        />
         {/* Route pour la page de Devis sur la commande */}
         <Route
           path="/devis"
@@ -155,6 +162,7 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
+
         {/* Route pour la page des lieux */}
         <Route
           path="/lieux"
@@ -164,6 +172,7 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
+
         {/* Redirection par défaut vers /accueil */}
         <Route path="*" element={<Navigate to="/accueil" />} />
       </Routes>

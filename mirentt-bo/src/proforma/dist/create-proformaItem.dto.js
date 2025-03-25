@@ -6,41 +6,53 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.CreateProformaItemDto = void 0;
+exports.CreateProformaItemByCriteriaDto = exports.VehicleCriteria = void 0;
+var class_transformer_1 = require("class-transformer");
 var class_validator_1 = require("class-validator");
-var CreateProformaItemDto = /** @class */ (function () {
-    function CreateProformaItemDto() {
+var VehicleCriteria = /** @class */ (function () {
+    function VehicleCriteria() {
     }
     __decorate([
+        class_validator_1.IsOptional(),
         class_validator_1.IsString()
-    ], CreateProformaItemDto.prototype, "proformaNumber");
+    ], VehicleCriteria.prototype, "marque");
     __decorate([
+        class_validator_1.IsOptional(),
         class_validator_1.IsString()
-    ], CreateProformaItemDto.prototype, "clientId");
+    ], VehicleCriteria.prototype, "modele");
     __decorate([
+        class_validator_1.IsOptional(),
         class_validator_1.IsString()
-    ], CreateProformaItemDto.prototype, "vehicleId");
-    __decorate([
-        class_validator_1.IsString()
-    ], CreateProformaItemDto.prototype, "regionId");
-    __decorate([
-        class_validator_1.IsDateString()
-    ], CreateProformaItemDto.prototype, "dateDepart");
-    __decorate([
-        class_validator_1.IsDateString()
-    ], CreateProformaItemDto.prototype, "dateRetour");
-    __decorate([
-        class_validator_1.IsNumber()
-    ], CreateProformaItemDto.prototype, "nombreJours");
-    __decorate([
-        class_validator_1.IsString()
-    ], CreateProformaItemDto.prototype, "carburant");
-    __decorate([
-        class_validator_1.IsNumber()
-    ], CreateProformaItemDto.prototype, "prixId");
-    __decorate([
-        class_validator_1.IsNumber()
-    ], CreateProformaItemDto.prototype, "totalAmount");
-    return CreateProformaItemDto;
+    ], VehicleCriteria.prototype, "type");
+    return VehicleCriteria;
 }());
-exports.CreateProformaItemDto = CreateProformaItemDto;
+exports.VehicleCriteria = VehicleCriteria;
+var CreateProformaItemByCriteriaDto = /** @class */ (function () {
+    function CreateProformaItemByCriteriaDto() {
+    }
+    __decorate([
+        class_validator_1.IsNotEmpty()
+    ], CreateProformaItemByCriteriaDto.prototype, "vehicleCriteria");
+    __decorate([
+        class_validator_1.IsNotEmpty(),
+        class_validator_1.IsString()
+    ], CreateProformaItemByCriteriaDto.prototype, "regionName");
+    __decorate([
+        class_validator_1.IsNotEmpty(),
+        class_transformer_1.Transform(function (_a) {
+            var value = _a.value;
+            return new Date(value);
+        }),
+        class_validator_1.IsDate()
+    ], CreateProformaItemByCriteriaDto.prototype, "dateDepart");
+    __decorate([
+        class_validator_1.IsNotEmpty(),
+        class_transformer_1.Transform(function (_a) {
+            var value = _a.value;
+            return new Date(value);
+        }),
+        class_validator_1.IsDate()
+    ], CreateProformaItemByCriteriaDto.prototype, "dateRetour");
+    return CreateProformaItemByCriteriaDto;
+}());
+exports.CreateProformaItemByCriteriaDto = CreateProformaItemByCriteriaDto;

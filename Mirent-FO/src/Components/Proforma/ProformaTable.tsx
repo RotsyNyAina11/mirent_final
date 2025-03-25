@@ -13,24 +13,29 @@ import {
   Typography,
 } from "@mui/material";
 
-import companyLogo from "../../assets/horizontal.png"; // Logo de l’entreprise
-import clientLogo from "../../assets/oms.png"; // Logo du client
-
+import companyLogo from "../../assets/horizontal.png";
+import clientLogo from "../../assets/oms.png";
+import { useEffect } from "react";
 const ProformaTable = () => {
-  const quotes = useSelector((state: RootState) => state.proforma.quotes);
+  const quotes = useSelector((state: RootState) => state.proforma.quotes) || [];
   const dispatch = useDispatch();
 
-  // Calcul des totaux
+  console.log("Quotes récupérés depuis Redux :", quotes);
+
+  if (!quotes || !Array.isArray(quotes)) {
+    return <Typography>Aucun devis disponible.</Typography>;
+  }
+
   const totalCarburant = quotes.reduce(
-    (sum, quote) => sum + (parseFloat(quote.carburant.toString()) || 0),
-    0
-  );
-  const totalPrixTotal = quotes.reduce(
-    (sum, quote) => sum + (parseFloat(quote.prixTotal.toString()) || 0),
+    (sum, quote) => sum + parseFloat(quote?.carburant?.toString() || "0"),
     0
   );
 
-  // Informations du client (à personnaliser selon les données réelles)
+  const totalPrixTotal = quotes.reduce(
+    (sum, quote) => sum + parseFloat(quote?.prixTotal?.toString() || "0"),
+    0
+  );
+
   const clientInfo = {
     name: "OMS Corporation",
     email: "contact@oms.com",
@@ -40,7 +45,6 @@ const ProformaTable = () => {
 
   return (
     <>
-      {/* Logos et informations */}
       <Grid
         container
         spacing={2}
@@ -48,7 +52,6 @@ const ProformaTable = () => {
         justifyContent="space-between"
         sx={{ marginBottom: 3 }}
       >
-        {/* Logo de l'entreprise */}
         <Grid item xs={4} sx={{ textAlign: "left" }}>
           <img
             src={companyLogo}
@@ -58,14 +61,12 @@ const ProformaTable = () => {
           <Typography>Facture n**</Typography>
         </Grid>
 
-        {/* Titre principal */}
         <Grid item xs={4} sx={{ textAlign: "center" }}>
           <Typography variant="h5" fontWeight="bold">
             Proforma/Devis
           </Typography>
         </Grid>
 
-        {/* Logo du client + Infos client */}
         <Grid item xs={4} sx={{ textAlign: "right" }}>
           <img
             src={clientLogo}
@@ -81,7 +82,6 @@ const ProformaTable = () => {
         </Grid>
       </Grid>
 
-      {/* Tableau des devis */}
       <Paper sx={{ padding: 3 }}>
         <TableContainer component={Paper}>
           <Table>
@@ -106,28 +106,33 @@ const ProformaTable = () => {
             </TableHead>
             <TableBody>
               {quotes.map((quote) => (
-                <TableRow key={quote.ref}>
-                  <TableCell>{quote.ref}</TableCell>
-                  <TableCell>{quote.voiture}</TableCell>
-                  <TableCell>{quote.numeroVoiture}</TableCell>
-                  <TableCell>{quote.destination}</TableCell>
-
+                <TableRow key={quote?.ref || Math.random()}>
+                  <TableCell>{quote?.ref || "N/A"}</TableCell>
+                  <TableCell>{quote?.voiture || "N/A"}</TableCell>
+                  <TableCell>{quote?.numeroVoiture || "N/A"}</TableCell>
+                  <TableCell>{quote?.destination || "N/A"}</TableCell>
                   <TableCell>
-                    {quote.dateDepart} au {quote.dateArrivee}
+                    {quote?.dateDepart || "??"} au {quote?.dateArrivee || "??"}
                   </TableCell>
-                  <TableCell>{quote.nombreJours}</TableCell>
+                  <TableCell>{quote?.nombreJours || "0"}</TableCell>
                   <TableCell>
-                    {parseFloat(quote.carburant.toString()).toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    {parseFloat(quote.prixUnitaire.toString()).toLocaleString()}
+                    {parseFloat(
+                      quote?.carburant?.toString() || "0"
+                    ).toLocaleString()}
                   </TableCell>
                   <TableCell>
-                    {parseFloat(quote.prixTotal.toString()).toLocaleString()}
+                    {parseFloat(
+                      quote?.prixUnitaire?.toString() || "0"
+                    ).toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    {parseFloat(
+                      quote?.prixTotal?.toString() || "0"
+                    ).toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}
-              {/* Ligne des totaux */}
+
               <TableRow>
                 <TableCell colSpan={6} align="right">
                   <Typography variant="body1" fontWeight="bold">
@@ -151,7 +156,7 @@ const ProformaTable = () => {
                 </TableCell>
                 <TableCell></TableCell>
               </TableRow>
-              {/* Ligne du montant total carburant */}
+
               <TableRow>
                 <TableCell colSpan={8} align="right">
                   <Typography variant="body1" fontWeight="bold">
@@ -170,7 +175,6 @@ const ProformaTable = () => {
         </TableContainer>
       </Paper>
 
-      {/* Montant total en lettres */}
       <Typography variant="body1" sx={{ marginTop: 2 }}>
         Arrêtée la présente facture à la somme de :{" "}
         <strong>
@@ -181,7 +185,6 @@ const ProformaTable = () => {
         </strong>
       </Typography>
 
-      {/* Date et signature */}
       <Grid container justifyContent="flex-end" sx={{ marginTop: 3 }}>
         <Grid item>
           <Typography variant="body1">

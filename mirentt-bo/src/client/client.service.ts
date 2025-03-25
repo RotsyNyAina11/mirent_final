@@ -11,6 +11,11 @@ export class ClientService {
     @InjectRepository(Client)
     private clientRepository: Repository<Client>,
   ) {}
+  //*ajout//
+  async findOneById(id: number): Promise<Client | undefined> {
+    const client = await this.clientRepository.findOne({ where: { id } });
+    return client ?? undefined;
+  }
 
   async getClientCount(): Promise<number> {
     const availableClientCount = await this.clientRepository.count({});

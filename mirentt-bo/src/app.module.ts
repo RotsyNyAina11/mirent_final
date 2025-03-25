@@ -12,6 +12,8 @@ import { RegionsModule } from './regions/regions.module';
 import { PrixsModule } from './prixs/prixs.module';
 import { ClientModule } from './client/client.module';
 import { ProformaModule } from './proforma/proforma.module';
+import { MailerModule } from './mailer/mailer.module';
+
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { ProformaModule } from './proforma/proforma.module';
     RegionsModule,
     PrixsModule,
     ProformaModule,
+    MailerModule
   ],
 })
 export class AppModule {}

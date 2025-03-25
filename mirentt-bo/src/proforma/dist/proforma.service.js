@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -49,19 +60,26 @@ exports.ProformaService = void 0;
 var common_1 = require("@nestjs/common");
 var typeorm_1 = require("@nestjs/typeorm");
 var proforma_entity_1 = require("src/entities/proforma.entity");
-var proformat_item_entity_1 = require("../entities/proformat-item.entity");
+var proformat_item_entity_1 = require("src/entities/proformat-item.entity");
+var typeorm_2 = require("typeorm");
 var vehicle_entity_1 = require("src/entities/vehicle.entity");
 var region_entity_1 = require("src/entities/region.entity");
 var prix_entity_1 = require("src/entities/prix.entity");
 var status_entity_1 = require("src/entities/status.entity");
+var client_entity_1 = require("src/entities/client.entity");
+var type_entity_1 = require("src/entities/type.entity");
 var ProformaService = /** @class */ (function () {
-    function ProformaService(proformaRepository, proformaItemRepository, vehiculeRepository, regionRepository, prixRepository, statusRepository) {
+    function ProformaService(proformaRepository, proformaItemRepository, vehiculeRepository, regionRepository, prixRepository, statusRepository, clientRepository, typeRepository, pdfService, mailService) {
         this.proformaRepository = proformaRepository;
         this.proformaItemRepository = proformaItemRepository;
         this.vehiculeRepository = vehiculeRepository;
         this.regionRepository = regionRepository;
         this.prixRepository = prixRepository;
         this.statusRepository = statusRepository;
+        this.clientRepository = clientRepository;
+        this.typeRepository = typeRepository;
+        this.pdfService = pdfService;
+        this.mailService = mailService;
     }
     ProformaService.prototype.generateProformaNumber = function () {
         return __awaiter(this, void 0, Promise, function () {
@@ -91,110 +109,233 @@ var ProformaService = /** @class */ (function () {
     };
     ProformaService.prototype.create = function (proformaData) {
         return __awaiter(this, void 0, Promise, function () {
-            var proforma, _a, proformaItems, _b, error_1;
+            var clientExist, proforma, _a, proformaItems, _b, savedProforma, savedProformaWithRelations, pdfBuffer;
             var _this = this;
             return __generator(this, function (_c) {
                 switch (_c.label) {
-                    case 0:
-                        _c.trys.push([0, 4, , 5]);
+                    case 0: return [4 /*yield*/, this.clientRepository.findOne({
+                            where: [
+                                { lastName: proformaData.clientLastName },
+                                { email: proformaData.clientEmail },
+                                { phone: proformaData.clientPhone },
+                            ]
+                        })];
+                    case 1:
+                        clientExist = _c.sent();
+                        if (!clientExist) {
+                            throw new common_1.NotFoundException("Client not found with the provided information");
+                        }
                         proforma = this.proformaRepository.create({
-                            client: { id: proformaData.clientId },
+                            client: clientExist,
                             date: proformaData.date,
+                            contractReference: proformaData.contractReference,
                             notes: proformaData.notes
                         });
                         _a = proforma;
                         return [4 /*yield*/, this.generateProformaNumber()];
-                    case 1:
+                    case 2:
                         _a.proformaNumber = _c.sent();
                         return [4 /*yield*/, Promise.all(proformaData.items.map(function (item) { return __awaiter(_this, void 0, void 0, function () {
-                                var vehiculeExist, regionExist, prixExist, statusDisponible, vehiculeDejaLoue, dateDepart, dateRetour, dureeLocation, subTotal, proformaItem, statusIndisponible;
+                                var regionExist, prixExist, statusDisponible, whereClause, typeExist, availableVehicles, vehiculeChoisi, vehiculeDejaLoue, dureeLocation, prixNumerique, subTotalCalculated, proformaItem, statusIndisponible;
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
-                                        case 0: return [4 /*yield*/, this.vehiculeRepository.findOne({
-                                                where: { id: Number(item.vehicleId) }
+                                        case 0: return [4 /*yield*/, this.regionRepository.findOne({
+                                                where: { nom_region: item.regionName },
+                                                relations: ['prix']
                                             })];
                                         case 1:
-                                            vehiculeExist = _a.sent();
-                                            if (!vehiculeExist)
-                                                throw new common_1.NotFoundException("V\u00E9hicule ID " + item.vehicleId + " introuvable");
-                                            return [4 /*yield*/, this.regionRepository.findOne({
-                                                    where: { id: Number(item.regionId) }
-                                                })];
-                                        case 2:
                                             regionExist = _a.sent();
-                                            if (!regionExist)
-                                                throw new common_1.NotFoundException("R\u00E9gion ID " + item.regionId + " introuvable");
-                                            return [4 /*yield*/, this.prixRepository.findOne({
-                                                    where: { id: item.prixId }
-                                                })];
-                                        case 3:
-                                            prixExist = _a.sent();
-                                            if (!prixExist)
-                                                throw new common_1.NotFoundException("Prix ID " + item.prixId + " introuvable");
+                                            if (!regionExist) {
+                                                throw new common_1.NotFoundException("Region with name \"" + item.regionName + "\" not found");
+                                            }
+                                            if (!regionExist.prix) {
+                                                throw new common_1.NotFoundException("Price not found for the region \"" + item.regionName + "\"");
+                                            }
+                                            prixExist = regionExist.prix;
                                             return [4 /*yield*/, this.statusRepository.findOne({
                                                     where: { status: 'Disponible' }
                                                 })];
-                                        case 4:
+                                        case 2:
                                             statusDisponible = _a.sent();
-                                            if (!statusDisponible)
-                                                throw new common_1.NotFoundException("Statut 'Disponible' non trouv\u00E9");
-                                            if (vehiculeExist.status.id !== statusDisponible.id) {
-                                                throw new common_1.BadRequestException("Le v\u00E9hicule " + item.vehicleId + " n'est pas disponible");
+                                            if (!statusDisponible) {
+                                                throw new common_1.NotFoundException("Statut \"Disponible\" non trouv\u00E9");
                                             }
-                                            return [4 /*yield*/, this.proformaItemRepository.findOne({
-                                                    where: {
-                                                        vehicle: { id: Number(item.vehicleId) },
-                                                        dateDepart: new Date(item.dateDepart),
-                                                        dateRetour: new Date(item.dateRetour)
-                                                    }
+                                            whereClause = __assign(__assign({}, item.vehicleCriteria), { status: { id: statusDisponible.id } });
+                                            if (!item.vehicleCriteria.type) return [3 /*break*/, 4];
+                                            return [4 /*yield*/, this.typeRepository.findOne({
+                                                    where: { type: item.vehicleCriteria.type }
+                                                })];
+                                        case 3:
+                                            typeExist = _a.sent();
+                                            if (!typeExist) {
+                                                throw new common_1.NotFoundException("Type \"" + item.vehicleCriteria.type + "\" not found");
+                                            }
+                                            whereClause.type = typeExist;
+                                            delete whereClause.type;
+                                            _a.label = 4;
+                                        case 4:
+                                            console.log('Critères de recherche :', whereClause);
+                                            return [4 /*yield*/, this.vehiculeRepository.find({
+                                                    where: whereClause,
+                                                    relations: ['type', 'status']
                                                 })];
                                         case 5:
+                                            availableVehicles = _a.sent();
+                                            if (!availableVehicles || availableVehicles.length === 0) {
+                                                throw new common_1.NotFoundException("No available vehicle found for the given criteria");
+                                            }
+                                            vehiculeChoisi = availableVehicles[0];
+                                            return [4 /*yield*/, this.proformaItemRepository.findOne({
+                                                    where: {
+                                                        vehicle: { id: vehiculeChoisi.id },
+                                                        dateDepart: item.dateDepart,
+                                                        dateRetour: item.dateRetour
+                                                    }
+                                                })];
+                                        case 6:
                                             vehiculeDejaLoue = _a.sent();
                                             if (vehiculeDejaLoue) {
-                                                throw new common_1.BadRequestException("Le v\u00E9hicule " + item.vehicleId + " est d\u00E9j\u00E0 lou\u00E9");
+                                                throw new common_1.BadRequestException("Le v\u00E9hicule \"" + vehiculeChoisi.nom + "\" (ID: " + vehiculeChoisi.id + ") est d\u00E9j\u00E0 lou\u00E9 pour cette p\u00E9riode");
                                             }
-                                            dateDepart = new Date(item.dateDepart);
-                                            dateRetour = new Date(item.dateRetour);
-                                            dureeLocation = Math.ceil((dateRetour.getTime() - dateDepart.getTime()) / (1000 * 3600 * 24));
-                                            item.nombreJours = dureeLocation;
-                                            subTotal = prixExist.prix * dureeLocation;
-                                            item['subTotal'] = subTotal;
+                                            dureeLocation = Math.ceil((new Date(item.dateRetour).getTime() -
+                                                new Date(item.dateDepart).getTime()) /
+                                                (1000 * 3600 * 24));
+                                            prixNumerique = Number(prixExist.prix);
+                                            subTotalCalculated = prixNumerique * dureeLocation;
+                                            console.log('Création ProformaItem - prixExist.prix:', prixExist.prix, 'dureeLocation:', dureeLocation, 'subTotalCalculated:', subTotalCalculated);
                                             proformaItem = this.proformaItemRepository.create({
-                                                vehicle: { id: Number(item.vehicleId) },
-                                                region: { id: Number(item.regionId) },
-                                                prix: { id: Number(item.prixId) },
-                                                dateDepart: dateDepart,
-                                                dateRetour: dateRetour,
+                                                vehicle: vehiculeChoisi,
+                                                region: regionExist,
+                                                prix: prixExist,
+                                                dateDepart: new Date(item.dateDepart),
+                                                dateRetour: new Date(item.dateRetour),
                                                 nombreJours: dureeLocation,
-                                                subTotal: subTotal
+                                                subTotal: subTotalCalculated
                                             });
                                             return [4 /*yield*/, this.statusRepository.findOne({
                                                     where: { status: 'Indisponible' }
                                                 })];
-                                        case 6:
-                                            statusIndisponible = _a.sent();
-                                            if (!statusIndisponible)
-                                                throw new common_1.NotFoundException("Statut 'Indisponible' non trouv\u00E9");
-                                            vehiculeExist.status = statusIndisponible;
-                                            return [4 /*yield*/, this.vehiculeRepository.save(vehiculeExist)];
                                         case 7:
+                                            statusIndisponible = _a.sent();
+                                            if (!statusIndisponible) {
+                                                throw new common_1.NotFoundException("Statut \"Indisponible\" non trouv\u00E9");
+                                            }
+                                            vehiculeChoisi.status = statusIndisponible;
+                                            return [4 /*yield*/, this.vehiculeRepository.save(vehiculeChoisi)];
+                                        case 8:
                                             _a.sent();
                                             return [2 /*return*/, proformaItem];
                                     }
                                 });
                             }); }))];
-                    case 2:
+                    case 3:
                         proformaItems = _c.sent();
                         _b = proforma;
                         return [4 /*yield*/, this.proformaItemRepository.save(proformaItems)];
-                    case 3:
-                        _b.items = _c.sent();
-                        proforma.totalAmount = proforma.items.reduce(function (sum, item) { return sum + item.subTotal; }, 0);
-                        return [2 /*return*/, this.proformaRepository.save(proforma)];
                     case 4:
-                        error_1 = _c.sent();
-                        throw new common_1.BadRequestException(error_1.message || 'Erreur lors de la création de la proforma');
-                    case 5: return [2 /*return*/];
+                        _b.items = _c.sent();
+                        proforma.totalAmount = proforma.items.reduce(function (sum, item) { return sum + Number(item.subTotal); }, 0);
+                        console.log('Total amount (before toFixed):', proforma.totalAmount);
+                        console.log('Type of total amount:', typeof proforma.totalAmount);
+                        proforma.totalAmount = Number(proforma.totalAmount.toFixed(2));
+                        console.log('Total amount (after toFixed):', proforma.totalAmount);
+                        console.log('Type of total amount:', typeof proforma.totalAmount);
+                        return [4 /*yield*/, this.proformaRepository.save(proforma)];
+                    case 5:
+                        savedProforma = _c.sent();
+                        return [4 /*yield*/, this.proformaRepository.findOne({
+                                where: { id: savedProforma.id },
+                                relations: [
+                                    'items',
+                                    'items.vehicle',
+                                    'items.vehicle.type',
+                                    'items.vehicle.status',
+                                    'items.region',
+                                    'items.prix',
+                                    'client',
+                                ]
+                            })];
+                    case 6:
+                        savedProformaWithRelations = _c.sent();
+                        console.log('Saved proforma with relations:', savedProformaWithRelations);
+                        return [4 /*yield*/, this.pdfService.generateProformaPdf(savedProformaWithRelations)];
+                    case 7:
+                        pdfBuffer = _c.sent();
+                        if (!savedProformaWithRelations) {
+                            throw new common_1.NotFoundException('Proforma not found after saving.');
+                        }
+                        return [2 /*return*/, { proforma: savedProformaWithRelations, pdfBuffer: pdfBuffer }];
+                }
+            });
+        });
+    };
+    ProformaService.prototype.updateStatus = function (id, newStatus) {
+        return __awaiter(this, void 0, Promise, function () {
+            var proforma;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.proformaRepository.findOne({ where: { id: id } })];
+                    case 1:
+                        proforma = _a.sent();
+                        if (!proforma) {
+                            throw new common_1.NotFoundException("Proforma with ID " + id + " not found");
+                        }
+                        proforma.status = newStatus;
+                        return [2 /*return*/, this.proformaRepository.save(proforma)];
+                }
+            });
+        });
+    };
+    ProformaService.prototype.findAvailableVehicles = function (criteria) {
+        return __awaiter(this, void 0, Promise, function () {
+            var marque, modele, type, dateDepart, dateRetour, statusDisponible, whereClause, typeExist, allMatchingVehicles, unavailableVehicles, unavailableVehicleIds;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        marque = criteria.marque, modele = criteria.modele, type = criteria.type, dateDepart = criteria.dateDepart, dateRetour = criteria.dateRetour;
+                        return [4 /*yield*/, this.statusRepository.findOne({
+                                where: { status: 'Disponible' }
+                            })];
+                    case 1:
+                        statusDisponible = _a.sent();
+                        if (!statusDisponible) {
+                            throw new common_1.NotFoundException("Statut \"Disponible\" non trouv\u00E9");
+                        }
+                        whereClause = { status: { id: statusDisponible.id } };
+                        if (marque) {
+                            whereClause.marque = marque;
+                        }
+                        if (modele) {
+                            whereClause.modele = modele;
+                        }
+                        if (!type) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this.typeRepository.findOne({ where: { type: type } })];
+                    case 2:
+                        typeExist = _a.sent();
+                        if (!typeExist) {
+                            throw new common_1.NotFoundException("Type \"" + type + "\" non trouv\u00E9");
+                        }
+                        whereClause.type = typeExist;
+                        _a.label = 3;
+                    case 3: return [4 /*yield*/, this.vehiculeRepository.find({
+                            where: whereClause,
+                            relations: ['type', 'status']
+                        })];
+                    case 4:
+                        allMatchingVehicles = _a.sent();
+                        return [4 /*yield*/, this.proformaItemRepository.find({
+                                where: [
+                                    {
+                                        dateDepart: typeorm_2.LessThanOrEqual(dateRetour),
+                                        dateRetour: typeorm_2.MoreThanOrEqual(dateDepart)
+                                    },
+                                ],
+                                relations: ['vehicle']
+                            })];
+                    case 5:
+                        unavailableVehicles = _a.sent();
+                        unavailableVehicleIds = unavailableVehicles.map(function (item) { return item.vehicle.id; });
+                        return [2 /*return*/, allMatchingVehicles.filter(function (vehicle) { return !unavailableVehicleIds.includes(vehicle.id); })];
                 }
             });
         });
@@ -209,6 +350,8 @@ var ProformaService = /** @class */ (function () {
                             relations: [
                                 'items',
                                 'items.vehicle',
+                                'items.vehicle.type',
+                                'items.vehicle.status',
                                 'items.region',
                                 'items.prix',
                                 'client',
@@ -216,8 +359,9 @@ var ProformaService = /** @class */ (function () {
                         })];
                     case 1:
                         proforma = _a.sent();
-                        if (!proforma)
-                            throw new common_1.NotFoundException("Proforma ID " + id + " introuvable");
+                        if (!proforma) {
+                            throw new common_1.NotFoundException("Proforma with ID " + id + " not found");
+                        }
                         return [2 /*return*/, proforma];
                 }
             });
@@ -237,7 +381,9 @@ var ProformaService = /** @class */ (function () {
         __param(2, typeorm_1.InjectRepository(vehicle_entity_1.Vehicule)),
         __param(3, typeorm_1.InjectRepository(region_entity_1.Region)),
         __param(4, typeorm_1.InjectRepository(prix_entity_1.Prix)),
-        __param(5, typeorm_1.InjectRepository(status_entity_1.Status))
+        __param(5, typeorm_1.InjectRepository(status_entity_1.Status)),
+        __param(6, typeorm_1.InjectRepository(client_entity_1.Client)),
+        __param(7, typeorm_1.InjectRepository(type_entity_1.Type))
     ], ProformaService);
     return ProformaService;
 }());

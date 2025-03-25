@@ -1,33 +1,35 @@
-import { IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class CreateProformaItemDto {
+export class VehicleCriteria {
+  @IsOptional()
   @IsString()
-  proformaNumber: string;
+  marque?: string;
 
+  @IsOptional()
   @IsString()
-  clientId: string;
+  modele?: string;
 
+  @IsOptional()
   @IsString()
-  vehicleId: string;
+  type?: string;
+}
 
+export class CreateProformaItemByCriteriaDto {
+  @IsNotEmpty()
+  vehicleCriteria: VehicleCriteria;
+
+  @IsNotEmpty()
   @IsString()
-  regionId: string;
+  regionName: string;
 
-  @IsDateString()
-  dateDepart: string;
+  @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
+  dateDepart: Date;
 
-  @IsDateString()
-  dateRetour: string;
-
-  @IsNumber()
-  nombreJours: number;
-
-  @IsString()
-  carburant: string;
-
-  @IsNumber()
-  prixId: number;
-
-  @IsNumber()
-  totalAmount: number;
+  @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
+  dateRetour: Date;
 }

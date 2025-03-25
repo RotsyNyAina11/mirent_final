@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import customersReducer from "./features/clients/customersSlice";
-import proformaReducer from "./slices/proformaSlice";
+import proformaReducer from "./features/proforma/proformaSlice";
 import commandeReducer from "./features/commande/commandeSlice";
 import authReducer from "./features/auth/authSlice";
 import sidebarReducer from "./features/sidebar/SidebarSlice";

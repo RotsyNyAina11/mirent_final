@@ -56,86 +56,111 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.ProformaController = void 0;
+exports.ClientService = void 0;
 var common_1 = require("@nestjs/common");
-var ProformaController = /** @class */ (function () {
-    function ProformaController(proformaService) {
-        this.proformaService = proformaService;
+var typeorm_1 = require("@nestjs/typeorm");
+var client_entity_1 = require("src/entities/client.entity");
+var ClientService = /** @class */ (function () {
+    function ClientService(clientRepository) {
+        this.clientRepository = clientRepository;
     }
-    ProformaController.prototype.createByCriteria = function (createProformaByCriteriaDto, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, proforma, pdfBuffer, pdfBase64, error_1;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _b.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.proformaService.create(createProformaByCriteriaDto)];
+    //*ajout//
+    ClientService.prototype.findOneById = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var client;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.clientRepository.findOne({ where: { id: id } })];
                     case 1:
-                        _a = _b.sent(), proforma = _a.proforma, pdfBuffer = _a.pdfBuffer;
-                        pdfBase64 = pdfBuffer.toString('base64');
-                        res.status(201).json(__assign(__assign({}, proforma), { pdfBase64: pdfBase64 })); // Incluez pdfBase64 dans la réponse
-                        return [3 /*break*/, 3];
-                    case 2:
-                        error_1 = _b.sent();
-                        res.status(500).json({ message: error_1.message });
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
+                        client = _a.sent();
+                        return [2 /*return*/, client !== null && client !== void 0 ? client : undefined];
                 }
             });
         });
     };
-    ProformaController.prototype.findAvailableVehicles = function (query) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.proformaService.findAvailableVehicles(query)];
-            });
-        });
-    };
-    ProformaController.prototype.findOne = function (id) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.proformaService.findOne(id)];
-            });
-        });
-    };
-    ProformaController.prototype.findAll = function () {
+    ClientService.prototype.getClientCount = function () {
         return __awaiter(this, void 0, Promise, function () {
+            var availableClientCount;
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.proformaService.findAll()];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.clientRepository.count({})];
+                    case 1:
+                        availableClientCount = _a.sent();
+                        if (availableClientCount === 0) {
+                            throw new common_1.NotFoundException('Aucun client disponible trouvé');
+                        }
+                        return [2 /*return*/, availableClientCount];
+                }
             });
         });
     };
-    ProformaController.prototype.updateStatus = function (id, updateProformaStatusDto) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.proformaService.updateStatus(id, updateProformaStatusDto.status)];
+    ClientService.prototype.findAll = function () {
+        return this.clientRepository.find();
+    };
+    ClientService.prototype.remove = function (id) {
+        var _a;
+        return __awaiter(this, void 0, Promise, function () {
+            var result;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4 /*yield*/, this.clientRepository["delete"](id)];
+                    case 1:
+                        result = _b.sent();
+                        return [2 /*return*/, ((_a = result.affected) !== null && _a !== void 0 ? _a : 0) > 0];
+                }
             });
         });
     };
-    __decorate([
-        common_1.Post(),
-        __param(0, common_1.Body(new common_1.ValidationPipe())),
-        __param(1, common_1.Res())
-    ], ProformaController.prototype, "createByCriteria");
-    __decorate([
-        common_1.Get('available-vehicles'),
-        __param(0, common_1.Query(new common_1.ValidationPipe()))
-    ], ProformaController.prototype, "findAvailableVehicles");
-    __decorate([
-        common_1.Get(':id'),
-        __param(0, common_1.Param('id', common_1.ParseIntPipe))
-    ], ProformaController.prototype, "findOne");
-    __decorate([
-        common_1.Get()
-    ], ProformaController.prototype, "findAll");
-    __decorate([
-        common_1.Patch(':id/status'),
-        __param(0, common_1.Param('id')),
-        __param(1, common_1.Body(new common_1.ValidationPipe()))
-    ], ProformaController.prototype, "updateStatus");
-    ProformaController = __decorate([
-        common_1.Controller('proforma')
-    ], ProformaController);
-    return ProformaController;
+    ClientService.prototype.create = function (dto, logo) {
+        return __awaiter(this, void 0, Promise, function () {
+            var client;
+            return __generator(this, function (_a) {
+                client = this.clientRepository.create(__assign(__assign({}, dto), { logo: logo || undefined }));
+                return [2 /*return*/, this.clientRepository.save(client)];
+            });
+        });
+    };
+    ClientService.prototype.findOne = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var client;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.clientRepository.findOne({ where: { id: id } })];
+                    case 1:
+                        client = _a.sent();
+                        if (!client) {
+                            return [2 /*return*/, null];
+                        }
+                        return [2 /*return*/, client];
+                }
+            });
+        });
+    };
+    ClientService.prototype.update = function (id, dto, logo) {
+        return __awaiter(this, void 0, Promise, function () {
+            var client;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.clientRepository.findOne({ where: { id: id } })];
+                    case 1:
+                        client = _a.sent();
+                        if (!client) {
+                            throw new common_1.NotFoundException('Client non trouvé');
+                        }
+                        client.lastName = dto.lastName || client.lastName;
+                        client.email = dto.email || client.email;
+                        client.phone = dto.phone || client.phone;
+                        client.logo = logo || client.logo;
+                        return [4 /*yield*/, this.clientRepository.save(client)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    ClientService = __decorate([
+        common_1.Injectable(),
+        __param(0, typeorm_1.InjectRepository(client_entity_1.Client))
+    ], ClientService);
+    return ClientService;
 }());
-exports.ProformaController = ProformaController;
+exports.ClientService = ClientService;

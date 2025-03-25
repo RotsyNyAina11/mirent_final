@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -6,51 +6,111 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Typography,
+  Container,
+  Paper,
 } from "@mui/material";
-import { useProformaStore } from "../../redux/store";
 
-const ProformaList: React.FC = () => {
-  const { proformas } = useProformaStore();
+interface Proforma {
+  id: number;
+  client: {
+    lastName: string;
+  };
+  items: ProformaItem[];
+  date: string;
+  contractReference: string;
+  notes: string;
+  isLoading: boolean;
+  error: string | null;
+  proformaNumber: string;
+}
+
+interface ProformaItem {
+  id: number;
+  vehicleId: number;
+  regionId: number;
+  prixId: number;
+  dateDepart: string;
+  dateRetour: string;
+  subTotal: number;
+  nombreJours: number;
+}
+
+function ProformaList() {
+  const [proformas, setProformas] = useState<Proforma[]>([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/proforma")
+      .then((response) => response.json())
+      .then((data) => setProformas(data))
+      .catch((error) => console.error("Erreur de chargement:", error));
+  }, []);
 
   return (
-    <Paper sx={{ padding: 4, maxWidth: 800, margin: "auto", mt: 4 }}>
-      <Typography variant="h5" gutterBottom align="center">
-        Liste des Devis
-      </Typography>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Réf</TableCell>
-              <TableCell>Voiture</TableCell>
-              <TableCell>Numéro</TableCell>
-              <TableCell>Départ</TableCell>
-              <TableCell>Arrivée</TableCell>
-              <TableCell>Jours</TableCell>
-              <TableCell>Carburant</TableCell>
-              <TableCell>Total (Ar)</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {proformas.map((proforma, index) => (
-              <TableRow key={index}>
-                <TableCell>{proforma.ref}</TableCell>
-                <TableCell>{proforma.voiture}</TableCell>
-                <TableCell>{proforma.numeroVoiture}</TableCell>
-                <TableCell>{proforma.dateDepart}</TableCell>
-                <TableCell>{proforma.dateArrivee}</TableCell>
-                <TableCell>{proforma.nombreJours}</TableCell>
-                <TableCell>{proforma.carburant}</TableCell>
-                <TableCell>{proforma.prixTotal}</TableCell>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Liste des Proforma
+        </Typography>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <strong>Contrat de reference</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Numéro Proforma</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Client</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Date Départ</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Date Retour</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Nombre de Jours</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Véhicule</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Région</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Prix</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Montant Total</strong>
+                </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Paper>
+            </TableHead>
+            <TableBody>
+              {proformas.map((proforma) =>
+                proforma.items.map((item) => (
+                  <TableRow key={`${proforma.id}-${item.id}`}>
+                    <TableCell>{proforma.contractReference}</TableCell>
+                    <TableCell>{proforma.proformaNumber}</TableCell>
+                    <TableCell>{proforma.client.lastName}</TableCell>
+                    <TableCell>{item.dateDepart}</TableCell>
+                    <TableCell>{item.dateRetour}</TableCell>
+                    <TableCell>{item.nombreJours}</TableCell>
+                    <TableCell>{item.vehicleId}</TableCell>
+                    <TableCell>{item.regionId}</TableCell>
+                    <TableCell>{item.prixId}</TableCell>
+                    <TableCell>{item.subTotal}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+    </Container>
   );
-};
+}
 
 export default ProformaList;

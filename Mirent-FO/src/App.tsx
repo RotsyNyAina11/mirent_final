@@ -20,6 +20,7 @@ import ContratPage from "./pages/contrat/contratPage";
 import Vehicule from "./pages/vehicules/vehiculePage";
 import ClientPage from "./pages/clients/ClientPage";
 import Home from "./pages/acceuil/HomePage";
+import 'react-toastify/dist/ReactToastify.css';
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal

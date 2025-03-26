@@ -28,6 +28,7 @@ import {
   AddShoppingCart,
   Search as SearchIcon,
   Notifications as NotificationsIcon,
+  Add as AddIcon, 
 } from "@mui/icons-material";
 import PlaceIcon from "@mui/icons-material/Place";
 import { Link as RouterLink } from "react-router-dom";
@@ -156,8 +157,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           </Box>
         </Box>
 
-        {/*  Date, Notification, Avatar */}
-        <Box display="flex" alignItems="center" gap={5} pr={2}> {/* Réduction du gap pour compacter les éléments à droite */}
+        {/* Date, Notification, Avatar */}
+        <Box display="flex" alignItems="center" gap={5} pr={2}>
           <Typography variant="body2" color="text.secondary">
             {currentTime.toLocaleString("fr-FR", {
               weekday: "long",
@@ -446,6 +447,38 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               </ListItemIcon>
               <ListItemText
                 primary="Liste des Clients"
+                primaryTypographyProps={{
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  color: textColor,
+                }}
+                sx={{
+                  opacity: isCollapsed ? 0 : 1,
+                  transition: "opacity 0.3s ease-in-out",
+                }}
+              />
+            </NavLinkButton>
+          </Tooltip>
+
+          {/* Créer Réservation */}
+          <Tooltip title="Créer Réservation" placement="right">
+            <NavLinkButton
+              to="/create-reservation"
+              selected={window.location.pathname === "/create-reservation"}
+              sx={{
+                padding: "12px 16px",
+                "& .MuiListItemIcon-root": {
+                  minWidth: "40px",
+                  color: iconColor,
+                  fontSize: "1.4rem",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <AddIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Créer Réservation"
                 primaryTypographyProps={{
                   fontSize: "14px",
                   fontWeight: "500",

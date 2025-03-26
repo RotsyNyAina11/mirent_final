@@ -8,7 +8,6 @@ import {
 import { Box, useMediaQuery } from "@mui/material";
 import Sidebar from "./Components/sidebar/Sidebar";
 import Login from "./Components/login/Login";
-import Reservations from "./pages/reservation";
 import Performat from "./pages/ProformaTable";
 import Devis from "./pages/Devis";
 import Facturation from "./pages/FacturationPage";
@@ -21,6 +20,7 @@ import Vehicule from "./pages/vehicules/vehiculePage";
 import ClientPage from "./pages/clients/ClientPage";
 import Home from "./pages/acceuil/HomePage";
 import 'react-toastify/dist/ReactToastify.css';
+
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -81,15 +81,6 @@ const App: React.FC = () => {
           element={
             <MainLayout>
               <ClientPage />
-            </MainLayout>
-          }
-        />
-        {/* Route pour la page de reservation */}
-        <Route
-          path="/reservations"
-          element={
-            <MainLayout>
-              <Reservations />
             </MainLayout>
           }
         />

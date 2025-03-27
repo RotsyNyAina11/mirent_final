@@ -530,18 +530,9 @@ const OrderPage: React.FC = () => {
                       fullWidth
                       variant="standard"
                       name="vehicleId"
-                      placeholder="Véhicule"
                       label="Vehicule"
                       value={orderDetails.vehicleId}
                       onChange={handleChange}
-                      InputProps={{
-                        sx: {
-                          "&::placeholder": {
-                            color: "gray",
-                            fontStyle: "italic",
-                          }, // Style du placeholder
-                        },
-                      }}
                     />
                     <Autocomplete
                       options={Array.isArray(regions) ? regions : []}

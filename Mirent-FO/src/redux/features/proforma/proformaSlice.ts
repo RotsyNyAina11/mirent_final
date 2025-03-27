@@ -1,185 +1,158 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { Proforma, ProformaStatus } from "../../../models/Proforma"; // Assurez-vous que le chemin est correct
 import axios from "axios";
+import { RootState } from "../../store";
 
-const API_URL = "http://localhost:3000/proforma";
-
-export enum ProformaStatus {
-  BROUILLON = "Brouillon",
-  ENVOYEE = "Envoyée",
-  CONFIRMEE = "Confirmée",
-  ANNULEE = "Annulée",
-}
-
-export interface Proforma {
-  id: number;
-  proformaNumber: string;
-  date: string;
-  totalAmount: number;
-  status: ProformaStatus;
-  clientId: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ProformaItem {
-  id: number;
-  dateDepart: string;
-  dateRetour: string;
-  nombreJours: number;
-  subTotal: number;
-  proformaId: number;
-  vehicleId: number;
-  prixId: number;
-  regionId: number;
-}
-
-export const fetchProformas = createAsyncThunk(
-  "proforma/fetchAll",
-  async () => {
-    const response = await axios.get(API_URL);
-    return response.data;
-  }
-);
-
-export const fetchProformaStatuses = createAsyncThunk(
-  "proforma/fetchStatuses",
-  async () => {
-    const response = await axios.get("http://localhost:3000/proforma/statuses");
-    return response.data;
-  }
-);
-
-export const createProforma = createAsyncThunk(
-  "proforma/create",
-  async (proformaData: Partial<Proforma>) => {
-    const response = await axios.post(API_URL, proformaData);
-    return response.data;
-  }
-);
-
-export const updateProforma = createAsyncThunk(
-  "proforma/update",
-  async ({
-    id,
-    updatedData,
-  }: {
-    id: number;
-    updatedData: Partial<Proforma>;
-  }) => {
-    const response = await axios.put(`${API_URL}/${id}`, updatedData);
-    return response.data;
-  }
-);
-
-export const deleteProforma = createAsyncThunk(
-  "proforma/delete",
-  async (id: number) => {
-    await axios.delete(`${API_URL}/${id}`);
-    return id;
-  }
-);
+const API_BASE_URL = "http://localhost:3000"; // Remplacez par votre URL
 
 interface ProformaState {
-  proformas: Proforma[];
-  fetchStatus: "idle" | "loading" | "succeeded" | "failed";
-  fetchStatusesStatus: "idle" | "loading" | "succeeded" | "failed";
-  createStatus: "idle" | "loading" | "succeeded" | "failed";
+  list: Proforma[];
+  loading: boolean;
   error: string | null;
-  clientId: number;
-  date: string;
-  contractReference: string;
-  notes: string;
-  items: ProformaItem[]; // Ajout de items
 }
 
 const initialState: ProformaState = {
-  proformas: [],
-  fetchStatus: "idle",
-  fetchStatusesStatus: "idle",
-  createStatus: "idle",
+  list: [],
+  loading: false,
   error: null,
-  clientId: 0,
-  date: "",
-  contractReference: "",
-  notes: "",
-  items: [], // Initialisation de items
 };
 
-const proformaSlice = createSlice({
+// Async Thunk pour récupérer les proformas
+export const fetchProformas = createAsyncThunk(
+  "proforma/fetchProformas",
+  async () => {
+    const response = await axios.get<Proforma[]>(`${API_BASE_URL}/proforma`);
+    return response.data;
+  }
+);
+
+// Async Thunk pour créer une proforma
+// Action pour créer une nouvelle proforma
+export const createProforma = createAsyncThunk(
+  "proforma/createProforma",
+  async (proformData: Omit<Proforma, "id" | "createdAt" | "updatedAt">) => {
+    const response = await axios.post<Proforma>(
+      `${API_BASE_URL}/proforma`,
+      proformData
+    );
+    return response.data;
+  }
+);
+
+// Async Thunk pour mettre à jour une proforma
+export const updateProforma = createAsyncThunk(
+  "proformas/updateProforma",
+  async (proformData: Proforma) => {
+    const response = await axios.put<Proforma>(
+      `${API_BASE_URL}/proforma/${proformData.id}`,
+      proformData
+    );
+    return response.data;
+  }
+);
+
+// Async Thunk pour supprimer une proforma
+export const deleteProforma = createAsyncThunk(
+  "proforma/deleteProforma",
+  async (id: number) => {
+    await axios.delete(`${API_BASE_URL}/proforma/${id}`);
+    return id; // Retourner l'ID pour mettre à jour l'état
+  }
+);
+
+export const proformaSlice = createSlice({
   name: "proforma",
   initialState,
   reducers: {
-    setClientId: (state, action: PayloadAction<number>) => {
-      state.clientId = action.payload;
-    },
-    setDate: (state, action: PayloadAction<string>) => {
-      state.date = action.payload;
-    },
-    setContractReference: (state, action: PayloadAction<string>) => {
-      state.contractReference = action.payload;
-    },
-    setNotes: (state, action: PayloadAction<string>) => {
-      state.notes = action.payload;
-    },
-    setItems: (state, action: PayloadAction<ProformaItem[]>) => {
-      state.items = action.payload;
-    },
+    // Reducers synchrones (si nécessaire)
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProformas.pending, (state) => {
-        state.fetchStatus = "loading";
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchProformas.fulfilled, (state, action) => {
-        state.fetchStatus = "succeeded";
-        state.proformas = action.payload;
-      })
+      .addCase(
+        fetchProformas.fulfilled,
+        (state, action: PayloadAction<Proforma[]>) => {
+          state.loading = false;
+          state.list = action.payload;
+        }
+      )
       .addCase(fetchProformas.rejected, (state, action) => {
-        state.fetchStatus = "failed";
-        state.error = action.error.message || null;
+        state.loading = false;
+        state.error =
+          action.error.message ||
+          "Erreur lors de la récupération des proformas.";
       })
       .addCase(createProforma.pending, (state) => {
-        state.createStatus = "loading";
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(createProforma.fulfilled, (state, action) => {
-        state.createStatus = "succeeded";
-        state.proformas.push(action.payload);
-      })
-      .addCase(createProforma.rejected, (state, action) => {
-        state.createStatus = "failed";
-        state.error = action.error.message || null;
-      })
-      .addCase(updateProforma.fulfilled, (state, action) => {
-        const index = state.proformas.findIndex(
-          (p) => p.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.proformas[index] = action.payload;
+      .addCase(
+        createProforma.fulfilled,
+        (state, action: PayloadAction<Proforma>) => {
+          state.loading = false;
+          state.list.push(action.payload);
         }
+      )
+      .addCase(createProforma.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.error.message || "Erreur lors de la création de la proforma.";
       })
-      .addCase(deleteProforma.fulfilled, (state, action) => {
-        state.proformas = state.proformas.filter(
-          (p) => p.id !== action.payload
-        );
+      .addCase(updateProforma.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchProformaStatuses.pending, (state) => {
-        state.fetchStatusesStatus = "loading";
+      .addCase(
+        updateProforma.fulfilled,
+        (state, action: PayloadAction<Proforma>) => {
+          state.loading = false;
+          const index = state.list.findIndex(
+            (proforma: Proforma) => proforma.id === action.payload.id
+          );
+          if (index !== -1) {
+            state.list[index] = action.payload;
+          }
+        }
+      )
+      .addCase(updateProforma.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.error.message ||
+          "Erreur lors de la mise à jour de la proforma.";
       })
-      .addCase(fetchProformaStatuses.fulfilled, (state) => {
-        state.fetchStatusesStatus = "succeeded";
+      .addCase(deleteProforma.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchProformaStatuses.rejected, (state, action) => {
-        state.fetchStatusesStatus = "failed";
-        state.error = action.error.message || null;
+      .addCase(
+        deleteProforma.fulfilled,
+        (state, action: PayloadAction<number>) => {
+          state.loading = false;
+          state.list = state.list.filter(
+            (proforma: Proforma): boolean => proforma.id !== action.payload
+          );
+        }
+      )
+      .addCase(deleteProforma.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.error.message ||
+          "Erreur lors de la suppression de la proforma.";
       });
   },
 });
 
-export const {
-  setClientId,
-  setDate,
-  setContractReference,
-  setNotes,
-  setItems,
-} = proformaSlice.actions;
+// Exportez les actions synchrones (si vous en avez)
+// export const { } = proformaSlice.actions;
+
+// Exportez le reducer
 export default proformaSlice.reducer;
+
+// Exportez les sélecteurs pour accéder à l'état
+export const selectAllProformas = (state: RootState) => state.proforma.list;
+export const selectProformasLoading = (state: RootState) =>
+  state.proforma.loading;
+export const selectProformasError = (state: RootState) => state.proforma.error;

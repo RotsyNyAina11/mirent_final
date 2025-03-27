@@ -47,6 +47,7 @@ async function bootstrap() {
   const PORT = process.env.PORT || 3000;
   const logger = new Logger('Main');
   app.useGlobalFilters(new AllExceptionsFilter());
+  app.enableCors();
 
   await app.listen(PORT);
   Logger.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);

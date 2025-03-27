@@ -77,6 +77,7 @@ function bootstrap() {
                     PORT = process.env.PORT || 3000;
                     logger = new common_1.Logger('Main');
                     app.useGlobalFilters(new all_eceptionfilters_1.AllExceptionsFilter());
+                    app.enableCors();
                     return [4 /*yield*/, app.listen(PORT)];
                 case 2:
                     _a.sent();

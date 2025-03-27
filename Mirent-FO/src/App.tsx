@@ -1,42 +1,53 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
-import { Grid, Box } from "@mui/material";
-import Accueil from "./Components/Accueil/Accueil";
-import VehiclesList from "./Components/Vehicules/Vehicule";
+import { Box, useMediaQuery } from "@mui/material";
 import Sidebar from "./Components/Sidebar/Sidebar";
-import Login from "./Components/Authentification/Login";
-import ClientList from "./Components/Clients/Customer";
+import Login from "./Components/login/Login";
 import Reservations from "./pages/reservation";
-import Performat from "./Components/Proforma/ProformaTable";
-import Devis from "./Components/Devis/Devis";
-import Facturation from "./Components/Proforma/Facturation";
-import DetailClientPage from "./pages/ClientPage";
-import Proforma from "./Components/Proforma/proformaPdf";
-import ProformaForm from "./Components/Proforma/ProformaForm";
-import Commande from "./pages/CommandePage";
-
-import LocationsPage from "./pages/locationPage";
-import ProformaPage from "./pages/ProformaPage";
+import Performat from "./pages/proforma/ProformaPage";
+import Devis from "./pages/DevisPage";
+import ProformaPage from "./pages/proforma/ProformaPage";
+import Commande from "./pages/commande/CommandePage";
+import LocationsPage from "./pages/lieux/locationPage";
+import ProformaPdf from "./Components/Proforma/proformaPdf";
+import ContratPage from "./pages/contrat/contratPage";
+import Vehicule from "./pages/vehicules/vehiculePage";
+import ClientPage from "./pages/clients/ClientPage";
+import Home from "./pages/acceuil/HomePage";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
   const MainLayout: React.FC<{ children: React.ReactNode }> = ({
     children,
   }) => {
+    const isSmallScreen = useMediaQuery("(max-width: 900px)");
+    const [isCollapsed, setIsCollapsed] = useState(isSmallScreen);
+
+    useEffect(() => {
+      setIsCollapsed(isSmallScreen);
+    }, [isSmallScreen]);
+
     return (
-      <Grid container>
-        <Grid item xs={2}>
-          <Sidebar />
-        </Grid>
-        <Grid item xs={10}>
-          <Box p={3}>{children}</Box>
-        </Grid>
-      </Grid>
+      <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+        {/* Conteneur principal avec Sidebar et contenu */}
+        <Box display="flex" flexGrow={1} pt={7}>
+          {" "}
+          {/* Ajustement de pt pour la nouvelle hauteur de l'en-tête (56px) */}
+          {/* Sidebar (contient déjà l'en-tête) */}
+          <Box sx={{ width: isCollapsed ? "60px" : "250px", flexShrink: 0 }}>
+            <Sidebar onCollapseChange={setIsCollapsed} />
+          </Box>
+          {/* Contenu principal */}
+          <Box flexGrow={1} p={3}>
+            {children}
+          </Box>
+        </Box>
+      </Box>
     );
   };
 
@@ -44,7 +55,6 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         {/* Route pour la page de connexion */}
-        {/*<Route path="/" element={<Login />} />*/}
         <Route path="/login" element={<Login />} />
 
         {/* Route pour l'accueil avec Sidebar */}
@@ -52,7 +62,7 @@ const App: React.FC = () => {
           path="/accueil"
           element={
             <MainLayout>
-              <Accueil />
+              <Home />
             </MainLayout>
           }
         />
@@ -62,7 +72,7 @@ const App: React.FC = () => {
           path="/vehicules"
           element={
             <MainLayout>
-              <VehiclesList />
+              <Vehicule />
             </MainLayout>
           }
         />
@@ -71,21 +81,10 @@ const App: React.FC = () => {
           path="/clients"
           element={
             <MainLayout>
-              <ClientList />
+              <ClientPage />
             </MainLayout>
           }
         />
-
-        {/* Route pour la liste des clients avec Sidebar */}
-        <Route
-          path="/clients/:id"
-          element={
-            <MainLayout>
-              <DetailClientPage />
-            </MainLayout>
-          }
-        />
-
         {/* Route pour la page de reservation */}
         <Route
           path="/reservations"
@@ -104,7 +103,7 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
-        {/** Route pour la page Table proforma*/}
+        {/* Route pour la page Table proforma */}
         <Route
           path="/tableau_proforma"
           element={
@@ -113,15 +112,7 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
-        {/** Route pour la page Form proforma*/}
-        <Route
-          path="/form_proforma"
-          element={
-            <MainLayout>
-              <ProformaForm />
-            </MainLayout>
-          }
-        />
+
         {/* Route pour la page de Devis sur la commande */}
         <Route
           path="/devis"
@@ -131,17 +122,6 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
-        {/* Route pour la page de Facturation sur la commande */}
-        <Route
-          path="/facturation"
-          element={
-            <MainLayout>
-              <Facturation />
-            </MainLayout>
-          }
-        />
-
-        {/* Route pour la page  sur la commande */}
 
         {/* Route pour la page des lieux */}
         <Route
@@ -153,7 +133,6 @@ const App: React.FC = () => {
           }
         />
         {/* Route pour la page sur la commande */}
-
         <Route
           path="/commande"
           element={
@@ -163,16 +142,24 @@ const App: React.FC = () => {
           }
         />
 
-        {/* Route pour la page des lieux */}
         <Route
-          path="/lieux"
+          path="/proforma-pdf"
           element={
             <MainLayout>
-              <LocationsPage />
+              <ProformaPdf />
             </MainLayout>
           }
         />
 
+        {/* Route pour la page de Contrat */}
+        <Route
+          path="/contrats"
+          element={
+            <MainLayout>
+              <ContratPage />
+            </MainLayout>
+          }
+        />
         {/* Redirection par défaut vers /accueil */}
         <Route path="*" element={<Navigate to="/accueil" />} />
       </Routes>

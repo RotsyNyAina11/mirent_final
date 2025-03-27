@@ -8,17 +8,20 @@ import {
 import { Box, useMediaQuery } from "@mui/material";
 import Sidebar from "./Components/Sidebar/Sidebar";
 import Login from "./Components/login/Login";
+
 import Reservations from "./pages/reservation";
 import Performat from "./pages/proforma/ProformaPage";
 import Devis from "./pages/DevisPage";
 import ProformaPage from "./pages/proforma/ProformaPage";
 import Commande from "./pages/commande/CommandePage";
+
 import LocationsPage from "./pages/lieux/locationPage";
 import ProformaPdf from "./Components/Proforma/proformaPdf";
 import ContratPage from "./pages/contrat/contratPage";
 import Vehicule from "./pages/vehicules/vehiculePage";
 import ClientPage from "./pages/clients/ClientPage";
 import Home from "./pages/acceuil/HomePage";
+import "react-toastify/dist/ReactToastify.css";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -82,15 +85,6 @@ const App: React.FC = () => {
           element={
             <MainLayout>
               <ClientPage />
-            </MainLayout>
-          }
-        />
-        {/* Route pour la page de reservation */}
-        <Route
-          path="/reservations"
-          element={
-            <MainLayout>
-              <Reservations />
             </MainLayout>
           }
         />
@@ -160,6 +154,7 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
+
         {/* Redirection par défaut vers /accueil */}
         <Route path="*" element={<Navigate to="/accueil" />} />
       </Routes>

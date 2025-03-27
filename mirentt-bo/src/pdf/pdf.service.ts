@@ -114,7 +114,6 @@ export class PdfService {
     }
 
     private nombreEnLettres(nombre: number): string {
-        // Implémentez la conversion du nombre en lettres ici
-        return nombre.toString(); // Remplacez par votre logique de conversion
+        return nombre.toString(); 
     }
 }

@@ -28,6 +28,7 @@ import {
   AddShoppingCart,
   Search as SearchIcon,
   Notifications as NotificationsIcon,
+  Add as AddIcon,
 } from "@mui/icons-material";
 import PlaceIcon from "@mui/icons-material/Place";
 import { Link as RouterLink } from "react-router-dom";
@@ -119,7 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
         boxShadow="0px 2px 4px rgba(0, 0, 0, 0.1)"
         sx={{ height: "56px" }}
       >
-        {/* Section gauche : Logo + Recherche */}
+        {/* Logo + Recherche */}
         <Box display="flex" alignItems="center" gap={20} width="100%">
           {/* Logo */}
           <RouterLink to="/accueil" style={{ textDecoration: "none" }}>
@@ -160,10 +161,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           </Box>
         </Box>
 
-        {/* Section droite : Date, Notification, Avatar */}
+        {/* Date, Notification, Avatar */}
         <Box display="flex" alignItems="center" gap={5} pr={2}>
-          {" "}
-          {/* Réduction du gap pour compacter les éléments à droite */}
           <Typography variant="body2" color="text.secondary">
             {currentTime.toLocaleString("fr-FR", {
               weekday: "long",
@@ -206,7 +205,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           sx={{
             display: "flex",
             justifyContent: "flex-end",
-            p: 1,
             backgroundColor: "#FFFFFF",
             borderBottom: "1px solid #e0e0e0",
           }}
@@ -225,8 +223,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
             )}
           </IconButton>
         </Box>
-
-        <Divider sx={{ my: 1, borderColor: "#e0e0e0" }} />
 
         {/* Liste des éléments du menu */}
         <List sx={{ overflowY: "auto", flexGrow: 1 }}>
@@ -480,6 +476,38 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
             </NavLinkButton>
           </Tooltip>
 
+          {/* Créer Réservation */}
+          <Tooltip title="Créer Réservation" placement="right">
+            <NavLinkButton
+              to="/create-reservation"
+              selected={window.location.pathname === "/create-reservation"}
+              sx={{
+                padding: "12px 16px",
+                "& .MuiListItemIcon-root": {
+                  minWidth: "40px",
+                  color: iconColor,
+                  fontSize: "1.4rem",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <AddIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Créer Réservation"
+                primaryTypographyProps={{
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  color: textColor,
+                }}
+                sx={{
+                  opacity: isCollapsed ? 0 : 1,
+                  transition: "opacity 0.3s ease-in-out",
+                }}
+              />
+            </NavLinkButton>
+          </Tooltip>
+
           {/* Lieux de Location */}
           <Tooltip title="Lieux de Location" placement="right">
             <NavLinkButton
@@ -577,50 +605,52 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           </Tooltip>
         </List>
 
-        <Divider sx={{ my: 1, borderColor: "#e0e0e0" }} />
+        <List>
+          <Divider sx={{ my: 8, borderColor: "#e0e0e0" }} />
 
-        {/* Se Déconnecter */}
-        <Box sx={{ mt: "auto", pb: 2 }}>
-          <Tooltip title="Se Déconnecter" placement="right">
-            <NavLinkButton
-              to="/logout"
-              sx={{
-                mx: 1,
-                padding: "10px 16px",
-                backgroundColor: "#ffebee",
-                color: "#d32f2f",
-                borderRadius: "8px",
-                "&:hover": {
-                  backgroundColor: "#ef9a9a",
-                  color: "#b71c1c",
-                  transform: "translateX(4px)",
-                  transition: "all 0.2s ease",
-                },
-                "& .MuiListItemIcon-root": {
-                  minWidth: "40px",
-                  color: "#d32f2f",
-                  fontSize: "1.4rem",
-                },
-              }}
-            >
-              <ListItemIcon>
-                <AccountCircle />
-              </ListItemIcon>
-              <ListItemText
-                primary="Se Déconnecter"
-                primaryTypographyProps={{
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "#d32f2f",
-                }}
+          {/* Se Déconnecter */}
+          <Box sx={{ mt: "auto", pb: 2 }}>
+            <Tooltip title="Se Déconnecter" placement="right">
+              <NavLinkButton
+                to="/logout"
                 sx={{
-                  opacity: isCollapsed ? 0 : 1,
-                  transition: "opacity 0.3s ease-in-out",
+                  mx: 1,
+                  padding: "10px 16px",
+                  backgroundColor: "#ffebee",
+                  color: "#d32f2f",
+                  borderRadius: "8px",
+                  "&:hover": {
+                    backgroundColor: "#ef9a9a",
+                    color: "#b71c1c",
+                    transform: "translateX(4px)",
+                    transition: "all 0.2s ease",
+                  },
+                  "& .MuiListItemIcon-root": {
+                    minWidth: "40px",
+                    color: "#d32f2f",
+                    fontSize: "1.4rem",
+                  },
                 }}
-              />
-            </NavLinkButton>
-          </Tooltip>
-        </Box>
+              >
+                <ListItemIcon>
+                  <AccountCircle />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Se Déconnecter"
+                  primaryTypographyProps={{
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    color: "#d32f2f",
+                  }}
+                  sx={{
+                    opacity: isCollapsed ? 0 : 1,
+                    transition: "opacity 0.3s ease-in-out",
+                  }}
+                />
+              </NavLinkButton>
+            </Tooltip>
+          </Box>
+        </List>
       </Drawer>
     </>
   );

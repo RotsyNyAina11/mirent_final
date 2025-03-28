@@ -460,11 +460,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
             </NavLinkButton>
           </Tooltip>
 
-          {/* Créer Réservation */}
-          <Tooltip title="Créer Réservation" placement="right">
+          {/* Créer Proformas */}
+          <Tooltip title="Créer Proformas" placement="right">
             <NavLinkButton
-              to="/create-reservation"
-              selected={window.location.pathname === "/create-reservation"}
+              to="/proformas"
+              selected={window.location.pathname === "/proformas"}
               sx={{
                 padding: "12px 16px",
                 "& .MuiListItemIcon-root": {
@@ -478,7 +478,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                 <AddIcon />
               </ListItemIcon>
               <ListItemText
-                primary="Créer Réservation"
+                primary="Créer Proformas"
                 primaryTypographyProps={{
                   fontSize: "14px",
                   fontWeight: "500",

@@ -11,15 +11,15 @@ import Login from "./Components/login/Login";
 import Performat from "./pages/ProformaTable";
 import Devis from "./pages/Devis";
 import Facturation from "./pages/FacturationPage";
-import ProformaForm from "./Components/proforma/ProformaForm";
 import Commande from "./pages/CommandePage";
 import LocationsPage from "./pages/lieux/locationPage";
-import ProformaPdf from "./Components/proforma/proformaPdf";
 import ContratPage from "./pages/contrat/contratPage";
 import Vehicule from "./pages/vehicules/vehiculePage";
 import ClientPage from "./pages/clients/ClientPage";
 import Home from "./pages/acceuil/HomePage";
 import 'react-toastify/dist/ReactToastify.css';
+import ReservationPage from "./pages/proforma/proformaPage";
+import ProformaPage from "./pages/proforma/proformaPage";
 
 
 const App: React.FC = () => {
@@ -35,8 +35,7 @@ const App: React.FC = () => {
     return (
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
         {/* Conteneur principal avec Sidebar et contenu */}
-        <Box display="flex" flexGrow={1} pt={7}> {/* Ajustement de pt pour la nouvelle hauteur de l'en-tête (56px) */}
-          {/* Sidebar (contient déjà l'en-tête) */}
+        <Box display="flex" flexGrow={1} pt={7}> 
           <Box sx={{ width: isCollapsed ? "60px" : "250px", flexShrink: 0 }}>
             <Sidebar onCollapseChange={setIsCollapsed} />
           </Box>
@@ -84,15 +83,14 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
-        {/* Route pour la page de Performat sur la commande */}
-        <Route
-          path="/proformat"
-          element={
-            <MainLayout>
-              <ProformaForm />
-            </MainLayout>
-          }
-        />
+      <Route
+        path="/proformas"
+        element={
+          <MainLayout>
+            <ProformaPage />
+          </MainLayout>
+        }
+      />
         {/* Route pour la page Table proforma */}
         <Route
           path="/tableau_proforma"
@@ -141,14 +139,6 @@ const App: React.FC = () => {
           }
         />
 
-        <Route
-          path="/proforma-pdf"
-          element={
-            <MainLayout>
-              <ProformaPdf />
-            </MainLayout>
-          }
-        />
 
         {/* Route pour la page de Contrat */}
         <Route

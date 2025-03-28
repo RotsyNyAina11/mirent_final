@@ -38,6 +38,7 @@ import {
 import { fetchClients } from "../../redux/features/clients/customersSlice";
 import { fetchRegions } from "../../redux/features/lieux/locationSlice";
 import { Prix } from "../../types/region";
+import { fetchVehicles } from "../../redux/features/vehicle/vehiclesSlice";
 
 // Interface pour définir le type de données d'un client
 interface Client {
@@ -54,6 +55,7 @@ interface Proforma {
   items: ProformaItem[];
   totalAmount: number;
   notes: string;
+  vehicule: Vehicle[];
 }
 
 interface ProformaItem {
@@ -91,6 +93,25 @@ interface Region {
   prix: Prix;
 }
 
+interface Vehicle {
+  id: number;
+  nom: string;
+  marque: string;
+  modele: string;
+  immatriculation: string;
+  nombrePlace: number;
+  imageUrl: string;
+  type: {
+    id: number;
+    type: string;
+  };
+  status: {
+    id: number;
+    status: string;
+  };
+  // ... autres propriétés de votre véhicule
+}
+
 const ButtonActions = {
   SEND_EMAIL: "SEND_EMAIL",
   CONFIRM: "CONFIRM",
@@ -108,6 +129,9 @@ const OrderPage: React.FC = () => {
 
   // États locaux
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectedVehicule, setSelectedVehicule] = useState<Vehicle | null>(
+    null
+  );
   const [tabIndex, setTabIndex] = useState(0);
   const [selectedRegion] = useState<Region | null>(null);
   const [activeButtonIndex, setActiveButtonIndex] = useState<number | null>(
@@ -133,6 +157,22 @@ const OrderPage: React.FC = () => {
   const regions = useSelector((state: any) => state.locations.regions);
   const loadingRegion = useSelector((state: any) => state.locations.loading);
 
+  const vehicules = state.vehicles ? state.vehicles.vehicules : [];
+  const loadingVehicules = useSelector(
+    (state: any) => state.vehicles.loadingVehicules
+  ); // Supposons un état de chargement dans Redux
+  const errorVehicules = useSelector(
+    (state: any) => state.vehicles.errorVehicules
+  ); // Supposons un état d'erreur
+
+  if (loadingVehicules) {
+    return <div>Chargement des véhicules...</div>;
+  }
+
+  if (errorVehicules) {
+    return <div>Erreur lors du chargement des véhicules.</div>;
+  }
+
   console.log("State Redux :", state);
 
   //  Charger les clients au montage
@@ -150,6 +190,11 @@ const OrderPage: React.FC = () => {
   console.log("Erreur :", error);
   if (loadingRegion) return <p>Chargement des régions...</p>;
   if (!regions) return <p>Erreur : Aucune région trouvée.</p>;
+
+  useEffect(() => {
+    console.log("Fetching vehicule...");
+    dispatch(fetchVehicles());
+  }, [dispatch]);
 
   // Fonction pour gérer les changements dans les champs de texte
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -221,6 +266,15 @@ const OrderPage: React.FC = () => {
     value: Client | null
   ) => {
     setSelectedClient(value);
+  };
+
+  const handleVehiculeChange = (
+    event: React.SyntheticEvent<Element, Event>,
+    value: Vehicle | null
+  ) => {
+    setSelectedVehicule(value);
+    // Vous pouvez également mettre à jour d'autres états ou déclencher des actions Redux ici
+    dispatch(setOrderDetails({ vehicleId: value?.id })); // Exemple: enregistrer l'ID du véhicule dans votre state de commande
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newIndex: number) => {
@@ -518,7 +572,7 @@ const OrderPage: React.FC = () => {
                     <TextField
                       fullWidth
                       variant="filled"
-                      name="creationDate"
+                      name="date"
                       label="Date de création"
                       value={formattedDate}
                       InputProps={{
@@ -526,13 +580,24 @@ const OrderPage: React.FC = () => {
                       }}
                     />
 
-                    <TextField
+                    <Autocomplete
+                      options={Array.isArray(vehicules) ? vehicules : []}
+                      getOptionLabel={(vehicule) => vehicule.nom || vehicule.id}
+                      value={selectedVehicule}
+                      onChange={handleVehiculeChange}
                       fullWidth
-                      variant="standard"
-                      name="vehicleId"
-                      label="Vehicule"
-                      value={orderDetails.vehicleId}
-                      onChange={handleChange}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Sélectionner un véhicule"
+                          variant="standard"
+                          value={
+                            selectedVehicule
+                              ? `Vehicule : ${selectedVehicule.id}`
+                              : ""
+                          }
+                        />
+                      )}
                     />
                     <Autocomplete
                       options={Array.isArray(regions) ? regions : []}

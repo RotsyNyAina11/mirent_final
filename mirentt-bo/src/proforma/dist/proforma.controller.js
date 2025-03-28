@@ -62,18 +62,24 @@ var ProformaController = /** @class */ (function () {
     function ProformaController(proformaService) {
         this.proformaService = proformaService;
     }
-    ProformaController.prototype.createByCriteria = function (createProformaByCriteriaDto, res) {
+    // Route pour créer une nouvelle Proforma
+    /* @Post()
+    createProforma(@Body() createProformaDto: CreateProformaDto) {
+      return { message: 'Proforma créée avec succès' };
+    }*/
+    ProformaController.prototype.createByCriteria = function (CreateProformaDto, res) {
         return __awaiter(this, void 0, void 0, function () {
             var _a, proforma, pdfBuffer, pdfBase64, error_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         _b.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.proformaService.create(createProformaByCriteriaDto)];
+                        return [4 /*yield*/, this.proformaService.create(CreateProformaDto)];
                     case 1:
                         _a = _b.sent(), proforma = _a.proforma, pdfBuffer = _a.pdfBuffer;
                         pdfBase64 = pdfBuffer.toString('base64');
-                        res.status(201).json(__assign(__assign({}, proforma), { pdfBase64: pdfBase64 })); // Incluez pdfBase64 dans la réponse
+                        // Inclure le PDF en base64 dans la réponse
+                        res.status(201).json(__assign(__assign({}, proforma), { pdfBase64: pdfBase64 }));
                         return [3 /*break*/, 3];
                     case 2:
                         error_1 = _b.sent();
@@ -84,20 +90,24 @@ var ProformaController = /** @class */ (function () {
             });
         });
     };
-    ProformaController.prototype.findAvailableVehicles = function (query) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.proformaService.findAvailableVehicles(query)];
-            });
-        });
-    };
+    // Route pour obtenir une Proforma par son ID
     ProformaController.prototype.findOne = function (id) {
         return __awaiter(this, void 0, void 0, function () {
+            var proforma;
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.proformaService.findOne(id)];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.proformaService.findOne(id)];
+                    case 1:
+                        proforma = _a.sent();
+                        if (!proforma) {
+                            throw new common_1.HttpException('Proforma non trouvée', common_1.HttpStatus.NOT_FOUND);
+                        }
+                        return [2 /*return*/, proforma];
+                }
             });
         });
     };
+    // Route pour obtenir toutes les Proformas
     ProformaController.prototype.findAll = function () {
         return __awaiter(this, void 0, Promise, function () {
             return __generator(this, function (_a) {
@@ -105,10 +115,24 @@ var ProformaController = /** @class */ (function () {
             });
         });
     };
-    ProformaController.prototype.updateStatus = function (id, updateProformaStatusDto) {
+    // Route pour mettre à jour une Proforma
+    ProformaController.prototype.updateProforma = function (id, updateProformaDto, // Utilisation du DTO
+    res) {
         return __awaiter(this, void 0, void 0, function () {
+            var proforma, error_2;
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.proformaService.updateStatus(id, updateProformaStatusDto.status)];
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.proformaService.update(id, updateProformaDto)];
+                    case 1:
+                        proforma = _a.sent();
+                        return [2 /*return*/, res.status(200).json(proforma)]; // Renvoie la proforma mise à jour
+                    case 2:
+                        error_2 = _a.sent();
+                        return [2 /*return*/, res.status(500).json({ message: error_2.message })];
+                    case 3: return [2 /*return*/];
+                }
             });
         });
     };
@@ -118,10 +142,6 @@ var ProformaController = /** @class */ (function () {
         __param(1, common_1.Res())
     ], ProformaController.prototype, "createByCriteria");
     __decorate([
-        common_1.Get('available-vehicles'),
-        __param(0, common_1.Query(new common_1.ValidationPipe()))
-    ], ProformaController.prototype, "findAvailableVehicles");
-    __decorate([
         common_1.Get(':id'),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], ProformaController.prototype, "findOne");
@@ -129,12 +149,13 @@ var ProformaController = /** @class */ (function () {
         common_1.Get()
     ], ProformaController.prototype, "findAll");
     __decorate([
-        common_1.Patch(':id/status'),
-        __param(0, common_1.Param('id')),
-        __param(1, common_1.Body(new common_1.ValidationPipe()))
-    ], ProformaController.prototype, "updateStatus");
+        common_1.Patch(':id'),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)),
+        __param(1, common_1.Body(new common_1.ValidationPipe())),
+        __param(2, common_1.Res())
+    ], ProformaController.prototype, "updateProforma");
     ProformaController = __decorate([
-        common_1.Controller('proforma')
+        common_1.Controller('proforma') // Note : Corrige le chemin pour correspondre à l'URL de l'API
     ], ProformaController);
     return ProformaController;
 }());

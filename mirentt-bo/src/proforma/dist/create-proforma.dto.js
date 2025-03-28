@@ -6,47 +6,47 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.CreateProformaByCriteriaDto = void 0;
+exports.CreateProformaDto = void 0;
 var class_validator_1 = require("class-validator");
-var class_transformer_1 = require("class-transformer");
-var create_proformaItem_dto_1 = require("./create-proformaItem.dto");
-var CreateProformaByCriteriaDto = /** @class */ (function () {
-    function CreateProformaByCriteriaDto() {
+var CreateProformaDto = /** @class */ (function () {
+    function CreateProformaDto() {
     }
     __decorate([
-        class_validator_1.IsNotEmpty(),
+        class_validator_1.IsArray(),
+        class_validator_1.IsNotEmpty()
+    ], CreateProformaDto.prototype, "items");
+    __decorate([
         class_validator_1.IsString()
-    ], CreateProformaByCriteriaDto.prototype, "clientLastName");
+    ], CreateProformaDto.prototype, "proformaNumber");
     __decorate([
-        class_validator_1.IsOptional(),
-        class_validator_1.IsString()
-    ], CreateProformaByCriteriaDto.prototype, "clientEmail");
+        class_validator_1.IsDateString()
+    ], CreateProformaDto.prototype, "date");
     __decorate([
-        class_validator_1.IsOptional(),
-        class_validator_1.IsString()
-    ], CreateProformaByCriteriaDto.prototype, "clientPhone");
+        class_validator_1.IsNumber()
+    ], CreateProformaDto.prototype, "totalAmount");
     __decorate([
-        class_validator_1.IsNotEmpty(),
-        class_transformer_1.Transform(function (_a) {
-            var value = _a.value;
-            return new Date(value);
-        }),
-        class_validator_1.IsDate()
-    ], CreateProformaByCriteriaDto.prototype, "date");
+        class_validator_1.IsNumber()
+    ], CreateProformaDto.prototype, "clientId");
     __decorate([
-        class_validator_1.IsOptional(),
-        class_validator_1.IsString()
-    ], CreateProformaByCriteriaDto.prototype, "contractReference");
+        class_validator_1.IsString(),
+        class_validator_1.IsOptional()
+    ], CreateProformaDto.prototype, "status");
     __decorate([
-        class_validator_1.IsOptional(),
-        class_validator_1.IsString()
-    ], CreateProformaByCriteriaDto.prototype, "notes");
+        class_validator_1.IsString(),
+        class_validator_1.IsOptional()
+    ], CreateProformaDto.prototype, "contractReference");
     __decorate([
-        class_validator_1.IsNotEmpty(),
-        class_validator_1.ArrayNotEmpty(),
-        class_validator_1.ValidateNested({ each: true }),
-        class_transformer_1.Type(function () { return create_proformaItem_dto_1.CreateProformaItemByCriteriaDto; })
-    ], CreateProformaByCriteriaDto.prototype, "items");
-    return CreateProformaByCriteriaDto;
+        class_validator_1.IsString(),
+        class_validator_1.IsOptional()
+    ], CreateProformaDto.prototype, "notes");
+    __decorate([
+        class_validator_1.IsString(),
+        class_validator_1.IsOptional()
+    ], CreateProformaDto.prototype, "createdAt");
+    __decorate([
+        class_validator_1.IsString(),
+        class_validator_1.IsOptional()
+    ], CreateProformaDto.prototype, "updatedAt");
+    return CreateProformaDto;
 }());
-exports.CreateProformaByCriteriaDto = CreateProformaByCriteriaDto;
+exports.CreateProformaDto = CreateProformaDto;

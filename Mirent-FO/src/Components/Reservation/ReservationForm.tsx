@@ -64,7 +64,6 @@ const ReservationForm: React.FC<ReservationFormProps> = () => {
 
   return (
     <div>
-      <h2>Créer une Nouvelle Réservation</h2>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>

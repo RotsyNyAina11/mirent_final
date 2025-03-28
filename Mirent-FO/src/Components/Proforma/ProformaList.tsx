@@ -12,7 +12,7 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 import { Proforma, ProformaStatus } from "../../models/Proforma";
-import dayjs from "dayjs";
+//import dayjs from "dayjs";
 
 const ProformaList = () => {
   // ... (gardez vos hooks useAppSelector et useAppDispatch existants)
@@ -35,11 +35,9 @@ const ProformaList = () => {
       headerAlign: "center",
     },
     {
-      field: "date",
-      headerName: "Date",
-      width: 130,
-      valueFormatter: (params: GridValueFormatterParams<string>) =>
-        dayjs(params.value).format("DD/MM/YYYY"),
+      field: "clientId",
+      headerName: "ID Client",
+      width: 100,
       headerAlign: "center",
       align: "center",
     },
@@ -51,13 +49,6 @@ const ProformaList = () => {
         `${params.value.toFixed(2)} €`,
       headerAlign: "center",
       align: "right",
-    },
-    {
-      field: "clientId",
-      headerName: "ID Client",
-      width: 100,
-      headerAlign: "center",
-      align: "center",
     },
     {
       field: "status",
@@ -80,22 +71,7 @@ const ProformaList = () => {
       headerAlign: "center",
       align: "center",
     },
-    {
-      field: "createdAt",
-      headerName: "Créé le",
-      width: 150,
-      valueFormatter: (params: GridValueFormatterParams<string>) =>
-        dayjs(params.value).format("DD/MM/YYYY HH:mm"),
-      headerAlign: "center",
-    },
-    {
-      field: "updatedAt",
-      headerName: "Modifié le",
-      width: 150,
-      valueFormatter: (params: GridValueFormatterParams<string>) =>
-        dayjs(params.value).format("DD/MM/YYYY HH:mm"),
-      headerAlign: "center",
-    },
+
     {
       field: "contractReference",
       headerName: "Contrat de Référence",

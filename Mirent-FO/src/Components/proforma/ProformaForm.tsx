@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -12,19 +12,33 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import { Proforma, ProformaStatus } from "../../models/Proforma";
-import { useAppDispatch, useAppSelector } from "../../hooks";
+import { ProformaStatus } from "../../models/Proforma";
 import {
   createProforma,
   updateProforma,
+} from "../../redux/features/proforma/proformaSlice"; // Import your service methods
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import {
   selectProformasLoading,
   selectProformasError,
 } from "../../redux/features/proforma/proformaSlice";
+import ProformaItem from "./proformaItem";
 
 interface ProformaFormProps {
   proforma?: Proforma | null;
   onClose: () => void;
-  onSubmitSuccess: () => void;
+  onSubmitSuccess?: () => void;
+}
+
+interface Proforma {
+  id: number;
+  proformaNumber: string;
+  date: string; // Or Date
+  totalAmount: number;
+  clientId: number;
+  status: ProformaStatus;
+  contractReference: string;
+  notes: string;
 }
 
 const ProformaForm: React.FC<ProformaFormProps> = ({
@@ -32,66 +46,110 @@ const ProformaForm: React.FC<ProformaFormProps> = ({
   onClose,
   onSubmitSuccess,
 }) => {
-  const dispatch = useAppDispatch();
   const loading = useAppSelector(selectProformasLoading);
   const error = useAppSelector(selectProformasError);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<Record<string, string>>({});
+
+  const isEditMode = !!proforma?.id;
+
+  const [formData, setFormData] = useState({
+    proformaNumber: "",
+    date: new Date().toISOString().split("T")[0],
+    totalAmount: 0,
+    clientId: 0,
+    status: ProformaStatus.DRAFT,
+    contractReference: "",
+    notes: "",
+  });
+
+  useEffect(() => {
+    if (proforma) {
+      setFormData({
+        proformaNumber: proforma.proformaNumber,
+        date: proforma.date.split("T")[0],
+        totalAmount: proforma.totalAmount,
+        clientId: proforma.clientId,
+        status: proforma.status,
+        contractReference: proforma.contractReference,
+        notes: proforma.notes,
+      });
+    }
+  }, [proforma]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.proformaNumber.trim()) {
-      newErrors.proformaNumber = "Le numéro est requis";
+      newErrors.proformaNumber = "Le numéro de proforma est requis.";
     }
 
     if (formData.totalAmount <= 0) {
-      newErrors.totalAmount = "Le montant doit être positif";
+      newErrors.totalAmount = "Le montant total doit être supérieur à 0.";
     }
 
     if (!formData.clientId || formData.clientId <= 0) {
-      newErrors.clientId = "Client invalide";
+      newErrors.clientId = "Un client valide est requis.";
     }
 
-    setErrors(newErrors);
+    if (!formData.status) {
+      newErrors.status = "Le statut est requis.";
+    }
+
+    if (formData.contractReference.length > 50) {
+      newErrors.contractReference =
+        "La référence du contrat ne doit pas dépasser 50 caractères.";
+    }
+
+    if (formData.notes.length > 200) {
+      newErrors.notes = "Les notes ne doivent pas dépasser 200 caractères.";
+    }
+
+    setFormError(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
     if (!validateForm()) return;
 
-    // ... reste du code
+    const payload = {
+      proformaNumber: formData.proformaNumber,
+      date: formData.date,
+      totalAmount: parseFloat(formData.totalAmount.toString()), // Make sure it's a number
+      clientId: parseInt(formData.clientId.toString(), 10), // Ensure it's a number
+      status: formData.status,
+      contractReference: formData.contractReference,
+      notes: formData.notes,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    console.log("Données envoyées :", payload);
+
+    try {
+      if (isEditMode) {
+        await updateProforma(proforma.id, payload);
+      } else {
+        await createProforma(payload);
+      }
+
+      if (onSubmitSuccess) onSubmitSuccess();
+      onClose();
+    } catch (error: any) {
+      if (error.response) {
+        console.error("Erreur API :", error.response.data); // API error details
+      } else {
+        console.error("Erreur inconnue :", error);
+      }
+    }
   };
 
-  const isEditMode = !!proforma?.id;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  const [formData, setFormData] = useState<
-    Omit<Proforma, "id" | "createdAt" | "updatedAt">
-  >(() => ({
-    proformaNumber: proforma?.proformaNumber || "",
-    date: proforma?.date || new Date().toISOString().slice(0, 10),
-    totalAmount: proforma?.totalAmount || 0,
-    clientId: proforma?.clientId || 0,
-    status: proforma?.status || ProformaStatus.DRAFT,
-    createdAt: proforma?.createdAt || 0,
-    updatedAt: proforma?.updatedAt || 0,
-    contractReference: proforma?.contractReference || "",
-    notes: proforma?.notes || "",
-  }));
-
-  const handleChange = (
-    event: React.ChangeEvent<
-      HTMLInputElement | { name?: string; value: unknown }
-    >
-  ) => {
-    const { name, value } = event.target;
-    if (name) {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+  const handleCancel = () => {
+    onClose();
   };
 
   return (
@@ -108,13 +166,12 @@ const ProformaForm: React.FC<ProformaFormProps> = ({
               label="Numéro de Proforma"
               name="proformaNumber"
               value={formData.proformaNumber}
-              onChange={handleChange}
-              error={!!errors.proformaNumber}
-              helperText={errors.proformaNumber}
+              onChange={handleInputChange}
+              error={!!formError.proformaNumber}
+              helperText={formError.proformaNumber}
               required
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -122,14 +179,11 @@ const ProformaForm: React.FC<ProformaFormProps> = ({
               type="date"
               name="date"
               value={formData.date}
-              onChange={handleChange}
-              error={!!errors.date}
-              helperText={errors.date}
+              onChange={handleInputChange}
               InputLabelProps={{ shrink: true }}
               required
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -137,12 +191,12 @@ const ProformaForm: React.FC<ProformaFormProps> = ({
               type="number"
               name="totalAmount"
               value={formData.totalAmount}
-              onChange={handleChange}
-              inputProps={{ min: 0, step: "0.01" }}
+              onChange={handleInputChange}
               required
+              error={!!formError.totalAmount}
+              helperText={formError.totalAmount}
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -150,82 +204,111 @@ const ProformaForm: React.FC<ProformaFormProps> = ({
               type="number"
               name="clientId"
               value={formData.clientId}
-              onChange={handleChange}
-              inputProps={{ min: 0 }}
+              onChange={handleInputChange}
+              inputProps={{ min: 1 }}
               required
+              error={!!formError.clientId}
+              helperText={formError.clientId}
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
+            <FormControl fullWidth error={!!formError.status}>
               <InputLabel id="status-label">Statut *</InputLabel>
               <Select
                 labelId="status-label"
                 name="status"
                 value={formData.status}
-                onChange={handleChange}
+                onChange={(event) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: event.target.value as ProformaStatus,
+                  }))
+                }
                 label="Statut *"
-                focused
+                required
               >
-                {Object.values(ProformaStatus).map((status) => (
-                  <MenuItem key={status} value={status}>
-                    {status === ProformaStatus.DRAFT && "Brouillon"}
-                    {status === ProformaStatus.SENT && "Envoyé"}
-                    {status === ProformaStatus.APPROVED && "Approuvé"}
-                    {status === ProformaStatus.REJECTED && "Rejeté"}
-                  </MenuItem>
-                ))}
+                <MenuItem value={ProformaStatus.DRAFT}>Brouillon</MenuItem>
+                <MenuItem value={ProformaStatus.SENT}>Envoyé</MenuItem>
+                <MenuItem value={ProformaStatus.APPROVED}>Approuvé</MenuItem>
+                <MenuItem value={ProformaStatus.REJECTED}>Rejeté</MenuItem>
               </Select>
+              {formError.status && (
+                <Typography variant="caption" color="error">
+                  {formError.status}
+                </Typography>
+              )}
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="Créer le"
-              type="date"
-              name="createdAt"
-              value={formData.createdAt}
-              onChange={handleChange}
-              inputProps={{ min: 0 }}
-              required
+              label="Contrat de référence"
+              type="text"
+              name="contractReference"
+              value={formData.contractReference}
+              onChange={handleInputChange}
+              error={!!formError.contractReference}
+              helperText={formError.contractReference}
             />
           </Grid>
-
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Modifier le"
-              type="date"
-              name="updatedAt"
-              value={formData.updatedAt}
-              onChange={handleChange}
-              inputProps={{ min: 0 }}
-              required
+              label="Notes"
+              multiline
+              rows={4}
+              name="notes"
+              value={formData.notes}
+              onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
+              error={!!formError.notes}
+              helperText={formError.notes}
             />
-          </Grid>
+            <ProformaItem
+              item={{
+                vehicleId: 0,
+                regionId: 0,
+                prixId: 0,
+                dateDepart: "",
+                dateRetour: "",
+                nombreJours: 0,
+                subTotal: 0,
+              }} // Replace with actual item
+              index={0} // Index of item
+              vehicles={[]} // Replace with actual vehicles list
+              regions={[]} // Replace with actual regions list
+              prixList={[]} // Replace with actual pricing list
+              onChange={() => {}} // Update logic for item change
+              onRemove={() => {}} // Remove logic
+            />
 
-          {error && (
+            {error && (
+              <Grid item xs={12}>
+                <Alert severity="error">{error}</Alert>
+              </Grid>
+            )}
+
             <Grid item xs={12}>
-              <Alert severity="error">{error}</Alert>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  startIcon={loading ? <CircularProgress size={20} /> : null}
+                >
+                  {isEditMode ? "Mettre à jour" : "Créer"}
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  onClick={handleCancel}
+                  disabled={loading}
+                >
+                  Annuler
+                </Button>
+              </Box>
             </Grid>
-          )}
-
-          <Grid item xs={12}>
-            <Box sx={{ display: "flex", gap: 2 }}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                startIcon={loading ? <CircularProgress size={20} /> : null}
-              >
-                {isEditMode ? "Mettre à jour" : "Créer"}
-              </Button>
-
-              <Button variant="outlined" onClick={onClose} disabled={loading}>
-                Annuler
-              </Button>
-            </Box>
           </Grid>
         </Grid>
       </form>

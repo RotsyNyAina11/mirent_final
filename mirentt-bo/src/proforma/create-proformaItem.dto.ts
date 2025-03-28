@@ -1,5 +1,5 @@
-import { Transform } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Transform } from "class-transformer";
+import { IsDate, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class VehicleCriteria {
   @IsOptional()
@@ -12,7 +12,7 @@ export class VehicleCriteria {
 
   @IsOptional()
   @IsString()
-  type?: string;
+  type?: string; 
 }
 
 export class CreateProformaItemByCriteriaDto {

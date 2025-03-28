@@ -66,7 +66,11 @@ export const deleteRegion = createAsyncThunk(
 const regionsSlice = createSlice({
   name: "regions",
   initialState,
-  reducers: {},
+  reducers: {
+    setRegions(state, action: PayloadAction<Region[]>) {
+      state.regions = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchRegions.pending, (state) => {
@@ -124,5 +128,7 @@ const regionsSlice = createSlice({
       );
   },
 });
+
+export const { setRegions } = regionsSlice.actions;
 
 export default regionsSlice.reducer;

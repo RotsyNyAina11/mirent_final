@@ -147,7 +147,11 @@ const clientSlice = createSlice({
   name: "customer",
   initialState,
 
-  reducers: {},
+  reducers: {
+    setClients(state, action: PayloadAction<Customer[]>) {
+      state.clients = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchClients.pending, (state) => {
@@ -204,5 +208,6 @@ const clientSlice = createSlice({
       );
   },
 });
+export const { setClients } = clientSlice.actions;
 
 export default clientSlice.reducer;

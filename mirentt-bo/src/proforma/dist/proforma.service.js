@@ -107,6 +107,27 @@ var ProformaService = /** @class */ (function () {
             });
         });
     };
+    ProformaService.prototype.update = function (id, updateProformaDto) {
+        return __awaiter(this, void 0, Promise, function () {
+            var proforma;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.proformaRepository.findOne({ where: { id: id } })];
+                    case 1:
+                        proforma = _a.sent();
+                        if (!proforma) {
+                            throw new common_1.NotFoundException("Proforma with ID " + id + " not found");
+                        }
+                        // Mettre à jour les propriétés de la proforma
+                        proforma.notes = updateProformaDto.notes || proforma.notes; // Si des notes sont envoyées, les mettre à jour
+                        proforma.status = updateProformaDto.status || proforma.status; // Mettre à jour le statut si fourni
+                        // Ajouter ici d'autres champs si nécessaire
+                        return [2 /*return*/, this.proformaRepository.save(proforma)];
+                }
+            });
+        });
+    };
+    // This misplaced code block has been removed as it is redundant and incorrectly scoped.
     ProformaService.prototype.create = function (proformaData) {
         return __awaiter(this, void 0, Promise, function () {
             var clientExist, proforma, _a, proformaItems, _b, savedProforma, savedProformaWithRelations, pdfBuffer;
@@ -114,11 +135,7 @@ var ProformaService = /** @class */ (function () {
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0: return [4 /*yield*/, this.clientRepository.findOne({
-                            where: [
-                                { lastName: proformaData.clientLastName },
-                                { email: proformaData.clientEmail },
-                                { phone: proformaData.clientPhone },
-                            ]
+                            where: [{ id: proformaData.clientId }]
                         })];
                     case 1:
                         clientExist = _c.sent();
@@ -171,7 +188,6 @@ var ProformaService = /** @class */ (function () {
                                                 throw new common_1.NotFoundException("Type \"" + item.vehicleCriteria.type + "\" not found");
                                             }
                                             whereClause.type = typeExist;
-                                            delete whereClause.type;
                                             _a.label = 4;
                                         case 4:
                                             console.log('Critères de recherche :', whereClause);
@@ -188,8 +204,8 @@ var ProformaService = /** @class */ (function () {
                                             return [4 /*yield*/, this.proformaItemRepository.findOne({
                                                     where: {
                                                         vehicle: { id: vehiculeChoisi.id },
-                                                        dateDepart: item.dateDepart,
-                                                        dateRetour: item.dateRetour
+                                                        dateDepart: typeorm_2.LessThanOrEqual(item.dateRetour),
+                                                        dateRetour: typeorm_2.MoreThanOrEqual(item.dateDepart)
                                                     }
                                                 })];
                                         case 6:

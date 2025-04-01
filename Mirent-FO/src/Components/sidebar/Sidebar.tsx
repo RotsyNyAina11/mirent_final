@@ -26,7 +26,6 @@ import {
   ExpandLess,
   ExpandMore,
   AddShoppingCart,
-  Search as SearchIcon,
   Notifications as NotificationsIcon,
   Add as AddIcon, 
 } from "@mui/icons-material";
@@ -99,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
   };
 
   return (
-    <>
+    <React.Fragment>
       {/* En-tête sticky avec le logo */}
       <Box
         bgcolor="white"
@@ -130,31 +129,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               }}
             />
           </RouterLink>
-
-          {/* Barre de recherche */}
-          <Box position="relative">
-            <input
-              type="text"
-              placeholder="Rechercher..."
-              style={{
-                padding: "6px 10px",
-                paddingLeft: "35px",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-                width: "180px", 
-                fontSize: "14px",
-              }}
-            />
-            <SearchIcon
-              sx={{
-                position: "absolute",
-                left: "10px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                fontSize: "20px",
-              }}
-            />
-          </Box>
         </Box>
 
         {/* Date, Notification, Avatar */}
@@ -602,7 +576,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           </Box>
         </List>
       </Drawer>
-    </>
+    </React.Fragment>
   );
 };
 

@@ -635,7 +635,7 @@ const Accueil: React.FC = () => {
                     transition:
                       "box-shadow 0.3s ease, transform 0.2s ease-in-out",
                     "&:hover": {
-                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                      boxShadow: "0 4px 20px rgba(0, 0, 0, 0.07)",
                       transform: "scale(1.02)",
                     },
                   }}
@@ -985,7 +985,7 @@ const Accueil: React.FC = () => {
           sx={{
             "& .MuiDialog-paper": {
               borderRadius: "12px",
-              boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
+              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.06)",
               backgroundColor: "#fff",
             },
           }}

@@ -9,19 +9,23 @@ import { Box, useMediaQuery } from "@mui/material";
 import Sidebar from "./Components/Sidebar/Sidebar";
 import Login from "./Components/login/Login";
 
-import Reservations from "./pages/reservation";
+//import Reservations from "./pages/reservation";
 import Performat from "./pages/proforma/ProformaPage";
 import Devis from "./pages/DevisPage";
 import ProformaPage from "./pages/proforma/ProformaPage";
 import Commande from "./pages/commande/CommandePage";
 
 import LocationsPage from "./pages/lieux/locationPage";
-import ProformaPdf from "./Components/Proforma/proformaPdf";
+//import ProformaPdf from "./Components/Proforma/proformaPdf";
+
 import ContratPage from "./pages/contrat/contratPage";
 import Vehicule from "./pages/vehicules/vehiculePage";
 import ClientPage from "./pages/clients/ClientPage";
 import Home from "./pages/acceuil/HomePage";
+
 import "react-toastify/dist/ReactToastify.css";
+//import ReservationPage from "./pages/proforma/proformaPage";
+//import ProformaPage from "./pages/proforma/proformaPage";
 
 const App: React.FC = () => {
   // Composant Layout pour intégrer le Sidebar et le contenu principal
@@ -38,10 +42,8 @@ const App: React.FC = () => {
     return (
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
         {/* Conteneur principal avec Sidebar et contenu */}
+
         <Box display="flex" flexGrow={1} pt={7}>
-          {" "}
-          {/* Ajustement de pt pour la nouvelle hauteur de l'en-tête (56px) */}
-          {/* Sidebar (contient déjà l'en-tête) */}
           <Box sx={{ width: isCollapsed ? "60px" : "250px", flexShrink: 0 }}>
             <Sidebar onCollapseChange={setIsCollapsed} />
           </Box>
@@ -88,6 +90,7 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
+
         {/* Route pour la page de Performat sur la commande */}
         <Route
           path="/proformat"
@@ -97,6 +100,16 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
+
+        <Route
+          path="/proformas"
+          element={
+            <MainLayout>
+              <ProformaPage />
+            </MainLayout>
+          }
+        />
+
         {/* Route pour la page Table proforma */}
         <Route
           path="/tableau_proforma"
@@ -132,15 +145,6 @@ const App: React.FC = () => {
           element={
             <MainLayout>
               <Commande />
-            </MainLayout>
-          }
-        />
-
-        <Route
-          path="/proforma-pdf"
-          element={
-            <MainLayout>
-              <ProformaPdf />
             </MainLayout>
           }
         />

@@ -255,6 +255,39 @@ export class ProformaService {
 
 
     async findAll(): Promise<Proforma[]> {
-        return this.proformaRepository.find();
+        return this.proformaRepository.find({
+            relations: ['items', 'items.vehicle', 'items.vehicle.type', 'items.vehicle.status', 'items.region', 'items.prix', 'client'],
+        });
     }
+
+    async delete(id: number): Promise<void> {
+        const proforma = await this.proformaRepository.findOne({
+            where: { id },
+            relations: ['items', 'items.vehicle'],
+        });
+
+        if (!proforma) {
+            throw new NotFoundException(`Proforma with ID ${id} not found`);
+        }
+
+        // Mettre à jour le statut des véhicules associés à "Disponible"
+        const statusDisponible = await this.statusRepository.findOne({ where: { status: 'Disponible' } });
+        if (!statusDisponible) {
+            throw new NotFoundException(`Statut "Disponible" non trouvé`);
+        }
+
+        for (const item of proforma.items) {
+            const vehicle = item.vehicle;
+            vehicle.status = statusDisponible;
+            await this.vehiculeRepository.save(vehicle);
+        }
+
+        // Supprimer les éléments du proforma
+        await this.proformaItemRepository.delete({ proforma: { id } });
+
+        // Supprimer le proforma
+        await this.proformaRepository.delete(id);
+    }
+
+    
 }

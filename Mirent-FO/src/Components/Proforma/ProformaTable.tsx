@@ -1,3 +1,4 @@
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
 import {
@@ -8,31 +9,91 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Button,
   Grid,
   Typography,
+  Box,
+  Button, // Importez Button pour les actions
+  styled, // Importez styled pour les composants stylisés
 } from "@mui/material";
 
 import companyLogo from "../../assets/horizontal.png";
 import clientLogo from "../../assets/oms.png";
-import { useEffect } from "react";
+import {
+  deleteProforma,
+  fetchProformas,
+} from "../../redux/features/commande/commandeSlice";
+import EditProformaForm from "../../Components/Commandes/EditProforma";
+
+interface ProformaItem {
+  vehicle?: { nom?: string };
+  dateDepart?: string;
+  dateRetour?: string;
+}
+
+interface Proforma {
+  id?: string | number;
+  proformaNumber?: string;
+  client?: { lastName?: string };
+  items: ProformaItem[];
+  nombreJours?: number;
+  totalAmount?: number;
+  carburant?: number;
+  prixUnitaire?: number;
+  prixTotal?: number;
+  status?: string;
+}
+
+// Définissez les composants stylisés pour les boutons (si vous les utilisez ailleurs)
+const PrimaryButton = styled(Button)(({ theme }) => ({
+  backgroundColor: "#3b82f6",
+  color: theme.palette.common.white,
+  padding: "6px 12px",
+  borderRadius: "8px",
+  textTransform: "none",
+  fontWeight: 500,
+  "&:hover": {
+    backgroundColor: "#2563eb",
+    transform: "scale(1.02)",
+    transition: "all 0.3s ease",
+  },
+  "&.Mui-disabled": {
+    backgroundColor: "#d1d5db",
+    color: "#6b7280",
+  },
+}));
+
+const DeleteButton = styled(Button)(({ theme }) => ({
+  backgroundColor: "#ef4444",
+  color: theme.palette.common.white,
+  padding: "6px 12px",
+  borderRadius: "8px",
+  textTransform: "none",
+  fontWeight: 500,
+  "&:hover": {
+    backgroundColor: "#dc2626",
+    transform: "scale(1.02)",
+    transition: "all 0.3s ease",
+  },
+}));
+
 const ProformaTable = () => {
-  const quotes = useSelector((state: RootState) => state.proforma.quotes) || [];
+  const proformas: Proforma[] =
+    useSelector((state: RootState) => state.proformas.proformas) || [];
   const dispatch = useDispatch();
 
-  console.log("Quotes récupérés depuis Redux :", quotes);
+  console.log("Quotes récupérés depuis Redux :", proformas);
 
-  if (!quotes || !Array.isArray(quotes)) {
+  if (!proformas || !Array.isArray(proformas)) {
     return <Typography>Aucun devis disponible.</Typography>;
   }
 
-  const totalCarburant = quotes.reduce(
-    (sum, quote) => sum + parseFloat(quote?.carburant?.toString() || "0"),
+  const totalCarburant = proformas.reduce(
+    (sum, proforma) => sum + parseFloat(proforma?.carburant?.toString() || "0"),
     0
   );
 
-  const totalPrixTotal = quotes.reduce(
-    (sum, quote) => sum + parseFloat(quote?.prixTotal?.toString() || "0"),
+  const totalPrixTotal = proformas.reduce(
+    (sum, proforma) => sum + parseFloat(proforma?.prixTotal?.toString() || "0"),
     0
   );
 
@@ -41,6 +102,17 @@ const ProformaTable = () => {
     email: "contact@oms.com",
     description: "Entreprise de location de véhicules",
     phone: "+261 34 12 345 67",
+  };
+
+  const handleEdit = (id: string | number) => {
+    console.log(`Modifier le proforma avec l'ID : ${id}`);
+    // Ici, vous pouvez ouvrir le formulaire d'édition ou rediriger vers une autre page
+  };
+
+  const handleDelete = (id: string | number) => {
+    console.log(`Supprimer le proforma avec l'ID : ${id}`);
+    dispatch(deleteProforma(id));
+    dispatch(fetchProformas());
   };
 
   return (
@@ -88,88 +160,120 @@ const ProformaTable = () => {
             <TableHead>
               <TableRow>
                 {[
-                  "Réf",
+                  "Numero",
+                  "Client",
                   "Voiture",
-                  "Numéro",
-                  "Destination",
-                  "Date",
+                  "Départ",
+                  "Retour",
                   "Jours",
+                  "Montant HT",
                   "Carburant",
                   "Prix U",
                   "Prix Total",
+                  "Statut",
+                  "Actions",
                 ].map((header) => (
-                  <TableCell key={header} align="center">
+                  <TableCell
+                    key={header}
+                    align="center"
+                    sx={{ fontWeight: 600 }}
+                  >
                     {header}
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {quotes.map((quote) => (
-                <TableRow key={quote?.ref || Math.random()}>
-                  <TableCell>{quote?.ref || "N/A"}</TableCell>
-                  <TableCell>{quote?.voiture || "N/A"}</TableCell>
-                  <TableCell>{quote?.numeroVoiture || "N/A"}</TableCell>
-                  <TableCell>{quote?.destination || "N/A"}</TableCell>
+              {proformas.map((proforma) => (
+                <TableRow key={proforma.id || Math.random()}>
+                  <TableCell>{proforma.proformaNumber || "N/A"}</TableCell>
+                  <TableCell>{proforma.client?.lastName || "N/A"}</TableCell>
                   <TableCell>
-                    {quote?.dateDepart || "??"} au {quote?.dateArrivee || "??"}
+                    {proforma.items[0]?.vehicle?.nom || "N/A"}
                   </TableCell>
-                  <TableCell>{quote?.nombreJours || "0"}</TableCell>
-                  <TableCell>
-                    {parseFloat(
-                      quote?.carburant?.toString() || "0"
-                    ).toLocaleString()}
+                  <TableCell align="center">
+                    {proforma.items[0]?.dateDepart || "N/A"}
                   </TableCell>
-                  <TableCell>
-                    {parseFloat(
-                      quote?.prixUnitaire?.toString() || "0"
-                    ).toLocaleString()}
+                  <TableCell align="center">
+                    {proforma.items[0]?.dateRetour || "N/A"}
                   </TableCell>
-                  <TableCell>
-                    {parseFloat(
-                      quote?.prixTotal?.toString() || "0"
-                    ).toLocaleString()}
+                  <TableCell align="center">
+                    {proforma.nombreJours?.toString() || "0"}
+                  </TableCell>
+                  <TableCell align="right">
+                    {proforma.totalAmount?.toLocaleString() || "N/A"}
+                  </TableCell>
+                  <TableCell align="right">
+                    {proforma.carburant?.toLocaleString() || "0"}
+                  </TableCell>
+                  <TableCell align="right">
+                    {proforma.prixUnitaire?.toLocaleString() || "0"}
+                  </TableCell>
+                  <TableCell align="right">
+                    {proforma.prixTotal?.toLocaleString() || "0"}
+                  </TableCell>
+                  <TableCell align="center">{proforma.status}</TableCell>
+                  <TableCell align="center">
+                    <Box
+                      sx={{ display: "flex", gap: 1, justifyContent: "center" }}
+                    >
+                      <PrimaryButton
+                        onClick={() => handleEdit(proforma.id)}
+                        aria-label={`Modifier le proforma ${proforma.id}`}
+                        size="small"
+                      >
+                        Modifier
+                      </PrimaryButton>
+                      <DeleteButton
+                        onClick={() => handleDelete(proforma.id)}
+                        aria-label={`Supprimer le proforma ${proforma.id}`}
+                        size="small"
+                      >
+                        Supprimer
+                      </DeleteButton>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}
 
               <TableRow>
-                <TableCell colSpan={6} align="right">
+                <TableCell colSpan={7} align="right">
                   <Typography variant="body1" fontWeight="bold">
-                    TOTAL
+                    TOTAL HT
                   </Typography>
                 </TableCell>
-                <TableCell align="center">
+                <TableCell align="right">
+                  <Typography variant="body1" fontWeight="bold">
+                    {totalPrixTotal.toLocaleString()}
+                  </Typography>
+                </TableCell>
+                <TableCell align="right">
                   <Typography variant="body1" fontWeight="bold">
                     {totalCarburant.toLocaleString()}
                   </Typography>
                 </TableCell>
-                <TableCell align="center">
+                <TableCell align="right">-</TableCell>
+                <TableCell align="right">
                   <Typography variant="body1" fontWeight="bold">
-                    -
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="body1" fontWeight="bold">
-                    {totalPrixTotal.toLocaleString()}
+                    {(totalPrixTotal + totalCarburant).toLocaleString()}
                   </Typography>
                 </TableCell>
                 <TableCell></TableCell>
               </TableRow>
 
-              <TableRow>
+              {/* <TableRow>
                 <TableCell colSpan={8} align="right">
                   <Typography variant="body1" fontWeight="bold">
                     MONTANT TOTAL CARBURANT
                   </Typography>
                 </TableCell>
-                <TableCell align="center">
+                <TableCell align="right">
                   <Typography variant="body1" fontWeight="bold">
                     {totalCarburant.toLocaleString()}
                   </Typography>
                 </TableCell>
                 <TableCell></TableCell>
-              </TableRow>
+              </TableRow> */}
             </TableBody>
           </Table>
         </TableContainer>
@@ -178,10 +282,10 @@ const ProformaTable = () => {
       <Typography variant="body1" sx={{ marginTop: 2 }}>
         Arrêtée la présente facture à la somme de :{" "}
         <strong>
-          {new Intl.NumberFormat("fr-FR", {
+          {new Intl.NumberFormat("fr-MG", {
             style: "currency",
             currency: "MGA",
-          }).format(totalPrixTotal)}
+          }).format(totalPrixTotal + totalCarburant)}
         </strong>
       </Typography>
 

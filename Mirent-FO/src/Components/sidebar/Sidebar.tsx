@@ -271,7 +271,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-
           {/* Commandes avec sous-menu */}
           <ListItemButton
             onClick={handleCommandeClick}
@@ -313,8 +312,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               {/* Proformat */}
               <Tooltip title="Proformat" placement="right">
                 <NavLinkButton
-                  to="/proformat"
-                  selected={window.location.pathname === "/proformat"}
+                  to="/commande"
+                  selected={window.location.pathname === "/commande"}
                   sx={{
                     pl: 6,
                     pr: 4,
@@ -411,7 +410,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               </Tooltip>
             </List>
           </Collapse>
-
           {/* Gérer les Véhicules */}
           <Tooltip title="Gérer les Véhicules" placement="right">
             <NavLinkButton
@@ -443,7 +441,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-
           {/* Liste des Clients */}
           <Tooltip title="Liste des Clients" placement="right">
             <NavLinkButton
@@ -475,12 +472,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-
-          {/* Créer Réservation */}
-          <Tooltip title="Créer Réservation" placement="right">
+          {/* Créer Proformas */}
+          <Tooltip title="Créer Proformas" placement="right">
             <NavLinkButton
-              to="/commande"
-              selected={window.location.pathname === "/commande"}
+              to="/proformas"
+              selected={window.location.pathname === "/proformas"}
               sx={{
                 padding: "12px 16px",
                 "& .MuiListItemIcon-root": {
@@ -494,7 +490,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                 <AddIcon />
               </ListItemIcon>
               <ListItemText
-                primary="Créer Réservation"
+                primary="Créer Proformas"
                 primaryTypographyProps={{
                   fontSize: "14px",
                   fontWeight: "500",
@@ -507,7 +503,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-
           {/* Lieux de Location */}
           <Tooltip title="Lieux de Location" placement="right">
             <NavLinkButton
@@ -539,7 +534,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-
           {/* Contact */}
           <Tooltip title="Contact" placement="right">
             <NavLinkButton
@@ -571,9 +565,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
+          {/*
+          commande
 
-          {/* commande
-          <Tooltip title="Commande" placement="right">
+            <Tooltip title="Commande" placement="right">
             <NavLinkButton
               to="/commande"
               selected={window.location.pathname === "/commande"}
@@ -603,7 +598,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-          */}
+           */}
         </List>
 
         <List>

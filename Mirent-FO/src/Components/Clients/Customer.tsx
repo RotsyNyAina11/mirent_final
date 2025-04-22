@@ -319,7 +319,7 @@ const CustomerManagement: React.FC = () => {
                 name="phone"
                 label="Téléphone"
                 type="text"
-                error={!!formErrors.phone} // Indicate error
+                error={!!formErrors.phone}
                 helperText={formErrors.phone}
                 fullWidth
                 value={form.phone}

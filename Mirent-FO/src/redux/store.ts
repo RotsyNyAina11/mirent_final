@@ -1,16 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import customersReducer from "./features/clients/customersSlice";
-import proformaReducer from "./features/proforma/proformaSlice";
-import commandeReducer from "./features/commande/commandeSlice";
 import authReducer from "./features/auth/authSlice";
 import sidebarReducer from "./features/sidebar/SidebarSlice";
 import vehiclesReducer from "./features/vehicle/vehiclesSlice";
 import { create } from "zustand";
 import { Proforma } from "../types/Proforma";
 import locationReducer from "../redux/features/lieux/locationSlice";
-import reservationReducer from "../redux/features/reservation/reservationSlice";
+import customersReducer from "./features/clients/customersSlice";
 import contractReducer from "./features/contrat/contratSlice";
-
+import proformasReducer from "./features/proforma/proformaSlice";
 interface ProformaState {
   proformas: Proforma[];
   addProforma: (newProforma: Proforma) => void;
@@ -28,11 +25,9 @@ export const store = configureStore({
     vehicles: vehiclesReducer,
     sidebar: sidebarReducer,
     customer: customersReducer,
-    proforma: proformaReducer,
-    commande: commandeReducer,
     locations: locationReducer,
     contrat: contractReducer as any,
-    reservations: reservationReducer,
+    proformas: proformasReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

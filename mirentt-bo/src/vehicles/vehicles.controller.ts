@@ -75,7 +75,7 @@ export class VehiclesController {
         callback(null, true);
       } 
     }))
-    async update(
+    async update( 
       @Param('id') id: number,
       @Body() dto: UpdateVehiculeDto,
       @UploadedFile() file: Express.Multer.File | undefined

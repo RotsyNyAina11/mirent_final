@@ -20,7 +20,6 @@ import {
   styled,
   InputAdornment,
   Toolbar,
-  Checkbox,
   Box,
   Card,
   CardContent,
@@ -38,12 +37,12 @@ import { Delete, Edit, Add, Search, FilterList, FileDownload, LocationOn, Map, A
 import { toast, ToastContainer } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '../../redux/store';
-import { Region, Prix } from '../../types/region';
+import { Region } from '../../types/region';
 import { RegionsService } from '../../services/regions.service';
 import { addRegion, updateRegion } from '../../redux/features/lieux/locationSlice';
 import Papa from 'papaparse';
 
-// Styles personnalisés
+// Styles personnalisés (unchanged)
 const PrimaryButton = styled(Button)(({ theme }) => ({
   backgroundColor: '#3b82f6',
   color: theme.palette.common.white,
@@ -62,21 +61,7 @@ const PrimaryButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const SecondaryButton = styled(Button)(({ theme }) => ({
-  backgroundColor: '#ef4444',
-  color: theme.palette.common.white,
-  padding: '8px 16px',
-  borderRadius: '8px',
-  textTransform: 'none',
-  fontWeight: 500,
-  '&:hover': {
-    backgroundColor: '#dc2626',
-    transform: 'scale(1.02)',
-    transition: 'all 0.3s ease',
-  },
-}));
-
-const CancelButton = styled(Button)(({ theme }) => ({
+const CancelButton = styled(Button)(({}) => ({
   color: '#6b7280',
   borderColor: '#d1d5db',
   padding: '8px 16px',
@@ -91,7 +76,7 @@ const CancelButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const SearchField = styled(TextField)(({ theme }) => ({
+const SearchField = styled(TextField)(({}) => ({
   '& .MuiOutlinedInput-root': {
     borderRadius: '12px',
     backgroundColor: '#fff',
@@ -112,7 +97,7 @@ const SearchField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const FilterField = styled(TextField)(({ theme }) => ({
+const FilterField = styled(TextField)(({}) => ({
   '& .MuiOutlinedInput-root': {
     borderRadius: '8px',
     '& fieldset': {
@@ -131,7 +116,7 @@ const FilterField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const FormField = styled(TextField)(({ theme }) => ({
+const FormField = styled(TextField)(({  }) => ({
   '& .MuiOutlinedInput-root': {
     borderRadius: '8px',
     backgroundColor: '#fff',
@@ -159,7 +144,7 @@ const FormField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const ErrorText = styled(Typography)(({ theme }) => ({
+const ErrorText = styled(Typography)(({ }) => ({
   color: '#ef4444',
   fontSize: '0.8rem',
   marginTop: '4px',
@@ -183,7 +168,6 @@ const LocationList = () => {
   const [prixValue, setPrixValue] = useState<number>(0);
   const [errors, setErrors] = useState<{ nom_region?: string; prix?: string }>({});
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -325,42 +309,20 @@ const LocationList = () => {
 
   const handleDelete = async () => {
     try {
-      if (selectedItems.length > 0) {
-        for (const id of selectedItems) {
-          await RegionsService.removeRegion(id);
-        }
-        toast.success(`${selectedItems.length} région(s) supprimée(s) avec succès`);
-      } else if (regionToDelete) {
+      if (regionToDelete) {
         await RegionsService.removeRegion(regionToDelete.id);
         toast.success('Région supprimée avec succès');
       }
       fetchRegions();
-      setSelectedItems([]);
       setRegionToDelete(null);
       setOpenDeleteDialog(false);
     } catch (error) {
-      console.error('Error deleting regions:', error);
+      console.error('Error deleting region:', error);
       toast.error('Erreur lors de la suppression');
     }
   };
 
-  const handleSelectItem = (id: number) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
-    } else {
-      setSelectedItems([...selectedItems, id]);
-    }
-  };
-
-  const handleSelectAll = () => {
-    if (selectedItems.length === regions.length) {
-      setSelectedItems([]);
-    } else {
-      setSelectedItems(regions.map((region) => region.id));
-    }
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 
@@ -494,15 +456,6 @@ const LocationList = () => {
               </Button>
             </Box>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {selectedItems.length > 0 && (
-                <SecondaryButton
-                  variant="contained"
-                  size="small"
-                  onClick={() => setOpenDeleteDialog(true)}
-                >
-                  Supprimer ({selectedItems.length})
-                </SecondaryButton>
-              )}
               <Button
                 variant="outlined"
                 startIcon={<FileDownload />}
@@ -593,16 +546,9 @@ const LocationList = () => {
                     }}
                   >
                     <CardContent sx={{ p: 2 }}>
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <Checkbox
-                          checked={selectedItems.includes(region.id)}
-                          onChange={() => handleSelectItem(region.id)}
-                          sx={{ padding: 0, mr: 1 }}
-                        />
-                        <Typography variant="body1" fontWeight={500}>
-                          {region.nom_region}
-                        </Typography>
-                      </Box>
+                      <Typography variant="body1" fontWeight={500}>
+                        {region.nom_region}
+                      </Typography>
                       <Typography variant="body2" color="text.secondary">
                         District: {region.nom_district || 'N/A'}
                       </Typography>
@@ -667,20 +613,6 @@ const LocationList = () => {
                 >
                   <TableRow>
                     <TableCell sx={{ fontWeight: 500, color: '#6b7280', fontSize: '0.85rem' }}>
-                      <Checkbox
-                        checked={selectedItems.length === regions.length}
-                        indeterminate={selectedItems.length > 0 && selectedItems.length < regions.length}
-                        onChange={handleSelectAll}
-                        sx={{
-                          padding: 0,
-                          color: '#6b7280',
-                          '&.Mui-checked': {
-                            color: '#3b82f6',
-                          },
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 500, color: '#6b7280', fontSize: '0.85rem' }}>
                       <TableSortLabel
                         active={orderBy === 'nom_region'}
                         direction={orderBy === 'nom_region' ? order : 'asc'}
@@ -729,13 +661,6 @@ const LocationList = () => {
                           '& td': { borderBottom: 'none' },
                         }}
                       >
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedItems.includes(region.id)}
-                            onChange={() => handleSelectItem(region.id)}
-                            sx={{ padding: 0 }}
-                          />
-                        </TableCell>
                         <TableCell sx={{ fontSize: '0.9rem', color: '#1f2937' }}>{region.nom_region}</TableCell>
                         <TableCell sx={{ fontSize: '0.9rem', color: '#1f2937' }}>
                           {region.nom_district || <Typography color="text.secondary">N/A</Typography>}
@@ -770,7 +695,7 @@ const LocationList = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={5} align="center" sx={{ color: '#6b7280', fontSize: '0.9rem', py: 4 }}>
+                      <TableCell colSpan={4} align="center" sx={{ color: '#6b7280', fontSize: '0.9rem', py: 4 }}>
                         Aucune région trouvée.
                       </TableCell>
                     </TableRow>
@@ -1005,9 +930,7 @@ const LocationList = () => {
           </DialogTitle>
           <DialogContent>
             <DialogContentText sx={{ color: '#1f2937' }}>
-              {selectedItems.length > 0
-                ? `Êtes-vous sûr de vouloir supprimer ${selectedItems.length} région(s) ?`
-                : 'Êtes-vous sûr de vouloir supprimer cette région ?'}
+              Êtes-vous sûr de vouloir supprimer cette région ?
             </DialogContentText>
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>

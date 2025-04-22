@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Res, StreamableFile, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res, StreamableFile, ValidationPipe } from '@nestjs/common';
 import { Response } from 'express';
 import { ProformaService } from './proforma.service';
 import { Proforma } from 'src/entities/proforma.entity';
@@ -15,13 +15,13 @@ export class ProformaController {
     @Post()
     async createByCriteria(
         @Body(new ValidationPipe()) createProformaByCriteriaDto: CreateProformaByCriteriaDto,
-        @Res() res: Response // Injectez l'objet Response
+        @Res() res: Response 
     ) {
         try {
             const { proforma, pdfBuffer } = await this.proformaService.create(createProformaByCriteriaDto);
             const pdfBase64 = pdfBuffer.toString('base64');
 
-            res.status(201).json({ ...proforma, pdfBase64 }); // Incluez pdfBase64 dans la réponse
+            res.status(201).json({ ...proforma, pdfBase64 });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
@@ -48,6 +48,16 @@ export class ProformaController {
       @Body(new ValidationPipe()) updateProformaStatusDto: UpdateProformaStatusDto,
     ) {
       return this.proformaService.updateStatus(id, updateProformaStatusDto.status);
+    }
+
+    @Delete(':id')
+    async delete(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
+        try {
+            await this.proformaService.delete(id);
+            res.status(200).json({ message: 'Proforma supprimé avec succès' });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
     }
 
 }

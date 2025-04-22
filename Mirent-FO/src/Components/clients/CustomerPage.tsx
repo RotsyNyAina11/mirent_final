@@ -46,7 +46,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  Checkbox,
   Select,
   MenuItem,
   FormControl,
@@ -125,7 +124,7 @@ const theme = createTheme({
   },
 });
 
-// Styles personnalisés (alignés avec LocationList.tsx)
+// Styles personnalisés
 const PrimaryButton = styled(Button)(({ theme }) => ({
   backgroundColor: '#3b82f6',
   color: theme.palette.common.white,
@@ -270,7 +269,7 @@ const CustomerManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { clients, loading, error } = useSelector((state: RootState) => state.customer);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Jusqu'à 600px
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -295,8 +294,6 @@ const CustomerManagement: React.FC = () => {
   const [confirmClearHistoryOpen, setConfirmClearHistoryOpen] = useState(false);
   const [historySearchTerm, setHistorySearchTerm] = useState("");
   const [historyFilterType, setHistoryFilterType] = useState<string>("Tous");
-  const [selectedClients, setSelectedClients] = useState<number[]>([]);
-  const [confirmDeleteSelectedOpen, setConfirmDeleteSelectedOpen] = useState(false);
 
   // Charger l'historique depuis le localStorage au montage
   useEffect(() => {
@@ -428,7 +425,6 @@ const CustomerManagement: React.FC = () => {
       logAction(`Client ${clientToDelete.lastName} supprimé`);
       setSnackbarMessage("Client supprimé avec succès !");
       setSnackbarOpen(true);
-      setSelectedClients((prev) => prev.filter((id) => id !== clientToDelete.id));
     }
     setConfirmDeleteOpen(false);
     setClientToDelete(null);
@@ -577,46 +573,6 @@ const CustomerManagement: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  // Gestion de la sélection des clients
-  const handleSelectAllClients = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = paginatedClients.map((client) => client.id);
-      setSelectedClients(newSelected);
-    } else {
-      setSelectedClients([]);
-    }
-  };
-
-  const handleSelectClient = (id: number) => {
-    setSelectedClients((prev) =>
-      prev.includes(id)
-        ? prev.filter((clientId) => clientId !== id)
-        : [...prev, id]
-    );
-  };
-
-  const openConfirmDeleteSelected = () => {
-    setConfirmDeleteSelectedOpen(true);
-  };
-
-  const handleConfirmDeleteSelected = () => {
-    selectedClients.forEach((id) => {
-      const client = clients.find((c) => c.id === id);
-      if (client) {
-        dispatch(deleteClient(id));
-        logAction(`Client ${client.lastName} supprimé`);
-      }
-    });
-    setSelectedClients([]);
-    setConfirmDeleteSelectedOpen(false);
-    setSnackbarMessage(`${selectedClients.length} client(s) supprimé(s) avec succès !`);
-    setSnackbarOpen(true);
-  };
-
-  const handleCloseConfirmDeleteSelected = () => {
-    setConfirmDeleteSelectedOpen(false);
-  };
-
   // Filtrage de l'historique
   const filteredHistory = actionHistory.filter((action) => {
     const matchesSearch =
@@ -739,37 +695,6 @@ const CustomerManagement: React.FC = () => {
               </Box>
             </Toolbar>
           </Grid>
-
-          {/* Barre d'actions contextuelle pour la sélection */}
-          {selectedClients.length > 0 && (
-            <Grid item xs={12}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  p: 2,
-                  backgroundColor: '#fff',
-                  borderRadius: '12px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                  mb: 2,
-                  position: 'sticky',
-                  top: '120px',
-                  zIndex: 1,
-                }}
-              >
-                <Typography variant="body1" sx={{ fontWeight: 500, color: '#1f2937' }}>
-                  {selectedClients.length} client(s) sélectionné(s)
-                </Typography>
-                <DeleteButton
-                  onClick={openConfirmDeleteSelected}
-                  aria-label="Supprimer les clients sélectionnés"
-                >
-                  Supprimer les clients sélectionnés
-                </DeleteButton>
-              </Box>
-            </Grid>
-          )}
 
           {/* Section de l'historique */}
           <Grid item xs={12}>
@@ -900,7 +825,7 @@ const CustomerManagement: React.FC = () => {
             </Collapse>
           </Grid>
 
-          {/* Tableau ou cartes (selon la taille de l'écran) */}
+          {/* Tableau ou cartes */}
           <Grid item xs={12}>
             {isMobile ? (
               // Affichage sous forme de cartes sur mobile
@@ -922,12 +847,6 @@ const CustomerManagement: React.FC = () => {
                     >
                       <CardContent sx={{ p: 2 }}>
                         <Box display="flex" alignItems="center" mb={1}>
-                          <Checkbox
-                            checked={selectedClients.includes(client.id)}
-                            onChange={() => handleSelectClient(client.id)}
-                            sx={{ mr: 1 }}
-                            aria-label={`Sélectionner le client ${client.lastName}`}
-                          />
                           <Avatar
                             src={client.logo || "/default-avatar.png"}
                             alt={client.lastName}
@@ -992,20 +911,6 @@ const CustomerManagement: React.FC = () => {
                   <TableHead sx={{ backgroundColor: "#f3f4f6" }}>
                     <TableRow>
                       <TableCell sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.85rem" }}>
-                        <Checkbox
-                          checked={
-                            paginatedClients.length > 0 &&
-                            paginatedClients.every((client) => selectedClients.includes(client.id))
-                          }
-                          onChange={handleSelectAllClients}
-                          indeterminate={
-                            selectedClients.length > 0 &&
-                            !paginatedClients.every((client) => selectedClients.includes(client.id))
-                          }
-                          aria-label="Sélectionner tous les clients"
-                        />
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.85rem" }}>
                         Logo
                       </TableCell>
                       <TableCell>
@@ -1058,13 +963,6 @@ const CustomerManagement: React.FC = () => {
                           }}
                         >
                           <TableCell>
-                            <Checkbox
-                              checked={selectedClients.includes(client.id)}
-                              onChange={() => handleSelectClient(client.id)}
-                              aria-label={`Sélectionner le client ${client.lastName}`}
-                            />
-                          </TableCell>
-                          <TableCell>
                             <Avatar
                               src={client.logo || "/default-avatar.png"}
                               alt={client.lastName}
@@ -1104,7 +1002,7 @@ const CustomerManagement: React.FC = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} align="center" sx={{ color: "text.secondary", fontSize: "0.9rem", py: 4 }}>
+                        <TableCell colSpan={5} align="center" sx={{ color: "text.secondary", fontSize: "0.9rem", py: 4 }}>
                           Aucun client trouvé.
                         </TableCell>
                       </TableRow>
@@ -1117,21 +1015,34 @@ const CustomerManagement: React.FC = () => {
 
           {/* Pagination */}
           <Grid item xs={12}>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={filteredClients.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              sx={{
-                "& .MuiTablePagination-selectLabel": { fontSize: "0.85rem", color: "text.secondary" },
-                "& .MuiTablePagination-displayedRows": { fontSize: "0.85rem", color: "text.secondary" },
-                "& .MuiTablePagination-actions": { color: "primary.main" },
-                "& .MuiTablePagination-toolbar": { justifyContent: "flex-end", py: 1 },
-              }}
-            />
+            <Box sx={{ width: '100%' }}>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={filteredClients.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                sx={{
+                  '& .MuiTablePagination-selectLabel': {
+                    fontSize: '0.85rem',
+                    color: 'text.secondary',
+                  },
+                  '& .MuiTablePagination-displayedRows': {
+                    fontSize: '0.85rem',
+                    color: 'text.secondary',
+                  },
+                  '& .MuiTablePagination-actions': {
+                    color: 'primary.main',
+                  },
+                  '& .MuiTablePagination-toolbar': {
+                    justifyContent: 'flex-end',
+                    py: 1,
+                  },
+                }}
+              />
+            </Box>
           </Grid>
 
           {/* Dialogue pour ajouter/modifier un client */}
@@ -1428,66 +1339,6 @@ const CustomerManagement: React.FC = () => {
                 onClick={handleConfirmDelete}
                 variant="contained"
                 aria-label="Confirmer la suppression"
-              >
-                Supprimer
-              </DeleteButton>
-            </DialogActions>
-          </Dialog>
-
-          {/* Dialogue de confirmation pour supprimer les clients sélectionnés */}
-          <Dialog
-            open={confirmDeleteSelectedOpen}
-            onClose={handleCloseConfirmDeleteSelected}
-            TransitionComponent={Fade}
-            TransitionProps={{ timeout: 300 }}
-            sx={{
-              '& .MuiDialog-paper': {
-                borderRadius: '12px',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-                borderTop: '4px solid #ef4444',
-                backgroundColor: '#fff',
-              },
-            }}
-          >
-            <DialogTitle
-              sx={{
-                fontWeight: 600,
-                textAlign: "center",
-                color: "text.primary",
-                borderBottom: "1px solid #e5e7eb",
-                py: 3,
-              }}
-            >
-              Confirmer la suppression
-            </DialogTitle>
-            <DialogContent sx={{ p: 4 }}>
-              <DialogContentText
-                id="confirm-delete-selected-description"
-                sx={{ color: '#1f2937', fontSize: '1rem', textAlign: 'center' }}
-              >
-                Êtes-vous sûr de vouloir supprimer {selectedClients.length} client(s) sélectionné(s) ? Cette action est irréversible.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions
-              sx={{
-                p: 3,
-                borderTop: "1px solid #e5e7eb",
-                display: "flex",
-                justifyContent: "space-between",
-                backgroundColor: '#f9fafb',
-              }}
-            >
-              <CancelButton
-                onClick={handleCloseConfirmDeleteSelected}
-                variant="outlined"
-                aria-label="Annuler la suppression des clients sélectionnés"
-              >
-                Annuler
-              </CancelButton>
-              <DeleteButton
-                onClick={handleConfirmDeleteSelected}
-                variant="contained"
-                aria-label="Confirmer la suppression des clients sélectionnés"
               >
                 Supprimer
               </DeleteButton>

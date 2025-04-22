@@ -12,14 +12,16 @@ import Performat from "./pages/ProformaTable";
 import Devis from "./pages/Devis";
 import Facturation from "./pages/FacturationPage";
 import Commande from "./pages/CommandePage";
-import LocationsPage from "./pages/lieux/locationPage";
-import ContratPage from "./pages/contrat/contratPage";
-import Vehicule from "./pages/vehicules/vehiculePage";
-import ClientPage from "./pages/clients/ClientPage";
-import Home from "./pages/acceuil/HomePage";
+import LocationsPage from "./pages/admin/lieux/locationPage";
+import ContratPage from "./pages/admin/contrat/contratPage";
+import Vehicule from "./pages/admin/vehicules/vehiculePage";
+import ClientPage from "./pages/admin/clients/ClientPage";
+import Home from "./pages/admin/acceuil/HomePage";
 import 'react-toastify/dist/ReactToastify.css';
-import ReservationPage from "./pages/proforma/proformaPage";
-import ProformaPage from "./pages/proforma/proformaPage";
+import ProformaPage from "./pages/admin/proforma/proformaPage";
+import Types from "./pages/admin/type/type";
+import ClientCatalogue from "./pages/clients/clientCatalogue";
+import ClientHome from "./pages/clients/pages/home";
 
 
 const App: React.FC = () => {
@@ -54,10 +56,12 @@ const App: React.FC = () => {
       <Routes>
         {/* Route pour la page de connexion */}
         <Route path="/login" element={<Login />} />
+        <Route path="/acceuil" element={<ClientHome/>} />
+        <Route path="/catalogue" element={<ClientCatalogue />} />
 
         {/* Route pour l'accueil avec Sidebar */}
         <Route
-          path="/accueil"
+          path="/home"
           element={
             <MainLayout>
               <Home />
@@ -74,6 +78,17 @@ const App: React.FC = () => {
             </MainLayout>
           }
         />
+
+        {/* Route pur les types de vehicules */}
+        <Route
+          path="/types"
+          element={
+            <MainLayout>
+              <Types/>
+            </MainLayout>
+          }
+        />
+
         {/* Route pour la liste des clients avec Sidebar */}
         <Route
           path="/clients"

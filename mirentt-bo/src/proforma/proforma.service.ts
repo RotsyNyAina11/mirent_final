@@ -144,7 +144,7 @@ export class ProformaService {
                 dateDepart: new Date(item.dateDepart),
                 dateRetour: new Date(item.dateRetour),
                 nombreJours: dureeLocation,
-                subTotal: subTotalCalculated, // Utilisation de la valeur numérique
+                subTotal: subTotalCalculated, 
             });
     
             const statusIndisponible = await this.statusRepository.findOne({ where: { status: 'Indisponible' } });

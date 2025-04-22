@@ -27,7 +27,9 @@ import {
   ExpandMore,
   AddShoppingCart,
   Notifications as NotificationsIcon,
-  Add as AddIcon, 
+  Add as AddIcon,
+  List as ListIcon, // Icône pour le sous-menu List
+  Category as CategoryIcon, // Icône pour le sous-menu Type
 } from "@mui/icons-material";
 import PlaceIcon from "@mui/icons-material/Place";
 import { Link as RouterLink } from "react-router-dom";
@@ -69,6 +71,7 @@ const NavLinkButton = styled(
 
 const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
   const [openCommande, setOpenCommande] = useState(false);
+  const [openVehicules, setOpenVehicules] = useState(false); // Nouvel état pour le sous-menu Véhicules
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
@@ -90,6 +93,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
 
   const handleCommandeClick = () => {
     setOpenCommande(!openCommande);
+  };
+
+  const handleVehiculesClick = () => {
+    setOpenVehicules(!openVehicules); // Gestion du clic pour ouvrir/fermer le sous-menu
   };
 
   const toggleCollapse = () => {
@@ -116,7 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
         sx={{ height: "56px" }}
       >
         {/* Logo + Recherche */}
-        <Box display="flex" alignItems="center" gap={20} width="100%"> 
+        <Box display="flex" alignItems="center" gap={20} width="100%">
           {/* Logo */}
           <RouterLink to="/accueil" style={{ textDecoration: "none" }}>
             <Box
@@ -370,37 +377,104 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
             </List>
           </Collapse>
 
-          {/* Gérer les Véhicules */}
-          <Tooltip title="Gérer les Véhicules" placement="right">
-            <NavLinkButton
-              to="/vehicules"
-              selected={window.location.pathname === "/vehicules"}
-              sx={{
-                padding: "12px 16px",
-                "& .MuiListItemIcon-root": {
-                  minWidth: "40px",
-                  color: iconColor,
-                  fontSize: "1.4rem",
-                },
+          {/* Véhicules avec sous-menu */}
+          <ListItemButton
+            onClick={handleVehiculesClick}
+            sx={{
+              "& .MuiListItemIcon-root": {
+                minWidth: "40px",
+                color: iconColor,
+                fontSize: "1.4rem",
+              },
+            }}
+          >
+            <ListItemIcon>
+              <DirectionsCar />
+            </ListItemIcon>
+            <ListItemText
+              primary="Véhicules"
+              primaryTypographyProps={{
+                fontSize: "14px",
+                fontWeight: "500",
+                color: textColor,
               }}
-            >
-              <ListItemIcon>
-                <DirectionsCar />
-              </ListItemIcon>
-              <ListItemText
-                primary="Gérer les Véhicules"
-                primaryTypographyProps={{
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  color: textColor,
-                }}
-                sx={{
-                  opacity: isCollapsed ? 0 : 1,
-                  transition: "opacity 0.3s ease-in-out",
-                }}
-              />
-            </NavLinkButton>
-          </Tooltip>
+              sx={{
+                opacity: isCollapsed ? 0 : 1,
+                transition: "opacity 0.3s ease-in-out",
+              }}
+            />
+            {isCollapsed ? null : openVehicules ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          <Collapse in={openVehicules} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding sx={{ backgroundColor: "#f0f4f8" }}>
+              {/* Liste des Véhicules */}
+              <Tooltip title="Liste des Véhicules" placement="right">
+                <NavLinkButton
+                  to="/vehicules"
+                  selected={window.location.pathname === "/vehicules/liste"}
+                  sx={{
+                    pl: 6,
+                    pr: 4,
+                    py: 1,
+                    "& .MuiListItemIcon-root": {
+                      minWidth: "40px",
+                      color: iconColor,
+                      fontSize: "1.4rem",
+                    },
+                  }}
+                >
+                  <ListItemIcon>
+                    <ListIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Liste"
+                    primaryTypographyProps={{
+                      fontSize: "13px",
+                      fontWeight: "500",
+                      color: textColor,
+                    }}
+                    sx={{
+                      opacity: isCollapsed ? 0 : 1,
+                      transition: "opacity 0.3s ease-in-out",
+                    }}
+                  />
+                </NavLinkButton>
+              </Tooltip>
+              {/* Types de Véhicules */}
+              <Tooltip title="Types de Véhicules" placement="right">
+                <NavLinkButton
+                  to="/types"
+                  selected={window.location.pathname === "/vehicules/types"}
+                  sx={{
+                    pl: 6,
+                    pr: 4,
+                    py: 1,
+                    "& .MuiListItemIcon-root": {
+                      minWidth: "40px",
+                      color: iconColor,
+                      fontSize: "1.4rem",
+                    },
+                  }}
+                >
+                  <ListItemIcon>
+                    <CategoryIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Type"
+                    primaryTypographyProps={{
+                      fontSize: "13px",
+                      fontWeight: "500",
+                      color: textColor,
+                    }}
+                    sx={{
+                      opacity: isCollapsed ? 0 : 1,
+                      transition: "opacity 0.3s ease-in-out",
+                    }}
+                  />
+                </NavLinkButton>
+              </Tooltip>
+            </List>
+          </Collapse>
 
           {/* Liste des Clients */}
           <Tooltip title="Liste des Clients" placement="right">
@@ -533,7 +607,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           <Divider sx={{ my: 8, borderColor: "#e0e0e0" }} />
 
           {/* Se Déconnecter */}
-          <Box sx={{ mt: "auto", pb: 2}}>
+          <Box sx={{ mt: "auto", pb: 2 }}>
             <Tooltip title="Se Déconnecter" placement="right">
               <NavLinkButton
                 to="/logout"

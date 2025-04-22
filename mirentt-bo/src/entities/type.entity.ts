@@ -9,6 +9,9 @@ export class Type {
     @Column({ unique: true, nullable: false })
     type: string;
 
+    @Column({ nullable: true })
+    description: string;
+
     @OneToMany(() => Vehicule, (vehicule) => vehicule.type)
     vehicules: Vehicule[];
 }

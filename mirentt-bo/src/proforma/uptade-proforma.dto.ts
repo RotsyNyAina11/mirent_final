@@ -1,24 +1,52 @@
-import { IsString, IsNumber, IsOptional, IsEnum } from 'class-validator';
-import { ProformaStatus } from 'src/entities/proforma.entity';
+import {
+  IsDateString,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class UpdateProformaDto {
-  @IsNumber()
+export class UpdateProformaItemDto {
   @IsOptional()
+  @IsInt()
+  @IsPositive()
+  proformaId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  vehicleId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  regionId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  prixId?: number;
+
+  @IsOptional()
+  @IsDateString()
+  dateDepart?: Date;
+
+  @IsOptional()
+  @IsDateString()
+  dateRetour?: Date;
+
+  @IsOptional()
+  @IsInt()
+  nombreJours?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  subTotal?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
   totalAmount?: number;
-
-  @IsOptional()
-  @IsEnum(ProformaStatus) // Si tu veux gérer les statuts avec un enum
-  status?: ProformaStatus;
-
-  @IsString()
-  @IsOptional()
-  contractReference?: string;
-
-  @IsString()
-  @IsOptional()
-  notes?: string;
-
-  @IsString()
-  @IsOptional()
-  updatedAt?: string; // Cette date sera mise à jour côté backend
 }

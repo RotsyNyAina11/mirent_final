@@ -62,24 +62,18 @@ var ProformaController = /** @class */ (function () {
     function ProformaController(proformaService) {
         this.proformaService = proformaService;
     }
-    // Route pour créer une nouvelle Proforma
-    /* @Post()
-    createProforma(@Body() createProformaDto: CreateProformaDto) {
-      return { message: 'Proforma créée avec succès' };
-    }*/
-    ProformaController.prototype.createByCriteria = function (CreateProformaDto, res) {
+    ProformaController.prototype.createByCriteria = function (createProformaByCriteriaDto, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, proforma, pdfBuffer, pdfBase64, error_1;
+            var _a, proforma, pdfBuffer, message, pdfBase64, error_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         _b.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.proformaService.create(CreateProformaDto)];
+                        return [4 /*yield*/, this.proformaService.create(createProformaByCriteriaDto)];
                     case 1:
-                        _a = _b.sent(), proforma = _a.proforma, pdfBuffer = _a.pdfBuffer;
+                        _a = _b.sent(), proforma = _a.proforma, pdfBuffer = _a.pdfBuffer, message = _a.message;
                         pdfBase64 = pdfBuffer.toString('base64');
-                        // Inclure le PDF en base64 dans la réponse
-                        res.status(201).json(__assign(__assign({}, proforma), { pdfBase64: pdfBase64 }));
+                        res.status(201).json(__assign(__assign({}, proforma), { pdfBase64: pdfBase64, message: message })); // Incluez pdfBase64 dans la réponse
                         return [3 /*break*/, 3];
                     case 2:
                         error_1 = _b.sent();
@@ -90,24 +84,20 @@ var ProformaController = /** @class */ (function () {
             });
         });
     };
-    // Route pour obtenir une Proforma par son ID
-    ProformaController.prototype.findOne = function (id) {
+    ProformaController.prototype.findAvailableVehicles = function (query) {
         return __awaiter(this, void 0, void 0, function () {
-            var proforma;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.proformaService.findOne(id)];
-                    case 1:
-                        proforma = _a.sent();
-                        if (!proforma) {
-                            throw new common_1.HttpException('Proforma non trouvée', common_1.HttpStatus.NOT_FOUND);
-                        }
-                        return [2 /*return*/, proforma];
-                }
+                return [2 /*return*/, this.proformaService.findAvailableVehicles(query)];
             });
         });
     };
-    // Route pour obtenir toutes les Proformas
+    ProformaController.prototype.findOne = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.proformaService.findOne(id)];
+            });
+        });
+    };
     ProformaController.prototype.findAll = function () {
         return __awaiter(this, void 0, Promise, function () {
             return __generator(this, function (_a) {
@@ -115,24 +105,48 @@ var ProformaController = /** @class */ (function () {
             });
         });
     };
-    // Route pour mettre à jour une Proforma
-    ProformaController.prototype.updateProforma = function (id, updateProformaDto, // Utilisation du DTO
-    res) {
+    ProformaController.prototype.updateStatus = function (id, updateProformaStatusDto) {
         return __awaiter(this, void 0, void 0, function () {
-            var proforma, error_2;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.proformaService.updateStatus(id, updateProformaStatusDto.status)];
+            });
+        });
+    };
+    ProformaController.prototype["delete"] = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.proformaService["delete"](id)];
+            });
+        });
+    };
+    ProformaController.prototype.updateProformaItem = function (id, dto) {
+        return __awaiter(this, void 0, void 0, function () {
+            var updatedItem, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.proformaService.update(id, updateProformaDto)];
+                        return [4 /*yield*/, this.proformaService.update(id, dto)];
                     case 1:
-                        proforma = _a.sent();
-                        return [2 /*return*/, res.status(200).json(proforma)]; // Renvoie la proforma mise à jour
+                        updatedItem = _a.sent();
+                        return [2 /*return*/, {
+                                message: 'ProformaItem mis à jour avec succès',
+                                data: updatedItem
+                            }];
                     case 2:
                         error_2 = _a.sent();
-                        return [2 /*return*/, res.status(500).json({ message: error_2.message })];
+                        console.error('Erreur lors de la mise à jour du ProformaItem :', error_2);
+                        throw error_2; // Renvoyer l'erreur pour qu'elle soit traitée par le filtre global
                     case 3: return [2 /*return*/];
                 }
+            });
+        });
+    };
+    ProformaController.prototype.getProformaPdf = function (id, res) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                console.log("[Controller] getProformaPdf : R\u00E9cup\u00E9ration du PDF pour l'ID : " + id);
+                return [2 /*return*/, this.proformaService.getProformaPdf(+id, res)];
             });
         });
     };
@@ -142,6 +156,10 @@ var ProformaController = /** @class */ (function () {
         __param(1, common_1.Res())
     ], ProformaController.prototype, "createByCriteria");
     __decorate([
+        common_1.Get('available-vehicles'),
+        __param(0, common_1.Query(new common_1.ValidationPipe()))
+    ], ProformaController.prototype, "findAvailableVehicles");
+    __decorate([
         common_1.Get(':id'),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], ProformaController.prototype, "findOne");
@@ -149,13 +167,26 @@ var ProformaController = /** @class */ (function () {
         common_1.Get()
     ], ProformaController.prototype, "findAll");
     __decorate([
-        common_1.Patch(':id'),
+        common_1.Patch(':id/status'),
+        __param(0, common_1.Param('id')),
+        __param(1, common_1.Body(new common_1.ValidationPipe()))
+    ], ProformaController.prototype, "updateStatus");
+    __decorate([
+        common_1.Delete(':id'),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], ProformaController.prototype, "delete");
+    __decorate([
+        common_1.Put(':id'),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)),
-        __param(1, common_1.Body(new common_1.ValidationPipe())),
-        __param(2, common_1.Res())
-    ], ProformaController.prototype, "updateProforma");
+        __param(1, common_1.Body())
+    ], ProformaController.prototype, "updateProformaItem");
+    __decorate([
+        common_1.Get(':id/pdf'),
+        __param(0, common_1.Param('id')),
+        __param(1, common_1.Res())
+    ], ProformaController.prototype, "getProformaPdf");
     ProformaController = __decorate([
-        common_1.Controller('proforma') // Note : Corrige le chemin pour correspondre à l'URL de l'API
+        common_1.Controller('proforma')
     ], ProformaController);
     return ProformaController;
 }());

@@ -43,6 +43,11 @@ export class ProformaItem {
   @Column({ type: 'integer' })
   nombreJours: number;
 
-  @Column('decimal', { precision: 10, scale: 2, default: 0, transformer: new NumericTransformer() })
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: new NumericTransformer(),
+  })
   subTotal: number;
 }

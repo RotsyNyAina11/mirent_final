@@ -107,27 +107,6 @@ var ProformaService = /** @class */ (function () {
             });
         });
     };
-    ProformaService.prototype.update = function (id, updateProformaDto) {
-        return __awaiter(this, void 0, Promise, function () {
-            var proforma;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.proformaRepository.findOne({ where: { id: id } })];
-                    case 1:
-                        proforma = _a.sent();
-                        if (!proforma) {
-                            throw new common_1.NotFoundException("Proforma with ID " + id + " not found");
-                        }
-                        // Mettre à jour les propriétés de la proforma
-                        proforma.notes = updateProformaDto.notes || proforma.notes; // Si des notes sont envoyées, les mettre à jour
-                        proforma.status = updateProformaDto.status || proforma.status; // Mettre à jour le statut si fourni
-                        // Ajouter ici d'autres champs si nécessaire
-                        return [2 /*return*/, this.proformaRepository.save(proforma)];
-                }
-            });
-        });
-    };
-    // This misplaced code block has been removed as it is redundant and incorrectly scoped.
     ProformaService.prototype.create = function (proformaData) {
         return __awaiter(this, void 0, Promise, function () {
             var clientExist, proforma, _a, proformaItems, _b, savedProforma, savedProformaWithRelations, pdfBuffer;
@@ -135,7 +114,11 @@ var ProformaService = /** @class */ (function () {
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0: return [4 /*yield*/, this.clientRepository.findOne({
-                            where: [{ id: proformaData.clientId }]
+                            where: [
+                                { lastName: proformaData.clientLastName },
+                                { email: proformaData.clientEmail },
+                                { phone: proformaData.clientPhone },
+                            ]
                         })];
                     case 1:
                         clientExist = _c.sent();
@@ -188,6 +171,7 @@ var ProformaService = /** @class */ (function () {
                                                 throw new common_1.NotFoundException("Type \"" + item.vehicleCriteria.type + "\" not found");
                                             }
                                             whereClause.type = typeExist;
+                                            delete whereClause.type;
                                             _a.label = 4;
                                         case 4:
                                             console.log('Critères de recherche :', whereClause);
@@ -204,8 +188,8 @@ var ProformaService = /** @class */ (function () {
                                             return [4 /*yield*/, this.proformaItemRepository.findOne({
                                                     where: {
                                                         vehicle: { id: vehiculeChoisi.id },
-                                                        dateDepart: typeorm_2.LessThanOrEqual(item.dateRetour),
-                                                        dateRetour: typeorm_2.MoreThanOrEqual(item.dateDepart)
+                                                        dateDepart: item.dateDepart,
+                                                        dateRetour: item.dateRetour
                                                     }
                                                 })];
                                         case 6:
@@ -280,7 +264,11 @@ var ProformaService = /** @class */ (function () {
                         if (!savedProformaWithRelations) {
                             throw new common_1.NotFoundException('Proforma not found after saving.');
                         }
-                        return [2 /*return*/, { proforma: savedProformaWithRelations, pdfBuffer: pdfBuffer }];
+                        return [2 /*return*/, {
+                                message: 'Le proforma a été créé avec succès !',
+                                proforma: savedProformaWithRelations,
+                                pdfBuffer: pdfBuffer
+                            }];
                 }
             });
         });
@@ -386,7 +374,198 @@ var ProformaService = /** @class */ (function () {
     ProformaService.prototype.findAll = function () {
         return __awaiter(this, void 0, Promise, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.proformaRepository.find()];
+                return [2 /*return*/, this.proformaRepository.find({
+                        relations: [
+                            'items',
+                            'items.vehicle',
+                            'items.vehicle.type',
+                            'items.vehicle.status',
+                            'items.region',
+                            'items.prix',
+                            'client',
+                        ]
+                    })];
+            });
+        });
+    };
+    ProformaService.prototype["delete"] = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var proforma, statusDisponible, _i, _a, item, vehicle;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4 /*yield*/, this.proformaRepository.findOne({
+                            where: { id: id },
+                            relations: ['items', 'items.vehicle']
+                        })];
+                    case 1:
+                        proforma = _b.sent();
+                        if (!proforma) {
+                            throw new common_1.NotFoundException("Proforma with ID " + id + " not found");
+                        }
+                        return [4 /*yield*/, this.statusRepository.findOne({
+                                where: { status: 'Disponible' }
+                            })];
+                    case 2:
+                        statusDisponible = _b.sent();
+                        if (!statusDisponible) {
+                            throw new common_1.NotFoundException("Statut \"Disponible\" non trouv\u00E9");
+                        }
+                        _i = 0, _a = proforma.items;
+                        _b.label = 3;
+                    case 3:
+                        if (!(_i < _a.length)) return [3 /*break*/, 6];
+                        item = _a[_i];
+                        vehicle = item.vehicle;
+                        vehicle.status = statusDisponible;
+                        return [4 /*yield*/, this.vehiculeRepository.save(vehicle)];
+                    case 4:
+                        _b.sent();
+                        _b.label = 5;
+                    case 5:
+                        _i++;
+                        return [3 /*break*/, 3];
+                    case 6: 
+                    // Supprimer les éléments du proforma
+                    return [4 /*yield*/, this.proformaItemRepository["delete"]({ proforma: { id: id } })];
+                    case 7:
+                        // Supprimer les éléments du proforma
+                        _b.sent();
+                        // Supprimer le proforma
+                        return [4 /*yield*/, this.proformaRepository["delete"](id)];
+                    case 8:
+                        // Supprimer le proforma
+                        _b.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /* async update(id: number, proformaData: Partial<Proforma>): Promise<Proforma> {
+      const result = await this.proformaRepository.update(id, proformaData);
+  
+      if (result.affected === 0) {
+        throw new NotFoundException(`Proforma with ID ${id} not found`);
+      }
+  
+      // Vérifier si l'objet mis à jour existe
+      const updatedProforma = await this.proformaRepository.findOne({
+        where: { id },
+      });
+  
+      if (!updatedProforma) {
+        throw new NotFoundException(
+          `Proforma with ID ${id} not found after update`,
+        );
+      }
+  
+      return updatedProforma;
+    }*/
+    ProformaService.prototype.update = function (id, updateDto) {
+        return __awaiter(this, void 0, Promise, function () {
+            var item, proforma, vehicule, region, prix;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.proformaItemRepository.findOne({ where: { id: id } })];
+                    case 1:
+                        item = _a.sent();
+                        if (!item) {
+                            throw new common_1.NotFoundException("ProformaItem avec l'id " + id + " non trouv\u00E9");
+                        }
+                        if (!updateDto.proformaId) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this.proformaRepository.findOne({
+                                where: { id: updateDto.proformaId }
+                            })];
+                    case 2:
+                        proforma = _a.sent();
+                        if (!proforma)
+                            throw new common_1.NotFoundException('Proforma non trouvée');
+                        item.proforma = proforma;
+                        _a.label = 3;
+                    case 3:
+                        if (!updateDto.vehicleId) return [3 /*break*/, 5];
+                        return [4 /*yield*/, this.vehiculeRepository.findOne({
+                                where: { id: updateDto.vehicleId }
+                            })];
+                    case 4:
+                        vehicule = _a.sent();
+                        if (!vehicule)
+                            throw new common_1.NotFoundException('Véhicule non trouvé');
+                        item.vehicle = vehicule;
+                        _a.label = 5;
+                    case 5:
+                        if (!updateDto.regionId) return [3 /*break*/, 7];
+                        return [4 /*yield*/, this.regionRepository.findOne({
+                                where: { id: updateDto.regionId }
+                            })];
+                    case 6:
+                        region = _a.sent();
+                        if (!region)
+                            throw new common_1.NotFoundException('Région non trouvée');
+                        item.region = region;
+                        _a.label = 7;
+                    case 7:
+                        if (!updateDto.prixId) return [3 /*break*/, 9];
+                        return [4 /*yield*/, this.prixRepository.findOne({
+                                where: { id: updateDto.prixId }
+                            })];
+                    case 8:
+                        prix = _a.sent();
+                        if (!prix)
+                            throw new common_1.NotFoundException('Prix non trouvé');
+                        item.prix = prix;
+                        _a.label = 9;
+                    case 9:
+                        // Mise à jour des champs simples
+                        if (updateDto.dateDepart)
+                            item.dateDepart = new Date(updateDto.dateDepart);
+                        if (updateDto.dateRetour)
+                            item.dateRetour = new Date(updateDto.dateRetour);
+                        // ✅ Mettre ici avec une vérification correcte même si la valeur est 0
+                        if (updateDto.nombreJours !== undefined) {
+                            item.nombreJours = updateDto.nombreJours;
+                        }
+                        if (updateDto.subTotal !== undefined) {
+                            item.subTotal = updateDto.subTotal;
+                        }
+                        // Enregistrement de l'élément mis à jour
+                        return [2 /*return*/, this.proformaItemRepository.save(item)];
+                }
+            });
+        });
+    };
+    // Nouvelle méthode pour servir le PDF
+    ProformaService.prototype.getProformaPdf = function (id, res) {
+        return __awaiter(this, void 0, Promise, function () {
+            var proformaWithRelations, pdfBuffer;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.proformaRepository.findOne({
+                            where: { id: id },
+                            relations: [
+                                'items',
+                                'items.vehicle',
+                                'items.vehicle.type',
+                                'items.vehicle.status',
+                                'items.region',
+                                'items.prix',
+                                'client',
+                            ]
+                        })];
+                    case 1:
+                        proformaWithRelations = _a.sent();
+                        if (!proformaWithRelations) {
+                            throw new common_1.NotFoundException("Proforma with ID " + id + " not found");
+                        }
+                        return [4 /*yield*/, this.pdfService.generateProformaPdf(proformaWithRelations)];
+                    case 2:
+                        pdfBuffer = _a.sent();
+                        // Configuration des headers pour indiquer au navigateur qu'il s'agit d'un PDF à télécharger
+                        res.setHeader('Content-Type', 'application/pdf');
+                        res.setHeader('Content-Disposition', "attachment; filename=\"proforma_" + proformaWithRelations.proformaNumber + ".pdf\"");
+                        // Envoyer le buffer du PDF en réponse
+                        res.send(pdfBuffer);
+                        return [2 /*return*/];
+                }
             });
         });
     };

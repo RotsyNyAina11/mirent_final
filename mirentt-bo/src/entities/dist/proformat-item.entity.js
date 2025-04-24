@@ -13,6 +13,7 @@ var vehicle_entity_1 = require("./vehicle.entity");
 var proforma_entity_1 = require("./proforma.entity");
 var region_entity_1 = require("./region.entity");
 var prix_entity_1 = require("./prix.entity");
+var numeric_transformer_1 = require("../numeric.transformer"); // Assurez-vous que le chemin est correct
 var ProformaItem = /** @class */ (function () {
     function ProformaItem() {
     }
@@ -45,7 +46,12 @@ var ProformaItem = /** @class */ (function () {
         typeorm_1.Column({ type: 'integer' })
     ], ProformaItem.prototype, "nombreJours");
     __decorate([
-        typeorm_1.Column({ type: 'decimal', precision: 10, scale: 2 })
+        typeorm_1.Column('decimal', {
+            precision: 10,
+            scale: 2,
+            "default": 0,
+            transformer: new numeric_transformer_1.NumericTransformer()
+        })
     ], ProformaItem.prototype, "subTotal");
     ProformaItem = __decorate([
         typeorm_1.Entity()

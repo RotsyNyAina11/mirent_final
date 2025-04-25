@@ -23,11 +23,14 @@ import {
   fetchProformas,
 } from "../../redux/features/commande/commandeSlice";
 import EditProformaForm from "../../Components/Commandes/EditProforma";
+import { AppDispatch } from "../../redux/store"; // Ensure this import exists
 
 interface ProformaItem {
   vehicle?: { nom?: string };
   dateDepart?: string;
   dateRetour?: string;
+  nombreJours?: number;
+  prix?: number;
 }
 
 interface Proforma {
@@ -35,7 +38,6 @@ interface Proforma {
   proformaNumber?: string;
   client?: { lastName?: string };
   items: ProformaItem[];
-  nombreJours?: number;
   totalAmount?: number;
   carburant?: number;
   prixUnitaire?: number;
@@ -79,7 +81,8 @@ const DeleteButton = styled(Button)(({ theme }) => ({
 const ProformaTable = () => {
   const proformas: Proforma[] =
     useSelector((state: RootState) => state.proformas.proformas) || [];
-  const dispatch = useDispatch();
+
+  const dispatch: AppDispatch = useDispatch();
 
   console.log("Quotes récupérés depuis Redux :", proformas);
 
@@ -111,7 +114,11 @@ const ProformaTable = () => {
 
   const handleDelete = (id: string | number) => {
     console.log(`Supprimer le proforma avec l'ID : ${id}`);
-    dispatch(deleteProforma(id));
+    if (typeof id === "number") {
+      dispatch(deleteProforma(id));
+    } else {
+      console.error("Invalid ID type. Expected a number.");
+    }
     dispatch(fetchProformas());
   };
 
@@ -198,7 +205,7 @@ const ProformaTable = () => {
                     {proforma.items[0]?.dateRetour || "N/A"}
                   </TableCell>
                   <TableCell align="center">
-                    {proforma.nombreJours?.toString() || "0"}
+                    {proforma.items[0]?.nombreJours}
                   </TableCell>
                   <TableCell align="right">
                     {proforma.totalAmount?.toLocaleString() || "N/A"}
@@ -261,7 +268,7 @@ const ProformaTable = () => {
                 <TableCell></TableCell>
               </TableRow>
 
-              {/* <TableRow>
+              <TableRow>
                 <TableCell colSpan={8} align="right">
                   <Typography variant="body1" fontWeight="bold">
                     MONTANT TOTAL CARBURANT
@@ -273,7 +280,7 @@ const ProformaTable = () => {
                   </Typography>
                 </TableCell>
                 <TableCell></TableCell>
-              </TableRow> */}
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>

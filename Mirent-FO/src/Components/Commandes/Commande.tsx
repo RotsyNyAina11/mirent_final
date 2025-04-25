@@ -443,7 +443,7 @@ const OrderPage: React.FC = () => {
               variant={activeButtonIndex === 1 ? "contained" : "outlined"}
               onClick={() => {
                 handleButtonClick(ButtonActions.CONFIRM, 1);
-                // Call the function here
+                setConfirmationMessage("Commande confirmée !");
               }}
             >
               Confirmer
@@ -453,7 +453,7 @@ const OrderPage: React.FC = () => {
               variant={activeButtonIndex === 2 ? "contained" : "outlined"}
               onClick={() => {
                 handleButtonClick(ButtonActions.PREVIEW, 2);
-                handlePreview; // Appel de la fonction
+                handlePreview;
               }}
             >
               Preview

@@ -24,6 +24,27 @@ import { useNavigate } from "react-router-dom"; // Pour la navigation vers la pa
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
+interface Devis {
+  Client: {
+    lastName: string;
+    email: string;
+    phone: number;
+  };
+  contractReference: string;
+  Vehicle: {
+    name: string;
+    number: string;
+    immatriculation: string;
+  };
+
+  dateDepart: string;
+  dateArrivee: string;
+  nombreJours: number;
+  carburant: string;
+  prixUnitaire: number;
+  prixTotal: number;
+}
+
 const DevisForm = () => {
   const [devisList, setDevisList] = useState<any[]>([]); // Liste des devis
   const [devis, setDevis] = useState({

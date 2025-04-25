@@ -11,7 +11,7 @@ import Login from "./Components/login/Login";
 
 //import Reservations from "./pages/reservation";
 import Performat from "./pages/proforma/ProformaPage";
-import Devis from "./pages/DevisPage";
+import Devis from "./pages/Devis/DevisPage";
 import ProformaPage from "./pages/proforma/ProformaPage";
 import Commande from "./pages/commande/CommandePage";
 
@@ -24,6 +24,7 @@ import ClientPage from "./pages/clients/ClientPage";
 import Home from "./pages/acceuil/HomePage";
 
 import "react-toastify/dist/ReactToastify.css";
+import ContactPage from "./pages/Contact/ContactPage";
 //import ReservationPage from "./pages/proforma/proformaPage";
 //import ProformaPage from "./pages/proforma/proformaPage";
 
@@ -155,6 +156,15 @@ const App: React.FC = () => {
           element={
             <MainLayout>
               <ContratPage />
+            </MainLayout>
+          }
+        />
+        {/* Route pour la page de Contact */}
+        <Route
+          path="/contact"
+          element={
+            <MainLayout>
+              <ContactPage />
             </MainLayout>
           }
         />

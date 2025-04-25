@@ -69,7 +69,7 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
     fetchPrixList();
   }, []);
 
-  // 📆 Mise à jour du nombre de jours
+  // Mise à jour du nombre de jours
   useEffect(() => {
     if (dateDepart && dateRetour) {
       const diffTime = Math.abs(dateRetour.getTime() - dateDepart.getTime());
@@ -78,7 +78,7 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
     }
   }, [dateDepart, dateRetour]);
 
-  // 💰 Mise à jour du sous-total
+  // Mise à jour du sous-total
   useEffect(() => {
     const prix = prixList.find((p) => p.id === parseInt(formData.prixId));
     if (prix) {
@@ -190,7 +190,7 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField label="Sous-total" value={subTotal} fullWidth disabled />
+          <TextField label="Sous-total" value={subTotal} fullWidth />
         </Grid>
         <Grid item xs={12}>
           <Box display="flex" justifyContent="flex-end" gap={2}>

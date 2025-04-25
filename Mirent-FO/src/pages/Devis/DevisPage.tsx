@@ -1,4 +1,4 @@
-import Devis from "../Components/Devis/Devis";
+import Devis from "../../Components/Devis/Devis";
 
 const DevisPage = () => {
   return <Devis />;

@@ -1,6 +1,6 @@
 import { Container, Grid } from "@mui/material";
-import CreateProforma from "../../Components/proforma/createProforma";
-import ProformasList from "../../Components/proforma/proformaList";
+import CreateProforma from "../../Components/Proforma/createProforma";
+import ProformasList from "../../Components/Proforma/proformaList";
 
 const ProformaPage: React.FC = () => {
   return (

@@ -1,9 +1,9 @@
 import React from "react";
 import { Container, Grid } from "@mui/material";
 import Commande from "../../Components/Commandes/Commande";
-//import proformaList from "../../Components/Proforma/proformaList";
+
 import ProformasList from "../../Components/Proforma/proformaList";
-import EditProforma from "../../Components/Commandes/EditProforma";
+//import ProformaTable from "../../Components/Proforma/ProformaTable";
 
 const CommandePage: React.FC = () => {
   return (

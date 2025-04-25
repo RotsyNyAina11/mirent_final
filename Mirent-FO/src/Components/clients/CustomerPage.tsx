@@ -52,9 +52,21 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-import { Edit, Delete, Add, SearchOutlined, Person, Email, Phone, PhotoCamera, FilterList, FileDownload, History } from "@mui/icons-material";
+import {
+  Edit,
+  Delete,
+  Add,
+  SearchOutlined,
+  Person,
+  Email,
+  Phone,
+  PhotoCamera,
+  FilterList,
+  FileDownload,
+  History,
+} from "@mui/icons-material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Papa from 'papaparse';
+import Papa from "papaparse";
 
 // Thème personnalisé
 const theme = createTheme({
@@ -127,129 +139,129 @@ const theme = createTheme({
 
 // Styles personnalisés (alignés avec LocationList.tsx)
 const PrimaryButton = styled(Button)(({ theme }) => ({
-  backgroundColor: '#3b82f6',
+  backgroundColor: "#3b82f6",
   color: theme.palette.common.white,
-  padding: '8px 16px',
-  borderRadius: '8px',
-  textTransform: 'none',
+  padding: "8px 16px",
+  borderRadius: "8px",
+  textTransform: "none",
   fontWeight: 500,
-  '&:hover': {
-    backgroundColor: '#2563eb',
-    transform: 'scale(1.02)',
-    transition: 'all 0.3s ease',
+  "&:hover": {
+    backgroundColor: "#2563eb",
+    transform: "scale(1.02)",
+    transition: "all 0.3s ease",
   },
-  '&.Mui-disabled': {
-    backgroundColor: '#d1d5db',
-    color: '#6b7280',
+  "&.Mui-disabled": {
+    backgroundColor: "#d1d5db",
+    color: "#6b7280",
   },
 }));
 
 const DeleteButton = styled(Button)(({ theme }) => ({
-  backgroundColor: '#ef4444',
+  backgroundColor: "#ef4444",
   color: theme.palette.common.white,
-  padding: '8px 16px',
-  borderRadius: '8px',
-  textTransform: 'none',
+  padding: "8px 16px",
+  borderRadius: "8px",
+  textTransform: "none",
   fontWeight: 500,
-  '&:hover': {
-    backgroundColor: '#dc2626',
-    transform: 'scale(1.02)',
-    transition: 'all 0.3s ease',
+  "&:hover": {
+    backgroundColor: "#dc2626",
+    transform: "scale(1.02)",
+    transition: "all 0.3s ease",
   },
-  '&.Mui-disabled': {
-    backgroundColor: '#d1d5db',
-    color: '#6b7280',
+  "&.Mui-disabled": {
+    backgroundColor: "#d1d5db",
+    color: "#6b7280",
   },
 }));
 
 const CancelButton = styled(Button)(({ theme }) => ({
-  color: '#6b7280',
-  borderColor: '#d1d5db',
-  padding: '8px 16px',
-  borderRadius: '8px',
-  textTransform: 'none',
+  color: "#6b7280",
+  borderColor: "#d1d5db",
+  padding: "8px 16px",
+  borderRadius: "8px",
+  textTransform: "none",
   fontWeight: 500,
-  '&:hover': {
-    borderColor: '#9ca3af',
-    backgroundColor: '#f3f4f6',
-    transform: 'scale(1.02)',
-    transition: 'all 0.3s ease',
+  "&:hover": {
+    borderColor: "#9ca3af",
+    backgroundColor: "#f3f4f6",
+    transform: "scale(1.02)",
+    transition: "all 0.3s ease",
   },
 }));
 
 const SearchField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
-    backgroundColor: '#fff',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-    '& fieldset': {
-      borderColor: '#d1d5db',
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "12px",
+    backgroundColor: "#fff",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+    "& fieldset": {
+      borderColor: "#d1d5db",
     },
-    '&:hover fieldset': {
-      borderColor: '#9ca3af',
+    "&:hover fieldset": {
+      borderColor: "#9ca3af",
     },
-    '&.Mui-focused fieldset': {
-      borderColor: '#3b82f6',
+    "&.Mui-focused fieldset": {
+      borderColor: "#3b82f6",
     },
   },
-  '& .MuiInputBase-input': {
-    fontSize: '0.9rem',
-    color: '#1f2937',
+  "& .MuiInputBase-input": {
+    fontSize: "0.9rem",
+    color: "#1f2937",
   },
 }));
 
 const FilterField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '8px',
-    '& fieldset': {
-      borderColor: '#d1d5db',
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    "& fieldset": {
+      borderColor: "#d1d5db",
     },
-    '&:hover fieldset': {
-      borderColor: '#9ca3af',
+    "&:hover fieldset": {
+      borderColor: "#9ca3af",
     },
-    '&.Mui-focused fieldset': {
-      borderColor: '#3b82f6',
+    "&.Mui-focused fieldset": {
+      borderColor: "#3b82f6",
     },
   },
-  '& .MuiInputBase-input': {
-    fontSize: '0.9rem',
-    color: '#1f2937',
+  "& .MuiInputBase-input": {
+    fontSize: "0.9rem",
+    color: "#1f2937",
   },
 }));
 
 const FormField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '8px',
-    backgroundColor: '#fff',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-    '& fieldset': {
-      borderColor: '#d1d5db',
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    backgroundColor: "#fff",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+    "& fieldset": {
+      borderColor: "#d1d5db",
     },
-    '&:hover fieldset': {
-      borderColor: '#9ca3af',
+    "&:hover fieldset": {
+      borderColor: "#9ca3af",
     },
-    '&.Mui-focused fieldset': {
-      borderColor: '#3b82f6',
+    "&.Mui-focused fieldset": {
+      borderColor: "#3b82f6",
     },
   },
-  '& .MuiInputLabel-root': {
-    color: '#6b7280',
-    fontSize: '0.9rem',
+  "& .MuiInputLabel-root": {
+    color: "#6b7280",
+    fontSize: "0.9rem",
   },
-  '& .MuiInputLabel-root.Mui-focused': {
-    color: '#3b82f6',
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#3b82f6",
   },
-  '& .MuiInputBase-input': {
-    fontSize: '0.9rem',
-    color: '#1f2937',
+  "& .MuiInputBase-input": {
+    fontSize: "0.9rem",
+    color: "#1f2937",
   },
 }));
 
 const ErrorText = styled(Typography)(({ theme }) => ({
-  color: '#ef4444',
-  fontSize: '0.8rem',
-  marginTop: '4px',
-  marginLeft: '14px',
+  color: "#ef4444",
+  fontSize: "0.8rem",
+  marginTop: "4px",
+  marginLeft: "14px",
 }));
 
 interface Customer {
@@ -268,15 +280,28 @@ interface ActionLog {
 
 const CustomerManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { clients, loading, error } = useSelector((state: RootState) => state.customer);
+  const { clients, loading, error } = useSelector(
+    (state: RootState) => state.customer
+  );
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Jusqu'à 600px
 
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [form, setForm] = useState({ lastName: "", email: "", phone: "", logo: "" });
-  const [errors, setErrors] = useState<{ lastName?: string; email?: string; phone?: string }>({});
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
+  const [form, setForm] = useState({
+    lastName: "",
+    email: "",
+    phone: "",
+    logo: "",
+  });
+  const [errors, setErrors] = useState<{
+    lastName?: string;
+    email?: string;
+    phone?: string;
+  }>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -289,14 +314,17 @@ const CustomerManagement: React.FC = () => {
   const [phonePrefixFilter, setPhonePrefixFilter] = useState("");
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [clientToDelete, setClientToDelete] = useState<Customer | null>(null);
-  const [lastDeletedClient, setLastDeletedClient] = useState<Customer | null>(null);
+  const [lastDeletedClient, setLastDeletedClient] = useState<Customer | null>(
+    null
+  );
   const [actionHistory, setActionHistory] = useState<ActionLog[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [confirmClearHistoryOpen, setConfirmClearHistoryOpen] = useState(false);
   const [historySearchTerm, setHistorySearchTerm] = useState("");
   const [historyFilterType, setHistoryFilterType] = useState<string>("Tous");
   const [selectedClients, setSelectedClients] = useState<number[]>([]);
-  const [confirmDeleteSelectedOpen, setConfirmDeleteSelectedOpen] = useState(false);
+  const [confirmDeleteSelectedOpen, setConfirmDeleteSelectedOpen] =
+    useState(false);
 
   // Charger l'historique depuis le localStorage au montage
   useEffect(() => {
@@ -308,7 +336,10 @@ const CustomerManagement: React.FC = () => {
 
   // Sauvegarder l'historique dans le localStorage à chaque modification
   useEffect(() => {
-    localStorage.setItem("customerActionHistory", JSON.stringify(actionHistory));
+    localStorage.setItem(
+      "customerActionHistory",
+      JSON.stringify(actionHistory)
+    );
   }, [actionHistory]);
 
   useEffect(() => {
@@ -316,13 +347,13 @@ const CustomerManagement: React.FC = () => {
   }, [dispatch]);
 
   const logAction = (description: string) => {
-    const timestamp = new Date().toLocaleString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
+    const timestamp = new Date().toLocaleString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
     setActionHistory((prev) => [
       { id: Date.now(), description, timestamp },
@@ -338,17 +369,17 @@ const CustomerManagement: React.FC = () => {
 
   const validateField = (name: string, value: string) => {
     const newErrors = { ...errors };
-    if (name === 'lastName') {
-      if (!value || value.trim() === '') {
-        newErrors.lastName = 'Le nom est requis';
+    if (name === "lastName") {
+      if (!value || value.trim() === "") {
+        newErrors.lastName = "Le nom est requis";
       } else {
         delete newErrors.lastName;
       }
-    } else if (name === 'email') {
-      if (!value || value.trim() === '') {
-        newErrors.email = 'L\'email est requis';
+    } else if (name === "email") {
+      if (!value || value.trim() === "") {
+        newErrors.email = "L'email est requis";
       } else if (!/\S+@\S+\.\S+/.test(value)) {
-        newErrors.email = 'Email invalide';
+        newErrors.email = "Email invalide";
       } else {
         const emailExists = clients.some(
           (client) =>
@@ -356,16 +387,17 @@ const CustomerManagement: React.FC = () => {
             (!selectedCustomer || client.id !== selectedCustomer.id)
         );
         if (emailExists) {
-          newErrors.email = 'Cet email est déjà utilisé';
+          newErrors.email = "Cet email est déjà utilisé";
         } else {
           delete newErrors.email;
         }
       }
-    } else if (name === 'phone') {
-      if (!value || value.trim() === '') {
-        newErrors.phone = 'Le téléphone est requis';
+    } else if (name === "phone") {
+      if (!value || value.trim() === "") {
+        newErrors.phone = "Le téléphone est requis";
       } else if (!/^\+\d{9,15}$/.test(value)) {
-        newErrors.phone = 'Le numéro doit commencer par "+" suivi de 9 à 15 chiffres';
+        newErrors.phone =
+          'Le numéro doit commencer par "+" suivi de 9 à 15 chiffres';
       } else {
         delete newErrors.phone;
       }
@@ -375,13 +407,13 @@ const CustomerManagement: React.FC = () => {
 
   const validateForm = () => {
     const newErrors: { lastName?: string; email?: string; phone?: string } = {};
-    if (!form.lastName || form.lastName.trim() === '') {
-      newErrors.lastName = 'Le nom est requis';
+    if (!form.lastName || form.lastName.trim() === "") {
+      newErrors.lastName = "Le nom est requis";
     }
-    if (!form.email || form.email.trim() === '') {
-      newErrors.email = 'L\'email est requis';
+    if (!form.email || form.email.trim() === "") {
+      newErrors.email = "L'email est requis";
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = 'Email invalide';
+      newErrors.email = "Email invalide";
     } else {
       const emailExists = clients.some(
         (client) =>
@@ -389,31 +421,32 @@ const CustomerManagement: React.FC = () => {
           (!selectedCustomer || client.id !== selectedCustomer.id)
       );
       if (emailExists) {
-        newErrors.email = 'Cet email est déjà utilisé';
+        newErrors.email = "Cet email est déjà utilisé";
       }
     }
-    if (!form.phone || form.phone.trim() === '') {
-      newErrors.phone = 'Le téléphone est requis';
+    if (!form.phone || form.phone.trim() === "") {
+      newErrors.phone = "Le téléphone est requis";
     } else if (!/^\+\d{9,15}$/.test(form.phone)) {
-      newErrors.phone = 'Le numéro doit commencer par "+" suivi de 9 à 15 chiffres';
+      newErrors.phone =
+        'Le numéro doit commencer par "+" suivi de 9 à 15 chiffres';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const resetLastName = () => {
-    setForm({ ...form, lastName: '' });
-    validateField('lastName', '');
+    setForm({ ...form, lastName: "" });
+    validateField("lastName", "");
   };
 
   const resetEmail = () => {
-    setForm({ ...form, email: '' });
-    validateField('email', '');
+    setForm({ ...form, email: "" });
+    validateField("email", "");
   };
 
   const resetPhone = () => {
-    setForm({ ...form, phone: '' });
-    validateField('phone', '');
+    setForm({ ...form, phone: "" });
+    validateField("phone", "");
   };
 
   const openConfirmDelete = (client: Customer) => {
@@ -428,7 +461,9 @@ const CustomerManagement: React.FC = () => {
       logAction(`Client ${clientToDelete.lastName} supprimé`);
       setSnackbarMessage("Client supprimé avec succès !");
       setSnackbarOpen(true);
-      setSelectedClients((prev) => prev.filter((id) => id !== clientToDelete.id));
+      setSelectedClients((prev) =>
+        prev.filter((id) => id !== clientToDelete.id)
+      );
     }
     setConfirmDeleteOpen(false);
     setClientToDelete(null);
@@ -508,13 +543,18 @@ const CustomerManagement: React.FC = () => {
     return matchesSearch && matchesEmailDomain && matchesPhonePrefix;
   });
 
-  const paginatedClients = filteredClients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedClients = filteredClients.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -565,20 +605,22 @@ const CustomerManagement: React.FC = () => {
       Nom: client.lastName,
       Email: client.email,
       Téléphone: client.phone,
-      Logo: client.logo || 'N/A',
+      Logo: client.logo || "N/A",
     }));
     const csv = Papa.unparse(csvData);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', 'clients.csv');
+    link.setAttribute("download", "clients.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   // Gestion de la sélection des clients
-  const handleSelectAllClients = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectAllClients = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (event.target.checked) {
       const newSelected = paginatedClients.map((client) => client.id);
       setSelectedClients(newSelected);
@@ -609,7 +651,9 @@ const CustomerManagement: React.FC = () => {
     });
     setSelectedClients([]);
     setConfirmDeleteSelectedOpen(false);
-    setSnackbarMessage(`${selectedClients.length} client(s) supprimé(s) avec succès !`);
+    setSnackbarMessage(
+      `${selectedClients.length} client(s) supprimé(s) avec succès !`
+    );
     setSnackbarOpen(true);
   };
 
@@ -620,14 +664,20 @@ const CustomerManagement: React.FC = () => {
   // Filtrage de l'historique
   const filteredHistory = actionHistory.filter((action) => {
     const matchesSearch =
-      action.description.toLowerCase().includes(historySearchTerm.toLowerCase()) ||
+      action.description
+        .toLowerCase()
+        .includes(historySearchTerm.toLowerCase()) ||
       action.timestamp.toLowerCase().includes(historySearchTerm.toLowerCase());
     const matchesType =
       historyFilterType === "Tous" ||
-      (historyFilterType === "Ajout" && action.description.includes("ajouté")) ||
-      (historyFilterType === "Modification" && action.description.includes("modifié")) ||
-      (historyFilterType === "Suppression" && action.description.includes("supprimé")) ||
-      (historyFilterType === "Restauration" && action.description.includes("restauré"));
+      (historyFilterType === "Ajout" &&
+        action.description.includes("ajouté")) ||
+      (historyFilterType === "Modification" &&
+        action.description.includes("modifié")) ||
+      (historyFilterType === "Suppression" &&
+        action.description.includes("supprimé")) ||
+      (historyFilterType === "Restauration" &&
+        action.description.includes("restauré"));
     return matchesSearch && matchesType;
   });
 
@@ -635,12 +685,26 @@ const CustomerManagement: React.FC = () => {
     <ThemeProvider theme={theme}>
       <Box sx={{ maxWidth: "95%", margin: "auto", mt: 4, mb: 8 }}>
         {/* Header */}
-        <Grid container spacing={3} sx={{ padding: isMobile ? 2 : 3, backgroundColor: '#f9fafb', minHeight: '100vh' }}>
+        <Grid
+          container
+          spacing={3}
+          sx={{
+            padding: isMobile ? 2 : 3,
+            backgroundColor: "#f9fafb",
+            minHeight: "100vh",
+          }}
+        >
           <Grid item xs={12}>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: '#1f2937', marginBottom: 1 }}>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 600, color: "#1f2937", marginBottom: 1 }}
+            >
               Gestion des Clients
             </Typography>
-            <Typography variant="body1" sx={{ fontSize: '0.9rem', color: '#6b7280' }}>
+            <Typography
+              variant="body1"
+              sx={{ fontSize: "0.9rem", color: "#6b7280" }}
+            >
               Gérer les clients : ajouter, modifier ou supprimer des clients.
             </Typography>
           </Grid>
@@ -648,18 +712,25 @@ const CustomerManagement: React.FC = () => {
           <Grid item xs={12}>
             <Toolbar
               sx={{
-                justifyContent: 'space-between',
-                flexDirection: isMobile ? 'column' : 'row',
+                justifyContent: "space-between",
+                flexDirection: isMobile ? "column" : "row",
                 gap: isMobile ? 2 : 0,
                 padding: 0,
-                position: 'sticky',
-                top: '64px',
-                backgroundColor: '#f9fafb',
+                position: "sticky",
+                top: "64px",
+                backgroundColor: "#f9fafb",
                 zIndex: 2,
                 mb: 2,
               }}
             >
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', width: isMobile ? '100%' : 'auto' }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  flexWrap: "wrap",
+                  width: isMobile ? "100%" : "auto",
+                }}
+              >
                 <SearchField
                   placeholder="Rechercher par nom ou email..."
                   variant="outlined"
@@ -680,13 +751,13 @@ const CustomerManagement: React.FC = () => {
                   startIcon={<FilterList />}
                   onClick={() => setFilterOpen(!filterOpen)}
                   sx={{
-                    borderColor: '#d1d5db',
-                    color: '#1f2937',
-                    borderRadius: '8px',
-                    textTransform: 'none',
-                    '&:hover': {
-                      borderColor: '#9ca3af',
-                      backgroundColor: '#f3f4f6',
+                    borderColor: "#d1d5db",
+                    color: "#1f2937",
+                    borderRadius: "8px",
+                    textTransform: "none",
+                    "&:hover": {
+                      borderColor: "#9ca3af",
+                      backgroundColor: "#f3f4f6",
                     },
                   }}
                 >
@@ -697,32 +768,32 @@ const CustomerManagement: React.FC = () => {
                   startIcon={<History />}
                   onClick={() => setHistoryOpen(!historyOpen)}
                   sx={{
-                    borderColor: '#d1d5db',
-                    color: '#1f2937',
-                    borderRadius: '8px',
-                    textTransform: 'none',
-                    '&:hover': {
-                      borderColor: '#9ca3af',
-                      backgroundColor: '#f3f4f6',
+                    borderColor: "#d1d5db",
+                    color: "#1f2937",
+                    borderRadius: "8px",
+                    textTransform: "none",
+                    "&:hover": {
+                      borderColor: "#9ca3af",
+                      backgroundColor: "#f3f4f6",
                     },
                   }}
                 >
                   Historique
                 </Button>
               </Box>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                 <Button
                   variant="outlined"
                   startIcon={<FileDownload />}
                   onClick={exportToCSV}
                   sx={{
-                    borderColor: '#d1d5db',
-                    color: '#1f2937',
-                    borderRadius: '8px',
-                    textTransform: 'none',
-                    '&:hover': {
-                      borderColor: '#9ca3af',
-                      backgroundColor: '#f3f4f6',
+                    borderColor: "#d1d5db",
+                    color: "#1f2937",
+                    borderRadius: "8px",
+                    textTransform: "none",
+                    "&:hover": {
+                      borderColor: "#9ca3af",
+                      backgroundColor: "#f3f4f6",
                     },
                   }}
                 >
@@ -745,20 +816,23 @@ const CustomerManagement: React.FC = () => {
             <Grid item xs={12}>
               <Box
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                   p: 2,
-                  backgroundColor: '#fff',
-                  borderRadius: '12px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                  backgroundColor: "#fff",
+                  borderRadius: "12px",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                   mb: 2,
-                  position: 'sticky',
-                  top: '120px',
+                  position: "sticky",
+                  top: "120px",
                   zIndex: 1,
                 }}
               >
-                <Typography variant="body1" sx={{ fontWeight: 500, color: '#1f2937' }}>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 500, color: "#1f2937" }}
+                >
                   {selectedClients.length} client(s) sélectionné(s)
                 </Typography>
                 <DeleteButton
@@ -777,16 +851,26 @@ const CustomerManagement: React.FC = () => {
               <Box
                 sx={{
                   p: 2,
-                  backgroundColor: '#fff',
-                  borderRadius: '12px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                  backgroundColor: "#fff",
+                  borderRadius: "12px",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                   mb: 2,
-                  maxHeight: '200px',
-                  overflowY: 'auto',
+                  maxHeight: "200px",
+                  overflowY: "auto",
                 }}
               >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="body1" sx={{ fontWeight: 500, color: '#1f2937' }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 2,
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: 500, color: "#1f2937" }}
+                  >
                     Historique des actions
                   </Typography>
                   <DeleteButton
@@ -816,15 +900,15 @@ const CustomerManagement: React.FC = () => {
                         onChange={(e) => setHistoryFilterType(e.target.value)}
                         label="Type d'action"
                         sx={{
-                          borderRadius: '8px',
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#d1d5db',
+                          borderRadius: "8px",
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#d1d5db",
                           },
-                          '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#9ca3af',
+                          "&:hover .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#9ca3af",
                           },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#3b82f6',
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#3b82f6",
                           },
                         }}
                       >
@@ -843,7 +927,10 @@ const CustomerManagement: React.FC = () => {
                       <ListItem key={action.id}>
                         <ListItemText
                           primary={`[${action.timestamp}] ${action.description}`}
-                          primaryTypographyProps={{ fontSize: '0.9rem', color: '#1f2937' }}
+                          primaryTypographyProps={{
+                            fontSize: "0.9rem",
+                            color: "#1f2937",
+                          }}
                         />
                       </ListItem>
                     ))}
@@ -865,13 +952,16 @@ const CustomerManagement: React.FC = () => {
               <Box
                 sx={{
                   p: 2,
-                  backgroundColor: '#fff',
-                  borderRadius: '12px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                  backgroundColor: "#fff",
+                  borderRadius: "12px",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                   mb: 2,
                 }}
               >
-                <Typography variant="body1" sx={{ fontWeight: 500, mb: 2, color: '#1f2937' }}>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 500, mb: 2, color: "#1f2937" }}
+                >
                   Filtres
                 </Typography>
                 <Grid container spacing={2}>
@@ -950,7 +1040,10 @@ const CustomerManagement: React.FC = () => {
                             onClick={() => handleOpenDialog(client)}
                             sx={{
                               color: "primary.main",
-                              "&:hover": { backgroundColor: "primary.light", transition: "background-color 0.3s ease" },
+                              "&:hover": {
+                                backgroundColor: "primary.light",
+                                transition: "background-color 0.3s ease",
+                              },
                             }}
                           >
                             <Edit fontSize="small" />
@@ -961,7 +1054,10 @@ const CustomerManagement: React.FC = () => {
                             onClick={() => openConfirmDelete(client)}
                             sx={{
                               color: "secondary.main",
-                              "&:hover": { backgroundColor: "secondary.light", transition: "background-color 0.3s ease" },
+                              "&:hover": {
+                                backgroundColor: "secondary.light",
+                                transition: "background-color 0.3s ease",
+                              },
                             }}
                           >
                             <Delete fontSize="small" />
@@ -971,7 +1067,11 @@ const CustomerManagement: React.FC = () => {
                     </Card>
                   ))
                 ) : (
-                  <Typography variant="body1" color="text.secondary" textAlign="center">
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    textAlign="center"
+                  >
                     Aucun client trouvé.
                   </Typography>
                 )}
@@ -991,21 +1091,37 @@ const CustomerManagement: React.FC = () => {
                 <Table>
                   <TableHead sx={{ backgroundColor: "#f3f4f6" }}>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.85rem" }}>
+                      <TableCell
+                        sx={{
+                          fontWeight: 500,
+                          color: "text.secondary",
+                          fontSize: "0.85rem",
+                        }}
+                      >
                         <Checkbox
                           checked={
                             paginatedClients.length > 0 &&
-                            paginatedClients.every((client) => selectedClients.includes(client.id))
+                            paginatedClients.every((client) =>
+                              selectedClients.includes(client.id)
+                            )
                           }
                           onChange={handleSelectAllClients}
                           indeterminate={
                             selectedClients.length > 0 &&
-                            !paginatedClients.every((client) => selectedClients.includes(client.id))
+                            !paginatedClients.every((client) =>
+                              selectedClients.includes(client.id)
+                            )
                           }
                           aria-label="Sélectionner tous les clients"
                         />
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.85rem" }}>
+                      <TableCell
+                        sx={{
+                          fontWeight: 500,
+                          color: "text.secondary",
+                          fontSize: "0.85rem",
+                        }}
+                      >
                         Logo
                       </TableCell>
                       <TableCell>
@@ -1013,7 +1129,11 @@ const CustomerManagement: React.FC = () => {
                           active={orderBy === "lastName"}
                           direction={orderBy === "lastName" ? order : "asc"}
                           onClick={() => handleRequestSort("lastName")}
-                          sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.85rem" }}
+                          sx={{
+                            fontWeight: 500,
+                            color: "text.secondary",
+                            fontSize: "0.85rem",
+                          }}
                         >
                           Nom
                         </TableSortLabel>
@@ -1023,7 +1143,11 @@ const CustomerManagement: React.FC = () => {
                           active={orderBy === "email"}
                           direction={orderBy === "email" ? order : "asc"}
                           onClick={() => handleRequestSort("email")}
-                          sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.85rem" }}
+                          sx={{
+                            fontWeight: 500,
+                            color: "text.secondary",
+                            fontSize: "0.85rem",
+                          }}
                         >
                           Email
                         </TableSortLabel>
@@ -1033,12 +1157,22 @@ const CustomerManagement: React.FC = () => {
                           active={orderBy === "phone"}
                           direction={orderBy === "phone" ? order : "asc"}
                           onClick={() => handleRequestSort("phone")}
-                          sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.85rem" }}
+                          sx={{
+                            fontWeight: 500,
+                            color: "text.secondary",
+                            fontSize: "0.85rem",
+                          }}
                         >
                           Téléphone
                         </TableSortLabel>
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.85rem" }}>
+                      <TableCell
+                        sx={{
+                          fontWeight: 500,
+                          color: "text.secondary",
+                          fontSize: "0.85rem",
+                        }}
+                      >
                         Actions
                       </TableCell>
                     </TableRow>
@@ -1049,7 +1183,8 @@ const CustomerManagement: React.FC = () => {
                         <TableRow
                           key={client.id}
                           sx={{
-                            backgroundColor: index % 2 === 0 ? "#fff" : "#f9fafb",
+                            backgroundColor:
+                              index % 2 === 0 ? "#fff" : "#f9fafb",
                             "&:hover": {
                               backgroundColor: "#f3f4f6",
                               transition: "background-color 0.3s ease",
@@ -1071,9 +1206,21 @@ const CustomerManagement: React.FC = () => {
                               sx={{ width: 40, height: 40 }}
                             />
                           </TableCell>
-                          <TableCell sx={{ fontSize: "0.9rem", color: "text.primary" }}>{client.lastName}</TableCell>
-                          <TableCell sx={{ fontSize: "0.9rem", color: "text.primary" }}>{client.email}</TableCell>
-                          <TableCell sx={{ fontSize: "0.9rem", color: "text.primary" }}>{client.phone}</TableCell>
+                          <TableCell
+                            sx={{ fontSize: "0.9rem", color: "text.primary" }}
+                          >
+                            {client.lastName}
+                          </TableCell>
+                          <TableCell
+                            sx={{ fontSize: "0.9rem", color: "text.primary" }}
+                          >
+                            {client.email}
+                          </TableCell>
+                          <TableCell
+                            sx={{ fontSize: "0.9rem", color: "text.primary" }}
+                          >
+                            {client.phone}
+                          </TableCell>
                           <TableCell>
                             <Stack direction="row" spacing={1}>
                               <Tooltip title="Modifier le client">
@@ -1081,7 +1228,10 @@ const CustomerManagement: React.FC = () => {
                                   onClick={() => handleOpenDialog(client)}
                                   sx={{
                                     color: "primary.main",
-                                    "&:hover": { backgroundColor: "primary.light", transition: "background-color 0.3s ease" },
+                                    "&:hover": {
+                                      backgroundColor: "primary.light",
+                                      transition: "background-color 0.3s ease",
+                                    },
                                   }}
                                 >
                                   <Edit fontSize="small" />
@@ -1092,7 +1242,10 @@ const CustomerManagement: React.FC = () => {
                                   onClick={() => openConfirmDelete(client)}
                                   sx={{
                                     color: "secondary.main",
-                                    "&:hover": { backgroundColor: "secondary.light", transition: "background-color 0.3s ease" },
+                                    "&:hover": {
+                                      backgroundColor: "secondary.light",
+                                      transition: "background-color 0.3s ease",
+                                    },
                                   }}
                                 >
                                   <Delete fontSize="small" />
@@ -1104,7 +1257,15 @@ const CustomerManagement: React.FC = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} align="center" sx={{ color: "text.secondary", fontSize: "0.9rem", py: 4 }}>
+                        <TableCell
+                          colSpan={6}
+                          align="center"
+                          sx={{
+                            color: "text.secondary",
+                            fontSize: "0.9rem",
+                            py: 4,
+                          }}
+                        >
                           Aucun client trouvé.
                         </TableCell>
                       </TableRow>
@@ -1126,10 +1287,19 @@ const CustomerManagement: React.FC = () => {
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               sx={{
-                "& .MuiTablePagination-selectLabel": { fontSize: "0.85rem", color: "text.secondary" },
-                "& .MuiTablePagination-displayedRows": { fontSize: "0.85rem", color: "text.secondary" },
+                "& .MuiTablePagination-selectLabel": {
+                  fontSize: "0.85rem",
+                  color: "text.secondary",
+                },
+                "& .MuiTablePagination-displayedRows": {
+                  fontSize: "0.85rem",
+                  color: "text.secondary",
+                },
                 "& .MuiTablePagination-actions": { color: "primary.main" },
-                "& .MuiTablePagination-toolbar": { justifyContent: "flex-end", py: 1 },
+                "& .MuiTablePagination-toolbar": {
+                  justifyContent: "flex-end",
+                  py: 1,
+                },
               }}
             />
           </Grid>
@@ -1143,11 +1313,11 @@ const CustomerManagement: React.FC = () => {
             TransitionComponent={Fade}
             TransitionProps={{ timeout: 300 }}
             sx={{
-              '& .MuiDialog-paper': {
-                borderRadius: '12px',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-                borderTop: '4px solid #3b82f6',
-                backgroundColor: '#fff',
+              "& .MuiDialog-paper": {
+                borderRadius: "12px",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
+                borderTop: "4px solid #3b82f6",
+                backgroundColor: "#fff",
               },
             }}
           >
@@ -1194,9 +1364,13 @@ const CustomerManagement: React.FC = () => {
                         hidden
                         type="file"
                         onChange={(e) => {
-                          const file = (e.target as HTMLInputElement).files?.[0];
+                          const file = (e.target as HTMLInputElement)
+                            .files?.[0];
                           if (file) {
-                            setForm({ ...form, logo: URL.createObjectURL(file) });
+                            setForm({
+                              ...form,
+                              logo: URL.createObjectURL(file),
+                            });
                           }
                         }}
                       />
@@ -1219,16 +1393,16 @@ const CustomerManagement: React.FC = () => {
                             <IconButton
                               onClick={resetLastName}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
+                                if (e.key === "Enter" || e.key === " ") {
                                   resetLastName();
                                 }
                               }}
                               sx={{
-                                color: '#6b7280',
-                                '&:hover': {
-                                  color: '#3b82f6',
-                                  transform: 'scale(1.1)',
-                                  transition: 'all 0.2s ease',
+                                color: "#6b7280",
+                                "&:hover": {
+                                  color: "#3b82f6",
+                                  transform: "scale(1.1)",
+                                  transition: "all 0.2s ease",
                                 },
                               }}
                               aria-label="Réinitialiser le nom"
@@ -1243,9 +1417,9 @@ const CustomerManagement: React.FC = () => {
                     sx={{ mb: errors.lastName ? 1 : 3 }}
                     InputLabelProps={{ shrink: true }}
                     inputProps={{
-                      'aria-label': errors.lastName
+                      "aria-label": errors.lastName
                         ? `Nom, erreur : ${errors.lastName}`
-                        : 'Nom',
+                        : "Nom",
                     }}
                     error={!!errors.lastName}
                   />
@@ -1266,16 +1440,16 @@ const CustomerManagement: React.FC = () => {
                             <IconButton
                               onClick={resetEmail}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
+                                if (e.key === "Enter" || e.key === " ") {
                                   resetEmail();
                                 }
                               }}
                               sx={{
-                                color: '#6b7280',
-                                '&:hover': {
-                                  color: '#3b82f6',
-                                  transform: 'scale(1.1)',
-                                  transition: 'all 0.2s ease',
+                                color: "#6b7280",
+                                "&:hover": {
+                                  color: "#3b82f6",
+                                  transform: "scale(1.1)",
+                                  transition: "all 0.2s ease",
                                 },
                               }}
                               aria-label="Réinitialiser l'email"
@@ -1290,9 +1464,9 @@ const CustomerManagement: React.FC = () => {
                     sx={{ mb: errors.email ? 1 : 3 }}
                     InputLabelProps={{ shrink: true }}
                     inputProps={{
-                      'aria-label': errors.email
+                      "aria-label": errors.email
                         ? `Email, erreur : ${errors.email}`
-                        : 'Email',
+                        : "Email",
                     }}
                     error={!!errors.email}
                   />
@@ -1313,16 +1487,16 @@ const CustomerManagement: React.FC = () => {
                             <IconButton
                               onClick={resetPhone}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
+                                if (e.key === "Enter" || e.key === " ") {
                                   resetPhone();
                                 }
                               }}
                               sx={{
-                                color: '#6b7280',
-                                '&:hover': {
-                                  color: '#3b82f6',
-                                  transform: 'scale(1.1)',
-                                  transition: 'all 0.2s ease',
+                                color: "#6b7280",
+                                "&:hover": {
+                                  color: "#3b82f6",
+                                  transform: "scale(1.1)",
+                                  transition: "all 0.2s ease",
                                 },
                               }}
                               aria-label="Réinitialiser le téléphone"
@@ -1337,9 +1511,9 @@ const CustomerManagement: React.FC = () => {
                     sx={{ mb: errors.phone ? 1 : 3 }}
                     InputLabelProps={{ shrink: true }}
                     inputProps={{
-                      'aria-label': errors.phone
+                      "aria-label": errors.phone
                         ? `Téléphone, erreur : ${errors.phone}`
-                        : 'Téléphone',
+                        : "Téléphone",
                     }}
                     error={!!errors.phone}
                   />
@@ -1353,7 +1527,7 @@ const CustomerManagement: React.FC = () => {
                 borderTop: "1px solid #e5e7eb",
                 display: "flex",
                 justifyContent: "space-between",
-                backgroundColor: '#f9fafb',
+                backgroundColor: "#f9fafb",
               }}
             >
               <CancelButton
@@ -1367,7 +1541,9 @@ const CustomerManagement: React.FC = () => {
                 onClick={handleAddOrEditCustomer}
                 variant="contained"
                 disabled={Object.keys(errors).length > 0}
-                aria-label={editMode ? "Modifier le client" : "Ajouter le client"}
+                aria-label={
+                  editMode ? "Modifier le client" : "Ajouter le client"
+                }
               >
                 {editMode ? "Modifier" : "Ajouter"}
               </PrimaryButton>
@@ -1381,11 +1557,11 @@ const CustomerManagement: React.FC = () => {
             TransitionComponent={Fade}
             TransitionProps={{ timeout: 300 }}
             sx={{
-              '& .MuiDialog-paper': {
-                borderRadius: '12px',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-                borderTop: '4px solid #ef4444',
-                backgroundColor: '#fff',
+              "& .MuiDialog-paper": {
+                borderRadius: "12px",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
+                borderTop: "4px solid #ef4444",
+                backgroundColor: "#fff",
               },
             }}
           >
@@ -1403,9 +1579,10 @@ const CustomerManagement: React.FC = () => {
             <DialogContent sx={{ p: 4 }}>
               <DialogContentText
                 id="confirm-delete-description"
-                sx={{ color: '#1f2937', fontSize: '1rem', textAlign: 'center' }}
+                sx={{ color: "#1f2937", fontSize: "1rem", textAlign: "center" }}
               >
-                Êtes-vous sûr de vouloir supprimer {clientToDelete?.lastName} ? Cette action est irréversible.
+                Êtes-vous sûr de vouloir supprimer {clientToDelete?.lastName} ?
+                Cette action est irréversible.
               </DialogContentText>
             </DialogContent>
             <DialogActions
@@ -1414,7 +1591,7 @@ const CustomerManagement: React.FC = () => {
                 borderTop: "1px solid #e5e7eb",
                 display: "flex",
                 justifyContent: "space-between",
-                backgroundColor: '#f9fafb',
+                backgroundColor: "#f9fafb",
               }}
             >
               <CancelButton
@@ -1441,11 +1618,11 @@ const CustomerManagement: React.FC = () => {
             TransitionComponent={Fade}
             TransitionProps={{ timeout: 300 }}
             sx={{
-              '& .MuiDialog-paper': {
-                borderRadius: '12px',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-                borderTop: '4px solid #ef4444',
-                backgroundColor: '#fff',
+              "& .MuiDialog-paper": {
+                borderRadius: "12px",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
+                borderTop: "4px solid #ef4444",
+                backgroundColor: "#fff",
               },
             }}
           >
@@ -1463,9 +1640,10 @@ const CustomerManagement: React.FC = () => {
             <DialogContent sx={{ p: 4 }}>
               <DialogContentText
                 id="confirm-delete-selected-description"
-                sx={{ color: '#1f2937', fontSize: '1rem', textAlign: 'center' }}
+                sx={{ color: "#1f2937", fontSize: "1rem", textAlign: "center" }}
               >
-                Êtes-vous sûr de vouloir supprimer {selectedClients.length} client(s) sélectionné(s) ? Cette action est irréversible.
+                Êtes-vous sûr de vouloir supprimer {selectedClients.length}{" "}
+                client(s) sélectionné(s) ? Cette action est irréversible.
               </DialogContentText>
             </DialogContent>
             <DialogActions
@@ -1474,7 +1652,7 @@ const CustomerManagement: React.FC = () => {
                 borderTop: "1px solid #e5e7eb",
                 display: "flex",
                 justifyContent: "space-between",
-                backgroundColor: '#f9fafb',
+                backgroundColor: "#f9fafb",
               }}
             >
               <CancelButton
@@ -1501,11 +1679,11 @@ const CustomerManagement: React.FC = () => {
             TransitionComponent={Fade}
             TransitionProps={{ timeout: 300 }}
             sx={{
-              '& .MuiDialog-paper': {
-                borderRadius: '12px',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-                borderTop: '4px solid #ef4444',
-                backgroundColor: '#fff',
+              "& .MuiDialog-paper": {
+                borderRadius: "12px",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
+                borderTop: "4px solid #ef4444",
+                backgroundColor: "#fff",
               },
             }}
           >
@@ -1523,9 +1701,10 @@ const CustomerManagement: React.FC = () => {
             <DialogContent sx={{ p: 4 }}>
               <DialogContentText
                 id="confirm-clear-history-description"
-                sx={{ color: '#1f2937', fontSize: '1rem', textAlign: 'center' }}
+                sx={{ color: "#1f2937", fontSize: "1rem", textAlign: "center" }}
               >
-                Êtes-vous sûr de vouloir effacer l'historique des actions ? Cette action est irréversible.
+                Êtes-vous sûr de vouloir effacer l'historique des actions ?
+                Cette action est irréversible.
               </DialogContentText>
             </DialogContent>
             <DialogActions
@@ -1534,7 +1713,7 @@ const CustomerManagement: React.FC = () => {
                 borderTop: "1px solid #e5e7eb",
                 display: "flex",
                 justifyContent: "space-between",
-                backgroundColor: '#f9fafb',
+                backgroundColor: "#f9fafb",
               }}
             >
               <CancelButton
@@ -1566,10 +1745,10 @@ const CustomerManagement: React.FC = () => {
                   color="inherit"
                   onClick={handleUndoDelete}
                   sx={{
-                    color: '#3b82f6',
-                    textTransform: 'none',
-                    '&:hover': {
-                      textDecoration: 'underline',
+                    color: "#3b82f6",
+                    textTransform: "none",
+                    "&:hover": {
+                      textDecoration: "underline",
                     },
                   }}
                 >

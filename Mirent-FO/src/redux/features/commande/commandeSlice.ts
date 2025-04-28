@@ -11,6 +11,7 @@ interface Proforma {
   totalAmount: number;
   status: "En attente" | "Confirmé" | "Annulé";
   items: ProformaItem[];
+  carburant?: number; // Ajouter le champ carburant pour la mise à jour
 }
 
 // Interface pour un élément de proforma
@@ -218,40 +219,30 @@ export const deleteProforma = createAsyncThunk(
   }
 );
 
-// Thunk pour mettre à jour un proforma
+// Thunk pour mettre à jour UN SEUL ITEM de proforma
 export const updateProforma = createAsyncThunk(
-  "proformas/updateProforma",
-  async (updateData: UpdateProformaData, { rejectWithValue }) => {
+  "proformas/updateProformaItem", // Nom de l'action plus spécifique
+  async (proformaItem: UpdateProformaData, { rejectWithValue }) => {
     try {
+      const { id, proformaId, ...updateData } = proformaItem;
+
       const response = await fetch(
-        `http://localhost:3000/proforma/${updateData.id}`,
+        `http://localhost:3000/proforma/${id}`, // Endpoint pour mettre à jour un item
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            proformaId: updateData.proformaId,
-            vehicleId: updateData.vehicleId,
-            regionId: updateData.regionId,
-            prixId: updateData.prixId,
-            dateDepart: updateData.dateDepart,
-            dateRetour: updateData.dateRetour,
-            nombreJours: updateData.nombreJours,
-            subTotal: updateData.subTotal,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updateData),
         }
       );
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.message || "Erreur lors de la mise à jour du proforma item"
+          errorData.message ||
+            "Erreur lors de la mise à jour de l'item du proforma"
         );
       }
-
       const data = await response.json();
-      return data;
+      return data; // Retourne l'item mis à jour
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

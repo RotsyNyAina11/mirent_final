@@ -30,10 +30,12 @@ export class UpdateProformaItemDto {
 
   @IsOptional()
   @IsDateString()
+  @Type(() => Date) // Ajoutez Type pour la transformation correcte de la chaîne en Date
   dateDepart?: Date;
 
   @IsOptional()
   @IsDateString()
+  @Type(() => Date) // Ajoutez Type pour la transformation correcte de la chaîne en Date
   dateRetour?: Date;
 
   @IsOptional()
@@ -49,4 +51,9 @@ export class UpdateProformaItemDto {
   @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 2 })
   totalAmount?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  carburant?: number; // Ajout du champ carburant
 }

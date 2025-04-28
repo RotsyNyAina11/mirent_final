@@ -338,13 +338,13 @@ const ProformasList: React.FC = () => {
     doc.setFontSize(8);
     doc.setTextColor(100);
 
-    doc.setFont("helvetica", "bold"); // 'helvetica' est une police par défaut, vous pouvez en choisir une autre
+    doc.setFont("helvetica", "bold");
     footerLines.forEach((line, index) => {
       const textWidth = doc.getTextWidth(line);
       doc.text(line, (pageWidth - textWidth) / 2, footerY + index * 5);
     });
 
-    // ✅ Export
+    // Exporter en pdf
     doc.save(`Proforma-${proforma.proformaNumber}.pdf`);
   };
 
@@ -575,25 +575,40 @@ const ProformasList: React.FC = () => {
                 item={selectedItem}
                 onClose={handleCloseEditModal}
                 onSave={(updatedItem) => {
-                  const updatedProformas: Proforma[] = proforma.map(
-                    (proforma) => {
-                      if (proforma.id === selectedProformaId) {
-                        return {
-                          ...proforma,
-                          items: proforma.items.map((item) =>
-                            item.id === updatedItem.id
-                              ? { ...updatedItem }
-                              : item
-                          ),
-                        };
-                      }
-                      return proforma;
-                    }
+                  // Recherche de l'index de la proforma à mettre à jour
+                  const proformaIndex = proformas.findIndex(
+                    (proforma) => proforma.id === selectedProformaId
                   );
 
-                  setProformas(updatedProformas);
-                  console.log("✅ Proformas mises à jour :", updatedProformas);
-                  setEditItemModalOpen(false); // Fermer la modale après la mise à jour
+                  if (proformaIndex !== -1) {
+                    // Création d'une copie de la proforma à modifier
+                    const updatedProforma = { ...proformas[proformaIndex] };
+
+                    // Mise à jour de l'item spécifique dans le tableau 'items'
+                    const updatedItems = updatedProforma.items.map((item) =>
+                      item.id === updatedItem.id ? { ...updatedItem } : item
+                    );
+
+                    updatedProforma.items = updatedItems;
+
+                    // Création d'une nouvelle liste de proformas avec la proforma mise à jour
+                    const updatedProformas = [
+                      ...proformas.slice(0, proformaIndex),
+                      updatedProforma,
+                      ...proformas.slice(proformaIndex + 1),
+                    ];
+
+                    setProformas(updatedProformas);
+                    console.log(
+                      "✅ Proformas mises à jour :",
+                      updatedProformas
+                    );
+                    setEditItemModalOpen(false); // Fermer la modale après la mise à jour
+                  } else {
+                    console.error(
+                      `❌ Impossible de trouver la proforma avec l'ID : ${selectedProformaId}`
+                    );
+                  }
                 }}
               />
             )}

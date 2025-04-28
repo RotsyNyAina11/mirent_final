@@ -637,7 +637,7 @@ const OrderPage: React.FC = () => {
                           <Select
                             labelId="vehicle-label"
                             name="vehicleId"
-                            value={formData.vehicleId || ""} // Assurez-vous qu'il y a une valeur par défaut
+                            value={formData.vehicleId} // Assurez-vous qu'il y a une valeur par défaut
                             variant="standard"
                             onChange={(e: SelectChangeEvent<string | number>) =>
                               handleChange(e)

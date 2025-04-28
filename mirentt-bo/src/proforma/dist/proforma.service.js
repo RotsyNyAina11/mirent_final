@@ -440,26 +440,6 @@ var ProformaService = /** @class */ (function () {
             });
         });
     };
-    /* async update(id: number, proformaData: Partial<Proforma>): Promise<Proforma> {
-      const result = await this.proformaRepository.update(id, proformaData);
-  
-      if (result.affected === 0) {
-        throw new NotFoundException(`Proforma with ID ${id} not found`);
-      }
-  
-      // Vérifier si l'objet mis à jour existe
-      const updatedProforma = await this.proformaRepository.findOne({
-        where: { id },
-      });
-  
-      if (!updatedProforma) {
-        throw new NotFoundException(
-          `Proforma with ID ${id} not found after update`,
-        );
-      }
-  
-      return updatedProforma;
-    }*/
     ProformaService.prototype.update = function (id, updateDto) {
         return __awaiter(this, void 0, Promise, function () {
             var item, proforma, vehicule, region, prix;

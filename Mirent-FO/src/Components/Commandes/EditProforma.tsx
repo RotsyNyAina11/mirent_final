@@ -54,9 +54,9 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
     item?.dateRetour ? new Date(item.dateRetour) : null
   );
   const [nombreJours, setNombreJours] = useState<number>(0);
-  const [subTotal, setSubTotal] = useState<number>(0);
+  const [subTotal, setSubTotal] = useState<number>(item?.subTotal ?? 0);
 
-  // 📥 Récupération de la liste des prix au chargement
+  // Récupération de la liste des prix au chargement
   useEffect(() => {
     const fetchPrixList = async () => {
       try {
@@ -110,17 +110,25 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
       };
 
       const response = await axios.put(
-        `http://localhost:3000/proforma/${formData.id}`,
+        `http://localhost:3000/proforma/${formData.id}`, // Correction de l'endpoint ici
         updatedItem
       );
 
-      dispatch(updateProforma(response.data));
+      dispatch(
+        updateProforma({
+          id: formData.proformaId, // Utilisation de proformaId car c'est l'ID de la proforma à mettre à jour dans le slice
+          items: [{ ...updatedItem, id: formData.id }], // Envoi d'un tableau avec l'item mis à jour
+        })
+      );
       onSave(response.data);
       setOpenSnackbar(true);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
+      // Typage de l'erreur pour un accès plus sûr aux propriétés
       console.error("Erreur lors de l’enregistrement :", error);
-      setSnackbarMessage("Erreur lors de la mise à jour.");
+      setSnackbarMessage(
+        error?.response?.data?.message || "Erreur lors de la mise à jour."
+      ); // Affichage d'un message d'erreur plus précis si disponible
       setSnackbarOpen(true);
     } finally {
       setLoading(false);
@@ -133,7 +141,7 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
       sx={{ padding: 4, maxWidth: 600, margin: "auto", mt: 2 }}
     >
       <Typography variant="h5" gutterBottom>
-        Modifier un Proforma Item
+        Modifier un Item de Proforma
       </Typography>
 
       <Grid container spacing={2}>
@@ -190,7 +198,7 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField label="Sous-total" value={subTotal} fullWidth />
+          <TextField label="Sous-total" value={subTotal} fullWidth disabled />
         </Grid>
         <Grid item xs={12}>
           <Box display="flex" justifyContent="flex-end" gap={2}>

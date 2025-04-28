@@ -237,7 +237,7 @@ const DevisForm = () => {
                 <TextField
                   fullWidth
                   type="number"
-                  label="Prix Total (€)"
+                  label="Prix Total (Ar)"
                   name="prixTotal"
                   variant="outlined"
                   value={devis.prixTotal}

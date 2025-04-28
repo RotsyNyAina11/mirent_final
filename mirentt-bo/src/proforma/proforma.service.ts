@@ -373,27 +373,6 @@ export class ProformaService {
     await this.proformaRepository.delete(id);
   }
 
-  /* async update(id: number, proformaData: Partial<Proforma>): Promise<Proforma> {
-    const result = await this.proformaRepository.update(id, proformaData);
-
-    if (result.affected === 0) {
-      throw new NotFoundException(`Proforma with ID ${id} not found`);
-    }
-
-    // Vérifier si l'objet mis à jour existe
-    const updatedProforma = await this.proformaRepository.findOne({
-      where: { id },
-    });
-
-    if (!updatedProforma) {
-      throw new NotFoundException(
-        `Proforma with ID ${id} not found after update`,
-      );
-    }
-
-    return updatedProforma;
-  }*/
-
   async update(
     id: number,
     updateDto: UpdateProformaItemDto,

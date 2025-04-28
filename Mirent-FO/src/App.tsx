@@ -102,6 +102,7 @@ const App: React.FC = () => {
           }
         />
 
+        {/*
         <Route
           path="/proformas"
           element={
@@ -109,7 +110,7 @@ const App: React.FC = () => {
               <ProformaPage />
             </MainLayout>
           }
-        />
+        />*/}
 
         {/* Route pour la page Table proforma */}
         <Route

@@ -34,11 +34,13 @@ var UpdateProformaItemDto = /** @class */ (function () {
     ], UpdateProformaItemDto.prototype, "prixId");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsDateString()
+        class_validator_1.IsDateString(),
+        class_transformer_1.Type(function () { return Date; }) // Ajoutez Type pour la transformation correcte de la chaîne en Date
     ], UpdateProformaItemDto.prototype, "dateDepart");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsDateString()
+        class_validator_1.IsDateString(),
+        class_transformer_1.Type(function () { return Date; }) // Ajoutez Type pour la transformation correcte de la chaîne en Date
     ], UpdateProformaItemDto.prototype, "dateRetour");
     __decorate([
         class_validator_1.IsOptional(),
@@ -54,6 +56,11 @@ var UpdateProformaItemDto = /** @class */ (function () {
         class_transformer_1.Type(function () { return Number; }),
         class_validator_1.IsNumber({ maxDecimalPlaces: 2 })
     ], UpdateProformaItemDto.prototype, "totalAmount");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_transformer_1.Type(function () { return Number; }),
+        class_validator_1.IsNumber({ maxDecimalPlaces: 2 })
+    ], UpdateProformaItemDto.prototype, "carburant");
     return UpdateProformaItemDto;
 }());
 exports.UpdateProformaItemDto = UpdateProformaItemDto;

@@ -472,7 +472,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-          {/* Créer Proformas */}
+          {/* Créer Proformas 
           <Tooltip title="Créer Proformas" placement="right">
             <NavLinkButton
               to="/proformas"
@@ -503,6 +503,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
+          */}
+
           {/* Lieux de Location */}
           <Tooltip title="Lieux de Location" placement="right">
             <NavLinkButton

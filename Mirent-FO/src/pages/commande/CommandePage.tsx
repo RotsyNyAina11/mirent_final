@@ -2,7 +2,7 @@ import React from "react";
 import { Container, Grid } from "@mui/material";
 import Commande from "../../Components/Commandes/Commande";
 
-import ProformasList from "../../Components/Proforma/proformaList";
+import ProformasList from "../../Components/Proforma/ProformaList";
 //import ProformaTable from "../../Components/Proforma/ProformaTable";
 
 const CommandePage: React.FC = () => {

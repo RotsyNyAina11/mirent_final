@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Home from "../admin/pages/acceuil/HomePage";
 import MainLayout from "../layouts/MainLayouts";
 import Vehicule from "../admin/pages/vehicules/vehiculePage";
@@ -10,8 +10,9 @@ import LocationsPage from "../admin/pages/lieux/locationPage";
 const AdminRoutes = () => {
     return (
         <Routes>
+            <Route path="/" element={<Navigate to="admin/home" />} />
             <Route
-                path="/home"
+                path="home"
                 element={
                 <MainLayout>
                     <Home />
@@ -20,7 +21,7 @@ const AdminRoutes = () => {
             />
 
             <Route
-                path="/vehicules"
+                path="vehicules"
                 element={
                 <MainLayout>
                     <Vehicule />
@@ -29,7 +30,7 @@ const AdminRoutes = () => {
             />
 
             <Route
-                path="/types"
+                path="types"
                 element={
                     <MainLayout>
                     <Types/>
@@ -38,7 +39,7 @@ const AdminRoutes = () => {
             />
 
             <Route
-                path="/clients"
+                path="clients"
                 element={
                     <MainLayout>
                     <ClientPage />
@@ -47,7 +48,7 @@ const AdminRoutes = () => {
             />
 
             <Route
-                path="/proformas"
+                path="proformas"
                 element={
                 <MainLayout>
                     <ProformaPage />
@@ -56,7 +57,7 @@ const AdminRoutes = () => {
             />
 
             <Route
-                path="/lieux"
+                path="lieux"
                 element={
                     <MainLayout>
                     <LocationsPage />

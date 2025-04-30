@@ -5,9 +5,9 @@ import VehiculeList from "../clients/pages/vehiculeList";
 const ClientRoutes = () => {
     return(
         <Routes>
-            <Route path="/" element={<Navigate to="/acceuil" />} />
-            <Route path="/acceuil" element={<ClientHome/>} />
-            <Route path="/vehicleList" element={<VehiculeList />} />
+            <Route index element={<Navigate to="acceuil" />} />
+            <Route path="acceuil" element={<ClientHome/>} />
+            <Route path="list-vehicule" element={<VehiculeList />} />
         </Routes>
     );
 };

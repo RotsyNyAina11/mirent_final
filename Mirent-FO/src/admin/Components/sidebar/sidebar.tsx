@@ -216,8 +216,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
             }}
           >
             <NavLinkButton
-              to="/accueil"
-              selected={window.location.pathname === "/accueil"}
+              to="/admin/home"
+              selected={window.location.pathname === "/acceuil"}
               sx={{
                 padding: "12px 16px",
                 "& .MuiListItemIcon-root": {
@@ -231,7 +231,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                 <Home />
               </ListItemIcon>
               <ListItemText
-                primary="Accueil"
+                primary="Acceuil"
                 primaryTypographyProps={{
                   fontSize: "14px",
                   fontWeight: "500",
@@ -278,7 +278,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               {/* Proformat */}
               <Tooltip title="Proformat" placement="right">
                 <NavLinkButton
-                  to="/proformat"
+                  to="/admin/proformat"
                   selected={window.location.pathname === "/proformat"}
                   sx={{
                     pl: 6,
@@ -311,7 +311,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               {/* Devis */}
               <Tooltip title="Devis" placement="right">
                 <NavLinkButton
-                  to="/devis"
+                  to="/admin/devis"
                   selected={window.location.pathname === "/devis"}
                   sx={{
                     pl: 6,
@@ -344,7 +344,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               {/* Facture */}
               <Tooltip title="Facture" placement="right">
                 <NavLinkButton
-                  to="/facture"
+                  to="/admin/facture"
                   selected={window.location.pathname === "/facture"}
                   sx={{
                     pl: 6,
@@ -410,7 +410,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               {/* Liste des Véhicules */}
               <Tooltip title="Liste des Véhicules" placement="right">
                 <NavLinkButton
-                  to="/vehicules"
+                  to="/admin/vehicules"
                   selected={window.location.pathname === "/vehicules/liste"}
                   sx={{
                     pl: 6,
@@ -443,7 +443,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               {/* Types de Véhicules */}
               <Tooltip title="Types de Véhicules" placement="right">
                 <NavLinkButton
-                  to="/types"
+                  to="/admin/types"
                   selected={window.location.pathname === "/vehicules/types"}
                   sx={{
                     pl: 6,
@@ -479,7 +479,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           {/* Liste des Clients */}
           <Tooltip title="Liste des Clients" placement="right">
             <NavLinkButton
-              to="/clients"
+              to="/admin/clients"
               selected={window.location.pathname === "/clients"}
               sx={{
                 padding: "12px 16px",
@@ -511,7 +511,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           {/* Créer Proformas */}
           <Tooltip title="Créer Proformas" placement="right">
             <NavLinkButton
-              to="/proformas"
+              to="/admin/proformas"
               selected={window.location.pathname === "/proformas"}
               sx={{
                 padding: "12px 16px",
@@ -543,7 +543,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           {/* Lieux de Location */}
           <Tooltip title="Lieux de Location" placement="right">
             <NavLinkButton
-              to="/lieux"
+              to="/admin/lieux"
               selected={window.location.pathname === "/lieux"}
               sx={{
                 padding: "12px 16px",
@@ -575,7 +575,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           {/* Contact */}
           <Tooltip title="Contact" placement="right">
             <NavLinkButton
-              to="/contact"
+              to="/admin/contact"
               selected={window.location.pathname === "/contact"}
               sx={{
                 padding: "12px 16px",

@@ -29,7 +29,7 @@ const Login: React.FC = () => {
     // Simulation de la vérification des identifiants
     if (email === "admin@mirent.com" && password === "admin123") {
       console.log("Connexion réussie : Administrateur");
-      navigate("/home"); 
+      navigate("/admin/home"); 
     } else if (email === "client@gmail.com" && password === "client123") {
       console.log("Connexion réussie : Client");
       navigate("/acceuil"); 

@@ -87,6 +87,7 @@ export class ProformaService {
       date: proformaData.date,
       contractReference: proformaData.contractReference,
       notes: proformaData.notes,
+      proformaNumber: await this.generateProformaNumber(),
     });
 
     proforma.proformaNumber = await this.generateProformaNumber();

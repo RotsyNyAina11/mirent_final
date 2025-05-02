@@ -109,10 +109,10 @@ var ProformaService = /** @class */ (function () {
     };
     ProformaService.prototype.create = function (proformaData) {
         return __awaiter(this, void 0, Promise, function () {
-            var clientExist, proforma, _a, proformaItems, _b, savedProforma, savedProformaWithRelations, pdfBuffer;
+            var clientExist, proforma, _a, _b, _c, _d, proformaItems, _e, savedProforma, savedProformaWithRelations, pdfBuffer;
             var _this = this;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            return __generator(this, function (_f) {
+                switch (_f.label) {
                     case 0: return [4 /*yield*/, this.clientRepository.findOne({
                             where: [
                                 { lastName: proformaData.clientLastName },
@@ -121,20 +121,25 @@ var ProformaService = /** @class */ (function () {
                             ]
                         })];
                     case 1:
-                        clientExist = _c.sent();
+                        clientExist = _f.sent();
                         if (!clientExist) {
                             throw new common_1.NotFoundException("Client not found with the provided information");
                         }
-                        proforma = this.proformaRepository.create({
+                        _b = (_a = this.proformaRepository).create;
+                        _c = {
                             client: clientExist,
                             date: proformaData.date,
                             contractReference: proformaData.contractReference,
                             notes: proformaData.notes
-                        });
-                        _a = proforma;
+                        };
                         return [4 /*yield*/, this.generateProformaNumber()];
                     case 2:
-                        _a.proformaNumber = _c.sent();
+                        proforma = _b.apply(_a, [(_c.proformaNumber = _f.sent(),
+                                _c)]);
+                        _d = proforma;
+                        return [4 /*yield*/, this.generateProformaNumber()];
+                    case 3:
+                        _d.proformaNumber = _f.sent();
                         return [4 /*yield*/, Promise.all(proformaData.items.map(function (item) { return __awaiter(_this, void 0, void 0, function () {
                                 var regionExist, prixExist, statusDisponible, whereClause, typeExist, availableVehicles, vehiculeChoisi, vehiculeDejaLoue, dureeLocation, prixNumerique, subTotalCalculated, proformaItem, statusIndisponible;
                                 return __generator(this, function (_a) {
@@ -228,12 +233,12 @@ var ProformaService = /** @class */ (function () {
                                     }
                                 });
                             }); }))];
-                    case 3:
-                        proformaItems = _c.sent();
-                        _b = proforma;
-                        return [4 /*yield*/, this.proformaItemRepository.save(proformaItems)];
                     case 4:
-                        _b.items = _c.sent();
+                        proformaItems = _f.sent();
+                        _e = proforma;
+                        return [4 /*yield*/, this.proformaItemRepository.save(proformaItems)];
+                    case 5:
+                        _e.items = _f.sent();
                         proforma.totalAmount = proforma.items.reduce(function (sum, item) { return sum + Number(item.subTotal); }, 0);
                         console.log('Total amount (before toFixed):', proforma.totalAmount);
                         console.log('Type of total amount:', typeof proforma.totalAmount);
@@ -241,8 +246,8 @@ var ProformaService = /** @class */ (function () {
                         console.log('Total amount (after toFixed):', proforma.totalAmount);
                         console.log('Type of total amount:', typeof proforma.totalAmount);
                         return [4 /*yield*/, this.proformaRepository.save(proforma)];
-                    case 5:
-                        savedProforma = _c.sent();
+                    case 6:
+                        savedProforma = _f.sent();
                         return [4 /*yield*/, this.proformaRepository.findOne({
                                 where: { id: savedProforma.id },
                                 relations: [
@@ -255,12 +260,12 @@ var ProformaService = /** @class */ (function () {
                                     'client',
                                 ]
                             })];
-                    case 6:
-                        savedProformaWithRelations = _c.sent();
+                    case 7:
+                        savedProformaWithRelations = _f.sent();
                         console.log('Saved proforma with relations:', savedProformaWithRelations);
                         return [4 /*yield*/, this.pdfService.generateProformaPdf(savedProformaWithRelations)];
-                    case 7:
-                        pdfBuffer = _c.sent();
+                    case 8:
+                        pdfBuffer = _f.sent();
                         if (!savedProformaWithRelations) {
                             throw new common_1.NotFoundException('Proforma not found after saving.');
                         }

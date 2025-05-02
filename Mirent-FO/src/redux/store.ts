@@ -8,6 +8,7 @@ import locationReducer from "../redux/features/lieux/locationSlice";
 import customersReducer from "./features/clients/customersSlice";
 import contractReducer from "./features/contrat/contratSlice";
 import proformasReducer from "./features/proforma/proformaSlice";
+import reservationReducer from "./features/reservation/reservationSlice";
 interface ProformaState {
   proformas: Proforma[];
   addProforma: (newProforma: Proforma) => void;
@@ -28,6 +29,7 @@ export const store = configureStore({
     locations: locationReducer,
     contrat: contractReducer as any,
     proformas: proformasReducer,
+    reservation: reservationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

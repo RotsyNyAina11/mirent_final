@@ -25,8 +25,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const navItems = [
-  { label: "Accueil", path: "#hero" },
-  { label: "Mes réservations", path: "/catalogue" },
+  { label: "Accueil", path: "/acceuil" },
+  { label: "Nos voitures", path: "/voitures" },
+  { label: "Mes réservations", path: "/reservations" },
   { label: "Contact", path: "#contact" },
 ];
 
@@ -36,7 +37,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Simuler l'état de connexion
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn") === "true");
 
   const handleNavigation = (path: string) => {
     if (path.startsWith("#")) {
@@ -59,17 +60,14 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userType");
     setIsLoggedIn(false);
     handleClosePopover();
     navigate("/acceuil");
   };
 
   const open = Boolean(anchorEl);
-
-  // Bouton temporaire pour tester la connexion (à supprimer dans une vraie application)
-  const toggleLogin = () => {
-    setIsLoggedIn(!isLoggedIn);
-  };
 
   return (
     <>
@@ -138,15 +136,6 @@ const Navbar: React.FC = () => {
                   Me connecter
                 </Button>
               )}
-              {/* Bouton temporaire pour tester la connexion */}
-              <Button
-                variant="text"
-                color="inherit"
-                onClick={toggleLogin}
-                sx={{ ml: 2, color: "white" }}
-              >
-                {isLoggedIn ? "Simuler déconnexion" : "Simuler connexion"}
-              </Button>
             </Box>
           ) : (
             <>

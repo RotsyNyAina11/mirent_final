@@ -1,64 +1,40 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcryptjs';
-import { BlacklistedToken } from 'src/entities/blacklisted-token.entity';
-import { User } from 'src/entities/user.entity';
+import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { RegisterDto } from './dto/register.dto';
+import * as bcrypt from 'bcrypt'
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
-        @InjectRepository(BlacklistedToken)
-        private readonly blacklistedTokenRepository: Repository<BlacklistedToken>,
-        private readonly jwtService: JwtService
-    ) {}
+        private usersRepository: Repository<User>,
+        private jwtService: JwtService,
+    ){}
 
+    async register(registerDto: RegisterDto): Promise<User>{
+        const { email, password } = registerDto;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = this.usersRepository.create({
+            email,
+            password: hashedPassword,
+        });
+        return this.usersRepository.save(user);
+    }
 
-    async validateUser(email: string, password: string): Promise<any> {
-        const user = await this.userRepository.findOne({ where: { email } });
-        if (user && (await bcrypt.compare(password, user.password))) {
-          const { password, ...result } = user;
-          return result;
+    async login(loginDto: LoginDto): Promise<{ access_token: string }> {
+        const {email, password} =  loginDto;
+        const user = await this.usersRepository.findOne({where:  { email }});
+        if(!user || !(await bcrypt.compare(password, user.password))) {
+            throw new UnauthorizedException('Invalid credentials');
         }
-        throw new UnauthorizedException('Invalid credentials');
-      }
 
-    async login(user: any) {
         const payload = { email: user.email, sub: user.id };
-        return {
-          access_token: this.jwtService.sign(payload),
-        };
-    }
-
-    async registerUser(user: User): Promise<User> {
-        const existingUser = await this.userRepository.findOne({ where: { email: user.email } });
-        if (existingUser) {
-            throw new Error('Email already in use');
+        return{
+            access_token: this.jwtService.sign(payload),
         }
-
-        
-        user.password = await bcrypt.hash(user.password, 10);
-        return this.userRepository.save(user);
-    }
-
-    async logout(token: string): Promise<void> {
-        // Verification de token s'il existe dejà dans la blacklist
-        const existinToken = await this.blacklistedTokenRepository.findOne({ where: { token } });
-        if(existinToken) {
-            throw new UnauthorizedException('Token already blacklisted');
-        }
-
-        // Ajout du token dans la blacklist
-        const blacklistedToken = new BlacklistedToken();
-        blacklistedToken.token = token;
-        await this.blacklistedTokenRepository.save(blacklistedToken);
-    }
-
-    async isTokenBlacklisted(token: string): Promise<boolean> {
-      const blacklistedToken = await this.blacklistedTokenRepository.findOne({ where: { token } });
-      return !!blacklistedToken;
     }
 }

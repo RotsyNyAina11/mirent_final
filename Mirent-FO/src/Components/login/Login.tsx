@@ -21,17 +21,21 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // État pour le message d'erreur
+  const [error, setError] = useState(""); 
 
   const handleLogin = () => {
-    setError(""); // Réinitialiser le message d'erreur
+    setError(""); 
 
     // Simulation de la vérification des identifiants
     if (email === "admin@mirent.com" && password === "admin123") {
       console.log("Connexion réussie : Administrateur");
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userType", "admin");
       navigate("/admin/home"); 
     } else if (email === "client@gmail.com" && password === "client123") {
       console.log("Connexion réussie : Client");
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userType", "client");
       navigate("/acceuil"); 
     } else {
       setError("Email ou mot de passe incorrect");

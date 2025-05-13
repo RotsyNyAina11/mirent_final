@@ -15,7 +15,6 @@ import {
   Backdrop,
   CircularProgress,
   Pagination,
-  TextField,
   InputLabel,
   FormControl,
 } from "@mui/material";
@@ -23,7 +22,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { RootState, AppDispatch } from "../../redux/store";
 import { fetchVehicles, Vehicle } from "../../redux/features/vehicle/vehiclesSlice";
-import Navbar from "../components/Navbar";
 import { motion } from "framer-motion";
 
 interface Lieu {
@@ -102,7 +100,6 @@ const VehiculeList = () => {
 
   return (
     <Box>
-      <Navbar />
       <Box sx={{ py: 4, minHeight: "100vh", bgcolor: "#f0f4f8" }}>
         <Container>
           <Typography variant="h4" fontWeight="bold" gutterBottom>

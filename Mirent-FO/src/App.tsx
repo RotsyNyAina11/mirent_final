@@ -7,8 +7,9 @@ import {
 import 'react-toastify/dist/ReactToastify.css';
 import Login from "./components/login/Login";
 import Register from "./components/register/Register";
-import ClientRoutes from "./routes/clientRoute";
-import AdminRoutes from "./routes/adminRoutes";
+import ClientRoutes from "./routes/ClientRoute";
+import AdminRoutes from "./routes/AdminRoutes";
+
 
 
 

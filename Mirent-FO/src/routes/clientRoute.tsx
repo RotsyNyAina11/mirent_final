@@ -1,16 +1,17 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import ClientHome from "../clients/pages/home";
-import VehiculeList from "../clients/pages/vehiculeList";
+import VehiclesPage from "../clients/pages/vehiculePage";
 import ReservationList from "../clients/pages/reservationList";
+
 
 
 
 const ClientRoutes = () => {
     return(
             <Routes>
-                <Route index element={<Navigate to="acceuil" />} />
-                <Route path="acceuil" element={<ClientHome/>} />
-                <Route path="/list-vehicule" element={<VehiculeList />} />
+                <Route index element={<Navigate to="accueil" />} />
+                <Route path="accueil" element={<ClientHome/>} />
+                <Route path="/list-vehicule" element={<VehiclesPage />} />
                 <Route path="/reservations" element={<ReservationList/>}/>
             </Routes>
     );

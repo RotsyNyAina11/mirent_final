@@ -36,7 +36,7 @@ const Login: React.FC = () => {
       console.log("Connexion réussie : Client");
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userType", "client");
-      navigate("/acceuil"); 
+      navigate("/accueil"); 
     } else {
       setError("Email ou mot de passe incorrect");
       console.log("Échec de la connexion : Identifiants incorrects");
@@ -63,7 +63,7 @@ const Login: React.FC = () => {
       >
         {/* Logo */}
         <Box display="flex" alignItems="center">
-          <RouterLink to="/acceuil" style={{ textDecoration: "none" }}>
+          <RouterLink to="/accueil" style={{ textDecoration: "none" }}>
             <Box
               component="img"
               src={logo}

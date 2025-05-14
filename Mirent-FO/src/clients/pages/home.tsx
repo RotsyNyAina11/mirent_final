@@ -31,7 +31,7 @@ const ClientHome = () => {
 
   return (
     <Box>
-      <Navbar />
+        <Navbar />
 
       {/* HERO */}
       <Box

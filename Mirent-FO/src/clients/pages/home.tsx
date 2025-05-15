@@ -13,7 +13,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import image from "../../assets/1.jpg";
+import image from "../../assets/bg.jpeg";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import ReservationForm from "../components/ReservationForm";
@@ -308,7 +308,7 @@ const ClientHome = () => {
           <Button
             variant="contained"
             size="large"
-            onClick={() => navigate("/catalogue")}
+            onClick={() => navigate("/list-vehicule")}
             sx={{
               bgcolor: "#0f172a",
               color: "white",

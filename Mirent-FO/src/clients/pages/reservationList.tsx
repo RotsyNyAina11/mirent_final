@@ -21,6 +21,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Navbar from "../components/Navbar";
+import image from "../../assets/bg.jpeg";
+import { MotionConfig } from "framer-motion";
 
 const fakeReservations = [
   {
@@ -82,7 +84,12 @@ const ReservationList: React.FC = () => {
   return (
     <Box>
       <Navbar />
-      <Box sx={{ p: 4, pt: 15 }}>
+      <Box 
+          sx={{ 
+            p: 4, 
+            pt: 15, 
+          }}
+      >
         <Typography variant="h5" mb={3} fontWeight="bold" align="center">
           Mes réservations
         </Typography>
@@ -94,7 +101,7 @@ const ReservationList: React.FC = () => {
             flexWrap: "wrap",
             alignItems: "center",
             justifyContent: "space-between",
-            backgroundColor: "white",
+            backgroundColor: "#fff",
             p: 2,
             borderRadius: 3,
             boxShadow: 2,

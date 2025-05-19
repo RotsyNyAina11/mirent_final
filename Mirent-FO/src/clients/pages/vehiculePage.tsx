@@ -23,13 +23,15 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import EuroIcon from "@mui/icons-material/Euro";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
 import InfoIcon from "@mui/icons-material/Info";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import BuildIcon from "@mui/icons-material/Build";
 import image from "/src/assets/bg.jpeg";
 
 // Données fictives pour les voitures
@@ -38,7 +40,7 @@ const mockVehicles = [
     id: 1,
     brand: "Toyota",
     model: "Corolla",
-    price: 50,
+    status: "Disponible",
     type: "Berline",
     image: "/src/assets/1.jpg",
     description: "La Toyota Corolla est une berline fiable et économique, parfaite pour les trajets urbains et les longues distances. Équipée d'un moteur hybride, elle offre un excellent rendement énergétique.",
@@ -48,7 +50,7 @@ const mockVehicles = [
     id: 2,
     brand: "Honda",
     model: "Civic",
-    price: 55,
+    status: "Réservé",
     type: "Berline",
     image: "/src/assets/1.jpg",
     description: "La Honda Civic combine style et performance avec une conduite dynamique. Idéale pour ceux qui recherchent confort et technologie.",
@@ -58,7 +60,7 @@ const mockVehicles = [
     id: 3,
     brand: "BMW",
     model: "Serie 3",
-    price: 80,
+    status: "Disponible",
     type: "Berline",
     image: "/src/assets/1.jpg",
     description: "La BMW Série 3 offre une expérience de conduite premium avec des finitions haut de gamme et des technologies avancées.",
@@ -68,7 +70,7 @@ const mockVehicles = [
     id: 4,
     brand: "Mercedes",
     model: "Classe C",
-    price: 90,
+    status: "En maintenance",
     type: "Berline",
     image: "/src/assets/1.jpg",
     description: "La Mercedes Classe C est synonyme de luxe et de confort, avec des équipements de pointe et une conduite fluide.",
@@ -78,7 +80,7 @@ const mockVehicles = [
     id: 5,
     brand: "Volkswagen",
     model: "Tiguan",
-    price: 65,
+    status: "Disponible",
     type: "SUV",
     image: "/src/assets/1.jpg",
     description: "Le Volkswagen Tiguan est un SUV polyvalent, idéal pour les familles et les aventures en plein air, avec un espace généreux.",
@@ -88,7 +90,7 @@ const mockVehicles = [
     id: 6,
     brand: "Audi",
     model: "Q5",
-    price: 85,
+    status: "Réservé",
     type: "SUV",
     image: "/src/assets/1.jpg",
     description: "L'Audi Q5 allie élégance et robustesse, avec des performances tout-terrain et un intérieur raffiné.",
@@ -96,36 +98,38 @@ const mockVehicles = [
   },
 ];
 
-// Marques et types disponibles pour les filtres
+// Marques, types et statuts pour les filtres
 const brands = ["Toutes", "Toyota", "Honda", "BMW", "Mercedes", "Volkswagen", "Audi"];
 const types = ["Tous", "Berline", "SUV", "Coupé", "Cabriolet"];
+const statuses = ["Tous", "Disponible", "Réservé", "En maintenance"];
 
 // Composant VehicleDetails pour le popover
 const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose: () => void }> = ({ vehicle, onClose }) => {
   const buttonVariants = {
-    hover: { scale: 1.1, boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)" },
-    tap: { scale: 0.9 },
+    hover: { scale: 1.05, boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)" },
+    tap: { scale: 0.95 },
   };
 
   if (!vehicle) {
     return (
-      <Box sx={{ p: 4, bgcolor: "#fff", borderRadius: 4, textAlign: "center" }}>
+      <Box sx={{ p: 4, bgcolor: "#fff", borderRadius: 8, textAlign: "center" }}>
         <SentimentDissatisfiedIcon sx={{ fontSize: 60, color: "#1976d2", mb: 2 }} />
-        <Typography variant="h6" sx={{ color: "#0f172a", mb: 2 }}>
+        <Typography variant="h6" sx={{ color: "#0f172a", mb: 2, fontFamily: "'Inter', sans-serif" }}>
           Véhicule non trouvé
         </Typography>
         <Button
           variant="contained"
           onClick={onClose}
           sx={{
-            bgcolor: "#ffd700",
-            color: "#0f172a",
-            borderRadius: 3,
+            bgcolor: "#ff6f61",
+            color: "#fff",
+            borderRadius: 8,
             px: 4,
-            py: 1,
+            py: 1.5,
             fontWeight: 600,
             textTransform: "none",
-            "&:hover": { bgcolor: "#ffca28" },
+            fontFamily: "'Inter', sans-serif",
+            "&:hover": { bgcolor: "#ff4d40" },
           }}
         >
           Fermer
@@ -138,70 +142,107 @@ const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      <Card sx={{ maxWidth: 500, borderRadius: 4, boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.15)", bgcolor: "#fff" }}>
+      <Card
+        sx={{
+          maxWidth: 500,
+          borderRadius: 8,
+          boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
+          bgcolor: "linear-gradient(145deg, #ffffff, #f9f9f9)",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+        }}
+      >
         <Box sx={{ position: "relative" }}>
           <IconButton
             onClick={onClose}
-            sx={{ position: "absolute", top: 8, right: 8, bgcolor: "rgba(255, 255, 255, 0.8)" }}
+            sx={{ position: "absolute", top: 12, right: 12, bgcolor: "rgba(255, 255, 255, 0.9)", "&:hover": { bgcolor: "#fff" } }}
           >
-            <CloseIcon />
+            <CloseIcon sx={{ color: "#0f172a" }} />
           </IconButton>
           <CardMedia
             component="img"
             height="200"
-            image={vehicle.image}
+            image={vehicle.image || "https://via.placeholder.com/500x200?text=Image+Indisponible"}
             alt={`${vehicle.brand} ${vehicle.model}`}
-            sx={{ objectFit: "cover", borderTopLeftRadius: 16, borderTopRightRadius: 16 }}
+            sx={{ objectFit: "cover", borderTopLeftRadius: 8, borderTopRightRadius: 8 }}
           />
         </Box>
         <CardContent sx={{ p: 3 }}>
-          <Typography variant="h6" fontWeight="bold" sx={{ color: "#0f172a", mb: 2 }}>
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            sx={{ color: "#0f172a", mb: 2, fontFamily: "'Inter', sans-serif", fontSize: "1.5rem" }}
+          >
             {vehicle.brand} {vehicle.model}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
             <Chip
               icon={<DirectionsCarIcon />}
               label={vehicle.type}
-              sx={{ bgcolor: "#e3f2fd", color: "#1976d2", fontWeight: 600 }}
+              sx={{ bgcolor: "#e3f2fd", color: "#1976d2", fontWeight: 600, fontFamily: "'Inter', sans-serif" }}
             />
             <Chip
-              icon={<EuroIcon />}
-              label={`${vehicle.price} €/jour`}
-              sx={{ bgcolor: "#fff3e0", color: "#ffd700", fontWeight: 600 }}
+              icon={
+                vehicle.status === "Disponible" ? (
+                  <CheckCircleIcon />
+                ) : vehicle.status === "Réservé" ? (
+                  <CancelIcon />
+                ) : (
+                  <BuildIcon />
+                )
+              }
+              label={vehicle.status}
+              sx={{
+                bgcolor: vehicle.status === "Disponible" ? "#e8f5e9" : vehicle.status === "Réservé" ? "#fff3e0" : "#ffebee",
+                color: vehicle.status === "Disponible" ? "#2e7d32" : vehicle.status === "Réservé" ? "#ff9800" : "#d32f2f",
+                fontWeight: 600,
+                fontFamily: "'Inter', sans-serif",
+              }}
             />
           </Box>
-          <Typography variant="body2" sx={{ color: "#555", mb: 2, lineHeight: 1.6 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "#475569", mb: 2, lineHeight: 1.7, fontFamily: "'Inter', sans-serif" }}
+          >
             {vehicle.description}
           </Typography>
-          <Typography variant="subtitle1" fontWeight="bold" sx={{ color: "#0f172a", mb: 1 }}>
+          <Typography
+            variant="subtitle1"
+            fontWeight="bold"
+            sx={{ color: "#0f172a", mb: 1.5, fontFamily: "'Inter', sans-serif" }}
+          >
             Caractéristiques
           </Typography>
           <Grid container spacing={1}>
             {vehicle.features.map((feature, index) => (
               <Grid item xs={12} sm={6} key={index}>
-                <Typography variant="body2" sx={{ color: "#1976d2", fontWeight: 500 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#1976d2", fontWeight: 500, fontFamily: "'Inter', sans-serif" }}
+                >
                   • {feature}
                 </Typography>
               </Grid>
             ))}
           </Grid>
         </CardContent>
-        <CardActions sx={{ p: 3, pt: 0, display: "flex", gap: 2 }}>
+        <CardActions sx={{ p: 3, pt: 0, display: "flex", gap: 2, justifyContent: "center" }}>
           <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
             <Button
               variant="contained"
               sx={{
-                bgcolor: "#ffd700",
-                color: "#0f172a",
-                borderRadius: 3,
-                px: 3,
-                py: 1,
+                bgcolor: "#ff6f61",
+                color: "#fff",
+                borderRadius: 8,
+                px: 4,
+                py: 1.5,
                 fontWeight: 600,
                 textTransform: "none",
-                "&:hover": { bgcolor: "#ffca28" },
+                fontFamily: "'Inter', sans-serif",
+                "&:hover": { bgcolor: "#ff4d40" },
               }}
+              aria-label="Réserver ce véhicule"
             >
               Réserver Maintenant
             </Button>
@@ -213,13 +254,15 @@ const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose
               sx={{
                 borderColor: "#1976d2",
                 color: "#1976d2",
-                borderRadius: 3,
-                px: 3,
-                py: 1,
+                borderRadius: 8,
+                px: 4,
+                py: 1.5,
                 fontWeight: 600,
                 textTransform: "none",
-                "&:hover": { borderColor: "#1565c0", bgcolor: "rgba(25, 118, 210, 0.04)" },
+                fontFamily: "'Inter', sans-serif",
+                "&:hover": { borderColor: "#1565c0", bgcolor: "rgba(25, 118, 210, 0.08)" },
               }}
+              aria-label="Fermer les détails"
             >
               Fermer
             </Button>
@@ -235,7 +278,7 @@ const VehiclesPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [brandFilter, setBrandFilter] = useState("Toutes");
   const [typeFilter, setTypeFilter] = useState("Tous");
-  const [priceFilter, setPriceFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("Tous");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
@@ -251,19 +294,19 @@ const VehiclesPage: React.FC = () => {
   const filteredVehicles = mockVehicles.filter((vehicle) => {
     const matchesBrand = brandFilter === "Toutes" || vehicle.brand === brandFilter;
     const matchesType = typeFilter === "Tous" || vehicle.type === typeFilter;
-    const matchesPrice = priceFilter ? vehicle.price <= parseInt(priceFilter) : true;
+    const matchesStatus = statusFilter === "Tous" || vehicle.status === statusFilter;
     const matchesSearch = searchQuery
       ? vehicle.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
         vehicle.model.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
-    return matchesBrand && matchesType && matchesPrice && matchesSearch;
+    return matchesBrand && matchesType && matchesStatus && matchesSearch;
   });
 
   // Réinitialiser les filtres
   const resetFilters = () => {
     setBrandFilter("Toutes");
     setTypeFilter("Tous");
-    setPriceFilter("");
+    setStatusFilter("Tous");
     setSearchQuery("");
     setPage(1);
   };
@@ -277,23 +320,23 @@ const VehiclesPage: React.FC = () => {
 
   // Animations
   const cardVariants = {
-    hidden: { opacity: 0, y: 30, scale: 0.95 },
+    hidden: { opacity: 0, y: 50, scale: 0.95 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
       scale: 1,
-      transition: { delay: i * 0.15, duration: 0.4, ease: "easeOut" },
+      transition: { delay: i * 0.2, duration: 0.5, ease: "easeOut" },
     }),
   };
 
   const buttonVariants = {
-    hover: { scale: 1.1, boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)" },
-    tap: { scale: 0.9 },
+    hover: { scale: 1.05, boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)" },
+    tap: { scale: 0.95 },
   };
 
   // Parallax effect for background
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 1000], [0, 200]);
+  const y = useTransform(scrollY, [0, 1000], [0, 250]);
 
   // Gestion du popover
   const handleOpenPopover = (event: React.MouseEvent<HTMLElement>, vehicleId: number) => {
@@ -312,7 +355,7 @@ const VehiclesPage: React.FC = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)",
+        background: "linear-gradient(145deg, #2b2d42 0%, #1e1e2e 100%)",
         position: "relative",
         overflow: "hidden",
       }}
@@ -328,7 +371,7 @@ const VehiclesPage: React.FC = () => {
           backgroundImage: `url(${image})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: 0.15,
+          opacity: 0.2,
           zIndex: 0,
           y,
         }}
@@ -336,20 +379,20 @@ const VehiclesPage: React.FC = () => {
       <Navbar />
       <Container
         sx={{
-          p: 4,
-          pt: 15,
+          p: { xs: 3, md: 4 },
+          pt: { xs: 12, md: 16 },
           pb: 8,
           position: "relative",
           zIndex: 1,
-          transition: "filter 0.3s",
-          ...(popoverAnchor && { filter: "blur(3px) brightness(0.7)" }), // Effet de flou et assombrissement
+          transition: "filter 0.3s ease",
+          ...(popoverAnchor && { filter: "blur(4px) brightness(0.6)" }),
         }}
       >
         {/* Titre */}
         <motion.div
-          initial={{ opacity: 0, y: -30 }}
+          initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
         >
           <Typography
             variant="h2"
@@ -358,12 +401,13 @@ const VehiclesPage: React.FC = () => {
             fontWeight="bold"
             sx={{
               color: "#ffffff",
-              mb: 5,
-              textShadow: "0px 2px 6px rgba(0, 0, 0, 0.3)",
-              fontSize: { xs: "2.5rem", md: "3.5rem" },
+              mb: 6,
+              textShadow: "0px 3px 8px rgba(0, 0, 0, 0.4)",
+              fontSize: { xs: "2.8rem", md: "4rem" },
+              fontFamily: "'Inter', sans-serif",
             }}
           >
-            Découvrez Notre Flotte
+            Explorez Notre Flotte
           </Typography>
         </motion.div>
 
@@ -375,10 +419,11 @@ const VehiclesPage: React.FC = () => {
             gap: 2,
             flexWrap: "wrap",
             alignItems: "center",
-            background: "rgba(255, 255, 255, 0.97)",
-            p: { xs: 2, md: 3 },
-            borderRadius: 3,
-            boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+            background: "rgba(255, 255, 255, 0.95)",
+            p: { xs: 2, md: 2.5 },
+            borderRadius: 12,
+            boxShadow: "0px 6px 24px rgba(0, 0, 0, 0.15)",
+            border: "1px solid rgba(0, 0, 0, 0.05)",
           }}
         >
           <TextField
@@ -388,14 +433,31 @@ const VehiclesPage: React.FC = () => {
               setSearchQuery(e.target.value);
               setPage(1);
             }}
-            sx={{ minWidth: { xs: 120, sm: 200 }, bgcolor: "#fff", "&:hover": { bgcolor: "#f5f5f5" } }}
+            sx={{
+              minWidth: { xs: 140, sm: 220 },
+              bgcolor: "#fff",
+              borderRadius: 8,
+              "&:hover": { bgcolor: "#f8fafc" },
+              "& .MuiInputBase-root": { fontFamily: "'Inter', sans-serif" },
+            }}
             InputProps={{
               startAdornment: <SearchIcon sx={{ mr: 1, color: "#1976d2" }} />,
-              sx: { borderRadius: 2, py: 0.5 },
+              sx: { borderRadius: 8, py: 0.5 },
             }}
+            InputLabelProps={{ sx: { fontFamily: "'Inter', sans-serif" } }}
+            aria-label="Rechercher une voiture par marque ou modèle"
           />
-          <FormControl sx={{ minWidth: { xs: 120, sm: 190 }, bgcolor: "#fff", borderRadius: 2, "&:hover": { bgcolor: "#f5f5f5" } }}>
-            <InputLabel sx={{ fontWeight: 500, color: "#1976d2" }}>Marque</InputLabel>
+          <FormControl
+            sx={{
+              minWidth: { xs: 140, sm: 200 },
+              bgcolor: "#fff",
+              borderRadius: 8,
+              "&:hover": { bgcolor: "#f8fafc" },
+            }}
+          >
+            <InputLabel sx={{ fontWeight: 500, color: "#1976d2", fontFamily: "'Inter', sans-serif" }}>
+              Marque
+            </InputLabel>
             <Select
               value={brandFilter}
               label="Marque"
@@ -404,17 +466,30 @@ const VehiclesPage: React.FC = () => {
                 setPage(1);
               }}
               startAdornment={<DirectionsCarIcon sx={{ mr: 1, color: "#1976d2" }} />}
-              sx={{ borderRadius: 2, "& .MuiSelect-select": { py: 1.5 } }}
+              sx={{
+                borderRadius: 8,
+                "& .MuiSelect-select": { py: 1.5, fontFamily: "'Inter', sans-serif" },
+              }}
+              aria-label="Filtrer par marque"
             >
               {brands.map((brand) => (
-                <MenuItem key={brand} value={brand}>
+                <MenuItem key={brand} value={brand} sx={{ fontFamily: "'Inter', sans-serif" }}>
                   {brand}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <FormControl sx={{ minWidth: { xs: 120, sm: 160 }, bgcolor: "#fff", borderRadius: 2, "&:hover": { bgcolor: "#f5f5f5" } }}>
-            <InputLabel sx={{ fontWeight: 500, color: "#1976d2" }}>Type</InputLabel>
+          <FormControl
+            sx={{
+              minWidth: { xs: 140, sm: 180 },
+              bgcolor: "#fff",
+              borderRadius: 8,
+              "&:hover": { bgcolor: "#f8fafc" },
+            }}
+          >
+            <InputLabel sx={{ fontWeight: 500, color: "#1976d2", fontFamily: "'Inter', sans-serif" }}>
+              Type
+            </InputLabel>
             <Select
               value={typeFilter}
               label="Type"
@@ -423,61 +498,88 @@ const VehiclesPage: React.FC = () => {
                 setPage(1);
               }}
               startAdornment={<DirectionsCarIcon sx={{ mr: 1, color: "#1976d2" }} />}
-              sx={{ borderRadius: 2, "& .MuiSelect-select": { py: 1.5 } }}
+              sx={{
+                borderRadius: 8,
+                "& .MuiSelect-select": { py: 1.5, fontFamily: "'Inter', sans-serif" },
+              }}
+              aria-label="Filtrer par type"
             >
               {types.map((type) => (
-                <MenuItem key={type} value={type}>
+                <MenuItem key={type} value={type} sx={{ fontFamily: "'Inter', sans-serif" }}>
                   {type}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <TextField
-            label="Prix max (€/jour)"
-            type="number"
-            value={priceFilter}
-            onChange={(e) => {
-              setPriceFilter(e.target.value);
-              setPage(1);
-            }}
-            sx={{ maxWidth: { xs: 120, sm: 160 }, bgcolor: "#fff", "&:hover": { bgcolor: "#f5f5f5" } }}
-            InputProps={{
-              startAdornment: <EuroIcon sx={{ mr: 1, color: "#1976d2" }} />,
-              sx: { borderRadius: 2, py: 0.5 },
-            }}
-          />
-          <IconButton
-            onClick={resetFilters}
-            aria-label="Réinitialiser les filtres"
+          <FormControl
             sx={{
+              minWidth: { xs: 140, sm: 180 },
               bgcolor: "#fff",
-              borderRadius: 2,
-              "&:hover": { bgcolor: "#f5f5f5" },
-              p: 1,
+              borderRadius: 8,
+              "&:hover": { bgcolor: "#f8fafc" },
             }}
           >
-            <RestartAltIcon sx={{ color: "#d32f2f", fontSize: "1.8rem" }} />
-          </IconButton>
+            <InputLabel sx={{ fontWeight: 500, color: "#1976d2", fontFamily: "'Inter', sans-serif" }}>
+              Statut
+            </InputLabel>
+            <Select
+              value={statusFilter}
+              label="Statut"
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              sx={{
+                borderRadius: 8,
+                "& .MuiSelect-select": { py: 1.5, fontFamily: "'Inter', sans-serif" },
+              }}
+              aria-label="Filtrer par statut"
+            >
+              {statuses.map((status) => (
+                <MenuItem key={status} value={status} sx={{ fontFamily: "'Inter', sans-serif" }}>
+                  {status}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            onClick={resetFilters}
+            startIcon={<RestartAltIcon />}
+            sx={{
+              bgcolor: "#fff",
+              color: "#d32f2f",
+              borderRadius: 8,
+              px: 3,
+              py: 1,
+              fontWeight: 600,
+              textTransform: "none",
+              fontFamily: "'Inter', sans-serif",
+              "&:hover": { bgcolor: "#f8fafc", color: "#b71c1c" },
+            }}
+            aria-label="Réinitialiser tous les filtres"
+          >
+            Réinitialiser
+          </Button>
         </Box>
 
         {/* Grille des voitures */}
-        <Grid container spacing={{ xs: 2, md: 4 }}>
+        <Grid container spacing={{ xs: 2, md: 3 }}>
           {isLoading
             ? Array.from(new Array(6)).map((_, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
                   <Skeleton
                     variant="rectangular"
-                    height={220}
-                    sx={{ borderRadius: 3 }}
+                    height={240}
+                    sx={{ borderRadius: 8 }}
                     animation="wave"
                   />
                   <Skeleton variant="text" width="60%" sx={{ mt: 2 }} animation="wave" />
                   <Skeleton variant="text" width="40%" animation="wave" />
                   <Skeleton
                     variant="rectangular"
-                    width="100px"
-                    height={36}
-                    sx={{ mt: 2, borderRadius: 2 }}
+                    width="120px"
+                    height={40}
+                    sx={{ mt: 2, borderRadius: 8 }}
                     animation="wave"
                   />
                 </Grid>
@@ -496,22 +598,23 @@ const VehiclesPage: React.FC = () => {
                         height: "100%",
                         display: "flex",
                         flexDirection: "column",
-                        borderRadius: 4,
+                        borderRadius: 8,
                         boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.15)",
-                        bgcolor: "#fff",
+                        bgcolor: "linear-gradient(145deg, #ffffff, #f9f9f9)",
+                        border: "1px solid rgba(0, 0, 0, 0.05)",
                         transition: "transform 0.3s ease, box-shadow 0.3s ease",
                         "&:hover": {
-                          transform: "translateY(-8px)",
-                          boxShadow: "0px 10px 28px rgba(0, 0, 0, 0.25)",
+                          transform: "translateY(-10px)",
+                          boxShadow: "0px 12px 32px rgba(0, 0, 0, 0.25)",
                         },
                       }}
                     >
                       <CardMedia
                         component="img"
-                        height="220"
-                        image={vehicle.image}
+                        height="240"
+                        image={vehicle.image || "https://via.placeholder.com/500x240?text=Image+Indisponible"}
                         alt={`${vehicle.brand} ${vehicle.model}`}
-                        sx={{ objectFit: "cover", borderTopLeftRadius: 16, borderTopRightRadius: 16 }}
+                        sx={{ objectFit: "cover", borderTopLeftRadius: 8, borderTopRightRadius: 8 }}
                       />
                       <CardContent sx={{ flexGrow: 1, p: 3 }}>
                         <Typography
@@ -519,38 +622,69 @@ const VehiclesPage: React.FC = () => {
                           variant="h6"
                           component="div"
                           fontWeight="bold"
-                          sx={{ color: "#0f172a", fontSize: "1.25rem" }}
+                          sx={{
+                            color: "#0f172a",
+                            fontSize: "1.3rem",
+                            fontFamily: "'Inter', sans-serif",
+                          }}
                         >
                           {vehicle.brand} {vehicle.model}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: "#555", mb: 1.5 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "#475569",
+                            mb: 1.5,
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
                           {vehicle.type}
                         </Typography>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                          <EuroIcon sx={{ color: "#ffd700", fontSize: "1.2rem" }} />
-                          <Typography variant="body1" sx={{ color: "#ffd700", fontWeight: 600 }}>
-                            {vehicle.price} €/jour
+                          {vehicle.status === "Disponible" ? (
+                            <CheckCircleIcon sx={{ color: "#2e7d32", fontSize: "1.2rem" }} />
+                          ) : vehicle.status === "Réservé" ? (
+                            <CancelIcon sx={{ color: "#ff9800", fontSize: "1.2rem" }} />
+                          ) : (
+                            <BuildIcon sx={{ color: "#d32f2f", fontSize: "1.2rem" }} />
+                          )}
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              color:
+                                vehicle.status === "Disponible"
+                                  ? "#2e7d32"
+                                  : vehicle.status === "Réservé"
+                                  ? "#ff9800"
+                                  : "#d32f2f",
+                              fontWeight: 600,
+                              fontFamily: "'Inter', sans-serif",
+                            }}
+                          >
+                            {vehicle.status}
                           </Typography>
                         </Box>
                       </CardContent>
-                      <CardActions sx={{ p: 3, pt: 0, display: "flex", gap: 2 }}>
+                      <CardActions sx={{ p: 3, pt: 0, display: "flex", gap: 2, justifyContent: "center" }}>
                         <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                           <Button
                             size="medium"
                             variant="contained"
                             onClick={() => navigate(`/voitures/${vehicle.id}`)}
                             sx={{
-                              bgcolor: "#ffd700",
-                              color: "#0f172a",
-                              borderRadius: 3,
+                              bgcolor: "#ff6f61",
+                              color: "#fff",
+                              borderRadius: 8,
                               px: 3,
-                              py: 1,
+                              py: 1.5,
                               fontWeight: 600,
                               textTransform: "none",
-                              "&:hover": { bgcolor: "#ffca28" },
+                              fontFamily: "'Inter', sans-serif",
+                              "&:hover": { bgcolor: "#ff4d40" },
                             }}
+                            aria-label={`Réserver ${vehicle.brand} ${vehicle.model}`}
                           >
-                            Réserver Maintenant
+                            Réserver
                           </Button>
                         </motion.div>
                         <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
@@ -561,14 +695,16 @@ const VehiclesPage: React.FC = () => {
                             sx={{
                               borderColor: "#1976d2",
                               color: "#1976d2",
-                              borderRadius: 3,
-                              px: 2,
-                              py: 1,
+                              borderRadius: 8,
+                              px: 3,
+                              py: 1.5,
                               fontWeight: 600,
                               textTransform: "none",
-                              "&:hover": { borderColor: "#1565c0", bgcolor: "rgba(25, 118, 210, 0.04)" },
+                              fontFamily: "'Inter', sans-serif",
+                              "&:hover": { borderColor: "#1565c0", bgcolor: "rgba(25, 118, 210, 0.08)" },
                             }}
                             startIcon={<InfoIcon />}
+                            aria-label={`Voir les détails de ${vehicle.brand} ${vehicle.model}`}
                           >
                             Détails
                           </Button>
@@ -579,12 +715,18 @@ const VehiclesPage: React.FC = () => {
                 </Grid>
               ))
             : (
-                <Box sx={{ width: "100%", textAlign: "center", py: 8 }}>
+                <Box sx={{ width: "100%", textAlign: "center", py: 10 }}>
                   <SentimentDissatisfiedIcon sx={{ fontSize: 60, color: "#fff", opacity: 0.7 }} />
-                  <Typography variant="h5" sx={{ color: "#fff", mt: 2, opacity: 0.9 }}>
+                  <Typography
+                    variant="h5"
+                    sx={{ color: "#fff", mt: 2, opacity: 0.9, fontFamily: "'Inter', sans-serif" }}
+                  >
                     Aucune voiture trouvée
                   </Typography>
-                  <Typography variant="body1" sx={{ color: "#fff", mt: 1, opacity: 0.7 }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ color: "#fff", mt: 1, opacity: 0.7, fontFamily: "'Inter', sans-serif" }}
+                  >
                     Modifiez vos filtres ou réinitialisez-les pour voir plus de résultats.
                   </Typography>
                 </Box>
@@ -597,7 +739,7 @@ const VehiclesPage: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.7 }}
             >
               <Pagination
                 count={totalPages}
@@ -608,11 +750,14 @@ const VehiclesPage: React.FC = () => {
                 sx={{
                   "& .MuiPaginationItem-root": {
                     color: "#fff",
-                    bgcolor: "rgba(255, 255, 255, 0.15)",
-                    "&:hover": { bgcolor: "rgba(255, 255, 255, 0.25)" },
-                    "&.Mui-selected": { bgcolor: "#ffd700", color: "#0f172a" },
+                    bgcolor: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: 8,
+                    fontFamily: "'Inter', sans-serif",
+                    "&:hover": { bgcolor: "rgba(255, 255, 255, 0.3)" },
+                    "&.Mui-selected": { bgcolor: "#ff6f61", color: "#fff" },
                   },
                 }}
+                aria-label="Navigation entre les pages des véhicules"
               />
             </motion.div>
           </Box>
@@ -633,8 +778,9 @@ const VehiclesPage: React.FC = () => {
           }}
           sx={{
             "& .MuiPopover-paper": {
-              borderRadius: 4,
+              borderRadius: 8,
               overflow: "visible",
+              boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.3)",
             },
           }}
         >

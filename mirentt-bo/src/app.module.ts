@@ -13,7 +13,8 @@ import { PrixsModule } from './prixs/prixs.module';
 import { ClientModule } from './client/client.module';
 import { ProformaModule } from './proforma/proforma.module';
 import { MailerModule } from './mailer/mailer.module';
-
+import { DevisController } from './devis/devis.controller';
+import { DevisModule } from './devis/devis.module';
 
 @Module({
   imports: [
@@ -31,7 +32,9 @@ import { MailerModule } from './mailer/mailer.module';
     RegionsModule,
     PrixsModule,
     ProformaModule,
-    MailerModule
+    MailerModule,
+    DevisModule,
   ],
+  controllers: [DevisController],
 })
 export class AppModule {}

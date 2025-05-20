@@ -12,6 +12,8 @@ var prix_entity_1 = require("src/entities/prix.entity");
 var client_entity_1 = require("../entities/client.entity");
 var proformat_item_entity_1 = require("src/entities/proformat-item.entity");
 var proforma_entity_1 = require("src/entities/proforma.entity");
+var devis_entity_1 = require("src/entities/devis.entity");
+var devis_item_entity_1 = require("src/entities/devis-item.entity");
 dotenv.config();
 exports.typeOrmConfig = {
     type: 'postgres',
@@ -31,6 +33,8 @@ exports.typeOrmConfig = {
         prix_entity_1.Prix,
         proformat_item_entity_1.ProformaItem,
         proforma_entity_1.Proforma,
+        devis_entity_1.Devis,
+        devis_item_entity_1.DevisItem,
     ],
     synchronize: true
 };

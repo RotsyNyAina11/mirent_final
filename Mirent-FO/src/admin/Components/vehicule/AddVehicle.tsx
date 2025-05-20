@@ -34,6 +34,9 @@ import { CameraAltOutlined } from "@mui/icons-material";
 interface AddVehicleProps {
   open: boolean;
   onClose: () => void;
+  vehicleId: number;
+  currentStatus: string;
+  onSuccess?: () => void;
 }
 
 const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
@@ -54,6 +57,20 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [imageFile, setImageFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    const getStatuses = async () => {
+      try {
+        const data = await Promise.all([
+          fetch("http://localhost:3000/status").then((res) => res.json()),
+        ]);
+        setVehicleStatuses(data.map((item: any) => item.status)); // ou item.name selon ton modèle
+      } catch (error) {
+        console.error("Erreur :", error);
+      }
+    };
+    getStatuses();
+  }, []);
 
   useEffect(() => {
     const fetchVehicleData = async () => {
@@ -401,6 +418,7 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
                 onChange={handleSelectStatus}
                 displayEmpty
                 inputProps={{ "aria-label": "Statut" }}
+                style={{ minWidth: 120 }}
               >
                 <MenuItem disabled value="">
                   Sélectionnez un statut

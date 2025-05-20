@@ -12,6 +12,6 @@ export class Region {
   @Column({ nullable: true })
   nom_district?: string;
 
-  @OneToOne(() => Prix, prix => prix.region)
+  @OneToOne(() => Prix, (prix) => prix.region)
   prix: Prix;
 }

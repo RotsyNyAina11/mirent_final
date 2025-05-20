@@ -178,16 +178,7 @@ const VehicleTypes: React.FC = () => {
   const handleEditVehicleType = () => {
     if (editingVehicleType && editingVehicleType.type.trim()) {
       dispatch(
-        updateVehicleTypeAction({
-          ...editingVehicleType,
-          nom: "", // Provide default or actual values for missing properties
-          marque: "",
-          modele: "",
-          immatriculation: "",
-          nombrePlace: 0, // Default or actual value
-          imageUrl: "", // Default or actual value
-          status: "", // Default or actual value
-        }) as any
+        updateVehicleTypeAction(editingVehicleType as VehicleTypeState) as any
       );
       handleCloseEditDialog();
     }
@@ -207,11 +198,6 @@ const VehicleTypes: React.FC = () => {
     if (deletingVehicleTypeId !== null) {
       dispatch(deleteVehicleTypeAction(deletingVehicleTypeId) as any);
       handleCloseDeleteDialog();
-    } else {
-      console.warn(
-        "Tentative de suppression avec un ID de type de véhicule nul."
-      );
-      // Vous pourriez afficher un message d'erreur à l'utilisateur ici
     }
   };
 

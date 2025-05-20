@@ -12,6 +12,8 @@ import { Prix } from 'src/entities/prix.entity';
 import { Client } from '../entities/client.entity';
 import { ProformaItem } from 'src/entities/proformat-item.entity';
 import { Proforma } from 'src/entities/proforma.entity';
+import { Devis } from 'src/entities/devis.entity';
+import { DevisItem } from 'src/entities/devis-item.entity';
 
 dotenv.config();
 
@@ -33,6 +35,8 @@ export const typeOrmConfig: DataSourceOptions = {
     Prix,
     ProformaItem,
     Proforma,
+    Devis,
+    DevisItem,
   ],
 
   synchronize: true,

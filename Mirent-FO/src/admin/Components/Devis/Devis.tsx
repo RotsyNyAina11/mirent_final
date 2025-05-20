@@ -1,401 +1,388 @@
-import { useState } from "react";
-import {
-  TextField,
-  Button,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  Box,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
-import { AddShoppingCart } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom"; // Pour la navigation vers la page Facturation
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
+import React, { useState, useEffect } from "react";
+import { TextField, Button, MenuItem, Grid, Typography } from "@mui/material";
+import dayjs from "dayjs";
+import { Prix, Region } from "../../../types/region";
 
-interface Devis {
-  Client: {
-    lastName: string;
-    email: string;
-    phone: number;
-  };
-  contractReference: string;
-  Vehicle: {
-    name: string;
-    number: string;
-    immatriculation: string;
-  };
+type Client = { id: number; [key: string]: any };
+type Vehicle = { id: number; [key: string]: any };
 
-  dateDepart: string;
-  dateArrivee: string;
-  nombreJours: number;
-  carburant: string;
-  prixUnitaire: number;
+interface DevisForm {
+  clientName: string;
+  dateCreation: Date;
+  numeroDevis: string;
+  prixCarburant: number;
   prixTotal: number;
+  totalEnLettre: string;
+  signatureClient: string;
+  clientId: number;
+  items: DevisItem[];
 }
 
-const DevisForm = () => {
-  const [devisList, setDevisList] = useState<any[]>([]); // Liste des devis
-  const [devis, setDevis] = useState({
-    client: "", // nouveau champ
-    ref: "",
-    voiture: "",
-    numeroVoiture: "",
-    dateDepart: "",
-    dateArrivee: "",
-    nombreJours: 1,
-    carburant: "",
-    prixUnitaire: 0,
+interface DevisItem {
+  devisId: number;
+  vehiculeId: number;
+  regionId: number;
+  prixId: number;
+  dateDebut: string;
+  dateFin: string;
+  nombreJours: number;
+  prixUnitaire: number;
+  sousTotal: number;
+}
+
+const CreateDevis = () => {
+  const [form, setForm] = useState<DevisForm>({
+    clientName: "",
+    dateCreation: new Date(),
+    numeroDevis: "",
     prixTotal: 0,
+    prixCarburant: 0,
+    totalEnLettre: "",
+    signatureClient: "",
+    clientId: 0,
+    items: [
+      {
+        devisId: 0,
+        vehiculeId: 0,
+        regionId: 0,
+        prixId: 0,
+        dateDebut: "",
+        dateFin: "",
+        nombreJours: 0,
+        prixUnitaire: 0,
+        sousTotal: 0,
+      },
+    ],
   });
-  const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [editOpen, setEditOpen] = useState(false);
-  const [editDevis, setEditDevis] = useState<any>(null);
 
-  const navigate = useNavigate(); // Utilisation de react-router-dom pour la navigation
+  const [clients, setClients] = useState<Client[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [regions, setRegions] = useState<Region[]>([]);
+  const [prixs, setPrix] = useState<Prix[]>([]); // Assuming
 
-  // Mise à jour des champs et calcul automatique du prix total
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    let newDevis = { ...devis, [name]: value };
+  useEffect(() => {
+    const fetchClients = async () => {
+      const response = await fetch("http://localhost:3000/clients");
+      const data = await response.json();
+      setClients(data);
+    };
 
-    // Calcul automatique du prix total basé sur les jours et le prix unitaire
-    if (name === "nombreJours" || name === "prixUnitaire") {
-      newDevis.prixTotal =
-        Number(newDevis.nombreJours) * Number(newDevis.prixUnitaire);
+    const fetchVehicles = async () => {
+      const response = await fetch("http://localhost:3000/vehicles");
+      const data = await response.json();
+      setVehicles(data);
+    };
+    const fetchRegions = async () => {
+      const response = await fetch("http://localhost:3000/regions");
+      const data = await response.json();
+      setRegions(data);
+    };
+
+    const fetchPrix = async () => {
+      const response = await fetch("http://localhost:3000/prixs");
+      const data = await response.json();
+      console.log("Data prixs :", data); // 🔍
+      setPrix(data);
+    };
+
+    fetchClients();
+    fetchVehicles();
+    fetchRegions();
+    fetchPrix();
+  }, []);
+
+  const calculateDays = () => {
+    const d1 = dayjs(form.items[0].dateDebut);
+    const d2 = dayjs(form.items[0].dateFin);
+    const diff = d2.diff(d1, "day");
+    return diff > 0 ? diff : 1;
+  };
+
+  // Handles top-level form fields
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value, type } = e.target;
+    if (name === "clientId" || name === "client") {
+      setForm((prev) => ({
+        ...prev,
+        clientId: Number(value),
+      }));
+    } else if (name === "referenceContrat" || name === "ref") {
+      setForm((prev) => ({
+        ...prev,
+        referenceContrat: value,
+      }));
+    } else if (name === "numeroDevis") {
+      setForm((prev) => ({
+        ...prev,
+        numeroDevis: value,
+      }));
+    } else if (name === "statut" || name === "Statut") {
+      setForm((prev) => ({
+        ...prev,
+        statut: value,
+      }));
+    } else if (
+      name === "vehiculeId" ||
+      name === "vehicle" ||
+      name === "dateDebut" ||
+      name === "dateFin" ||
+      name === "prixUnitaire"
+    ) {
+      setForm((prev) => ({
+        ...prev,
+        items: [
+          {
+            ...prev.items[0],
+            vehiculeId:
+              name === "vehiculeId" || name === "vehicle"
+                ? Number(value)
+                : prev.items[0].vehiculeId,
+            dateDebut: name === "dateDebut" ? value : prev.items[0].dateDebut,
+            dateFin: name === "dateFin" ? value : prev.items[0].dateFin,
+            prixUnitaire:
+              name === "prixUnitaire"
+                ? Number(value)
+                : prev.items[0].prixUnitaire,
+          },
+        ],
+      }));
     }
-
-    setDevis(newDevis);
   };
 
-  // Fonction d'envoi du formulaire et ajout d'un devis à la liste
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Envoi du devis à l'
+  const handleSubmit = async () => {
+    const days = calculateDays();
+    const payload = {
+      dateCreation: new Date(),
+      numeroDevis: form.numeroDevis,
+      prixCarburant: 0,
+      prixTotal: days * Number(form.items[0].prixUnitaire),
+      totalEnLettre: "",
+      signatureClient: "",
+      clientId: Number(form.clientId),
+      items: [
+        {
+          vehiculeId: Number(form.items[0].vehiculeId),
+          regionId: 0,
+          prixId: 0,
+          devisId: 0,
+          dateDebut: form.items[0].dateDebut,
+          dateFin: form.items[0].dateFin,
+          nombreJours: days,
+          prixUnitaire: Number(form.items[0].prixUnitaire),
+          sousTotal: days * Number(form.items[0].prixUnitaire),
+        },
+      ],
+    };
 
-    // Ajouter le devis à la liste des devis
-    setDevisList([...devisList, devis]);
+    console.log("Payload envoyé :", payload);
 
-    // Réinitialisation du formulaire
-    setDevis({
-      client: "", //
-      ref: "",
-      voiture: "",
-      numeroVoiture: "",
-      dateDepart: "",
-      dateArrivee: "",
-      nombreJours: 0,
-      carburant: "",
-      prixUnitaire: 0,
-      prixTotal: 0,
-    });
-  };
+    try {
+      const response = await fetch("http://localhost:3000/devis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-  // Fonction pour naviguer vers la page de facturation en passant la liste des devis
-  const handleNavigateToFacturation = () => {
-    navigate("/facturation", { state: { devisList } });
-  };
+      const data = await response.json();
 
-  const handleDelete = (index: number) => {
-    const newList = devisList.filter((_, i) => i !== index);
-    setDevisList(newList);
-  };
-  const handleEdit = (index: number) => {
-    setEditIndex(index);
-    setEditDevis(devisList[index]);
-    setEditOpen(true);
+      if (!response.ok) {
+        console.error("Erreur backend :", data);
+        alert("Erreur lors de l’enregistrement.");
+      } else {
+        alert("✅ Devis enregistré !");
+      }
+    } catch (err) {
+      console.error("Erreur réseau :", err);
+      alert("Erreur réseau !");
+    }
   };
 
   return (
-    <Container>
-      {/* Formulaire pour ajouter un devis */}
-      <Card sx={{ p: 3, boxShadow: 4, borderRadius: 3 }}>
-        <CardContent>
-          <Typography variant="h4" align="center" sx={{ mb: 2 }}>
-            <AddShoppingCart fontSize="large" sx={{ color: "#1976d2" }} /> Créer
-            un Devis
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Nom du Client"
-                  name="client"
-                  value={devis.client}
-                  variant="outlined"
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
+    <Grid container spacing={2} sx={{ padding: 2 }}>
+      <Grid item xs={12}>
+        <Typography> Ici vous créer un devis de votre location</Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          label="Date de création"
+          type="date"
+          name="dateCreation"
+          InputLabelProps={{ shrink: true }}
+          value={form.dateCreation.toISOString().split("T")[0]}
+          onChange={handleChange}
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          label="Numéro de devis"
+          name="numeroDevis"
+          value={form.numeroDevis}
+          onChange={handleChange}
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          select
+          label="Client"
+          name="client"
+          value={form.clientId}
+          onChange={handleChange}
+          fullWidth
+        >
+          {clients.map((client) => (
+            <MenuItem key={client.id} value={client.id}>
+              {client.lastName}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
 
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Référence"
-                  name="ref"
-                  value={devis.ref}
-                  variant="outlined"
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Voiture"
-                  name="voiture"
-                  value={devis.voiture}
-                  variant="outlined"
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Numéro Voiture"
-                  name="numeroVoiture"
-                  value={devis.numeroVoiture}
-                  variant="outlined"
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  label="Date de départ"
-                  name="dateDepart"
-                  value={devis.dateDepart}
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  label="Date d'arrivée"
-                  name="dateArrivee"
-                  value={devis.dateArrivee}
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="Nombre de jours"
-                  name="nombreJours"
-                  value={devis.nombreJours}
-                  variant="outlined"
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Carburant"
-                  name="carburant"
-                  value={devis.carburant}
-                  variant="outlined"
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="Prix Unitaire (Ar)"
-                  name="prixUnitaire"
-                  value={devis.prixUnitaire}
-                  variant="outlined"
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="Prix Total (Ar)"
-                  name="prixTotal"
-                  variant="outlined"
-                  value={devis.prixTotal}
-                  disabled
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  sx={{ py: 1.5 }}
-                >
-                  Enregistrer le Devis
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </CardContent>
-      </Card>
+      <Grid item xs={6}>
+        <TextField
+          select
+          label="Véhicule"
+          name="vehicle"
+          value={form.items[0].vehiculeId}
+          onChange={handleChange}
+          fullWidth
+        >
+          {vehicles.map((vehicle) => (
+            <MenuItem key={vehicle.id} value={vehicle.id}>
+              {vehicle.nom}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          select
+          label="Région"
+          name="regionId"
+          value={form.items[0].regionId}
+          onChange={(e) => {
+            const regionId = Number(e.target.value);
+            setForm((prev) => ({
+              ...prev,
+              items: [
+                {
+                  ...prev.items[0],
+                  regionId,
+                },
+              ],
+            }));
+          }}
+          fullWidth
+        >
+          {regions.map((region) => (
+            <MenuItem key={region.id} value={region.id}>
+              {region.nom_region}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
 
-      {devisList.length > 0 && (
-        <Box mt={4}>
-          <Typography variant="h6" gutterBottom>
-            Liste des Devis enregistrés
-          </Typography>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Réf</TableCell>
-                <TableCell>Client</TableCell>
-                <TableCell>Voiture</TableCell>
-                <TableCell>Dates</TableCell>
-                <TableCell>Jours</TableCell>
-                <TableCell>Carburant</TableCell>
-                <TableCell>PU</TableCell>
-                <TableCell>Total</TableCell>
-                <TableCell>Action</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {devisList.map((d, index) => (
-                <TableRow key={index}>
-                  <TableCell>{d.ref}</TableCell>
-                  <TableCell>{d.client}</TableCell>
-                  <TableCell>
-                    {d.voiture} ({d.numeroVoiture})
-                  </TableCell>
-                  <TableCell>
-                    {d.dateDepart} → {d.dateArrivee}
-                  </TableCell>
-                  <TableCell>{d.nombreJours}</TableCell>
-                  <TableCell>{d.carburant}</TableCell>
-                  <TableCell>{d.prixUnitaire} Ar</TableCell>
-                  <TableCell>{d.prixTotal} Ar</TableCell>
-                  <TableCell>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(index)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                  <IconButton color="primary" onClick={() => handleEdit(index)}>
-                    <EditIcon />
-                  </IconButton>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      <Grid item xs={6}>
+        <TextField
+          type="date"
+          label="Date de début"
+          name="dateDebut"
+          InputLabelProps={{ shrink: true }}
+          value={form.items[0].dateDebut}
+          onChange={handleChange}
+          fullWidth
+        />
+      </Grid>
 
-          {/* Boutons PDF + facturation */}
-          <Box mt={2}>
-            <Button
-              variant="outlined"
-              color="success"
-              onClick={() => generatePDF(devisList)}
-              sx={{ mr: 2 }}
-            >
-              Générer le PDF
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleNavigateToFacturation}
-            >
-              Aller à la Facturation
-            </Button>
-          </Box>
-        </Box>
-      )}
+      <Grid item xs={6}>
+        <TextField
+          type="date"
+          label="Date de fin"
+          name="dateFin"
+          InputLabelProps={{ shrink: true }}
+          value={form.items[0].dateFin}
+          onChange={handleChange}
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          label="Nombre de jours"
+          value={
+            form.items[0].dateDebut && form.items[0].dateFin
+              ? calculateDays()
+              : 0
+          }
+          InputProps={{ readOnly: true }}
+          fullWidth
+        />
+      </Grid>
 
-      <Dialog
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Modifier le Devis</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} mt={1}>
-            {Object.entries(editDevis || {}).map(
-              ([key, value]) =>
-                key !== "prixTotal" && (
-                  <Grid item xs={12} sm={6} key={key}>
-                    <TextField
-                      fullWidth
-                      label={key}
-                      name={key}
-                      value={value}
-                      type={
-                        ["prixUnitaire", "nombreJours"].includes(key)
-                          ? "number"
-                          : "text"
-                      }
-                      onChange={(e) =>
-                        setEditDevis({
-                          ...editDevis,
-                          [key]: e.target.value,
-                          prixTotal:
-                            key === "nombreJours" || key === "prixUnitaire"
-                              ? Number(
-                                  key === "nombreJours"
-                                    ? e.target.value
-                                    : editDevis.nombreJours
-                                ) *
-                                Number(
-                                  key === "prixUnitaire"
-                                    ? e.target.value
-                                    : editDevis.prixUnitaire
-                                )
-                              : editDevis.prixTotal,
-                        })
-                      }
-                    />
-                  </Grid>
-                )
-            )}
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditOpen(false)}>Annuler</Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              const updated = [...devisList];
-              updated[editIndex!] = editDevis;
-              setDevisList(updated);
-              setEditOpen(false);
-            }}
-          >
-            Sauvegarder
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+      <Grid item xs={6}>
+        <TextField
+          type="number"
+          label="Prix unitaire"
+          name="prixUnitaire"
+          value={form.items[0].prixUnitaire}
+          onChange={handleChange}
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          label="Prix carburant"
+          name="prixCarburant"
+          value={form.prixCarburant}
+          onChange={handleChange}
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          type="number"
+          label="Prix total"
+          value={
+            form.items[0].prixUnitaire &&
+            form.items[0].dateDebut &&
+            form.items[0].dateFin
+              ? calculateDays() * Number(form.items[0].prixUnitaire)
+              : 0
+          }
+          InputProps={{ readOnly: true }}
+          fullWidth
+        />
+      </Grid>
+
+      <Grid item xs={6}>
+        <TextField
+          label="Total en lettre"
+          name="totalEnLettre"
+          value={form.totalEnLettre}
+          onChange={handleChange}
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          label="Signature client"
+          name="signatureClient"
+          value={form.signatureClient}
+          onChange={handleChange}
+          fullWidth
+        />
+      </Grid>
+
+      <Grid item xs={12}>
+        <Button onClick={handleSubmit} variant="contained" fullWidth>
+          Enregistrer le devis
+        </Button>
+      </Grid>
+    </Grid>
   );
 };
 
-export default DevisForm;
+export default CreateDevis;

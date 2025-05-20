@@ -20,6 +20,9 @@ var regions_module_1 = require("./regions/regions.module");
 var prixs_module_1 = require("./prixs/prixs.module");
 var client_module_1 = require("./client/client.module");
 var proforma_module_1 = require("./proforma/proforma.module");
+var mailer_module_1 = require("./mailer/mailer.module");
+var devis_controller_1 = require("./devis/devis.controller");
+var devis_module_1 = require("./devis/devis.module");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -40,7 +43,10 @@ var AppModule = /** @class */ (function () {
                 regions_module_1.RegionsModule,
                 prixs_module_1.PrixsModule,
                 proforma_module_1.ProformaModule,
-            ]
+                mailer_module_1.MailerModule,
+                devis_module_1.DevisModule,
+            ],
+            controllers: [devis_controller_1.DevisController]
         })
     ], AppModule);
     return AppModule;

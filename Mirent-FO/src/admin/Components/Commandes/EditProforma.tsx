@@ -8,12 +8,13 @@ import {
   Paper,
   Snackbar,
   Alert,
+  MenuItem,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import axios from "axios";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../redux/store";
 import { updateProforma } from "../../../redux/features/commande/commandeSlice";
-import { DatePicker } from "@mui/x-date-pickers";
-import axios from "axios";
 
 interface Prix {
   id: number;
@@ -28,8 +29,8 @@ interface EditProformaItemProps {
 
 const EditProformaItem: React.FC<EditProformaItemProps> = ({
   item,
-  onClose,
   onSave,
+  onClose,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -53,20 +54,30 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
   const [dateRetour, setDateRetour] = useState<Date | null>(
     item?.dateRetour ? new Date(item.dateRetour) : null
   );
-  const [nombreJours, setNombreJours] = useState<number>(0);
+  const [nombreJours, setNombreJours] = useState(item?.nombreJours ?? 0);
   const [subTotal, setSubTotal] = useState<number>(item?.subTotal ?? 0);
+  interface Region {
+    id: number;
+    nom_region: string;
+    // add other properties if needed
+  }
+  const [region, setRegions] = useState<Region[]>([]);
 
-  // Récupération de la liste des prix au chargement
   useEffect(() => {
-    const fetchPrixList = async () => {
+    const fetchRegions = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/prix");
-        setPrixList(res.data);
-      } catch (err) {
-        console.error("Erreur lors du chargement des prix :", err);
+        const response = await axios.get("http://localhost:3000/regions");
+        setRegions(response.data);
+        console.log("Régions chargées :", response.data);
+      } catch (error) {
+        console.error(
+          "Erreur lors du chargement des régions avec prix :",
+          error
+        );
       }
     };
-    fetchPrixList();
+
+    fetchRegions();
   }, []);
 
   // Mise à jour du nombre de jours
@@ -86,7 +97,9 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
     }
   }, [formData.prixId, nombreJours, prixList]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -110,25 +123,25 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
       };
 
       const response = await axios.put(
-        `http://localhost:3000/proforma/${formData.id}`, // Correction de l'endpoint ici
+        `http://localhost:3000/proforma-items/${formData.id}`,
         updatedItem
       );
 
       dispatch(
         updateProforma({
-          id: formData.proformaId, // Utilisation de proformaId car c'est l'ID de la proforma à mettre à jour dans le slice
-          items: [{ ...updatedItem, id: formData.id }], // Envoi d'un tableau avec l'item mis à jour
+          id: formData.proformaId,
+          items: [{ ...updatedItem, id: formData.id }],
         })
       );
+
       onSave(response.data);
       setOpenSnackbar(true);
       onClose();
     } catch (error: any) {
-      // Typage de l'erreur pour un accès plus sûr aux propriétés
       console.error("Erreur lors de l’enregistrement :", error);
       setSnackbarMessage(
         error?.response?.data?.message || "Erreur lors de la mise à jour."
-      ); // Affichage d'un message d'erreur plus précis si disponible
+      );
       setSnackbarOpen(true);
     } finally {
       setLoading(false);
@@ -173,8 +186,9 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
             fullWidth
             value={formData.prixId}
             onChange={handleChange}
-          />
+          ></TextField>
         </Grid>
+
         <Grid item xs={12} sm={6}>
           <DatePicker
             label="Date de départ"

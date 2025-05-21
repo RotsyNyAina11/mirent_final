@@ -3,6 +3,7 @@ import ClientHome from "../clients/pages/home";
 import VehiclesPage from "../clients/pages/vehiculePage";
 import ReservationList from "../clients/pages/reservationList";
 import VehicleDetails from "../clients/components/VehiclesDetails";
+import ReservationPage from "../clients/pages/reservationPage";
 
 
 
@@ -14,7 +15,8 @@ const ClientRoutes = () => {
                 <Route path="accueil" element={<ClientHome/>} />
                 <Route path="/list-vehicule" element={<VehiclesPage />} />
                 <Route path="/voitures/:id/details" element={<VehicleDetails /> }/>
-                <Route path="/reservations" element={<ReservationList/>}/>
+                <Route path="/voitures/:id/reserver" element={<ReservationPage />} />
+                <Route path="/reservations-list" element={<ReservationList/>}/>
             </Routes>
     );
 };

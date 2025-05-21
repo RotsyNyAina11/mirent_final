@@ -105,6 +105,7 @@ const statuses = ["Tous", "Disponible", "Réservé", "En maintenance"];
 
 // Composant VehicleDetails pour le popover
 const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose: () => void }> = ({ vehicle, onClose }) => {
+  const navigate = useNavigate();
   const buttonVariants = {
     hover: { scale: 1.05, boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)" },
     tap: { scale: 0.95 },
@@ -157,6 +158,7 @@ const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose
           <IconButton
             onClick={onClose}
             sx={{ position: "absolute", top: 12, right: 12, bgcolor: "rgba(255, 255, 255, 0.9)", "&:hover": { bgcolor: "#fff" } }}
+            aria-label="Fermer le popover"
           >
             <CloseIcon sx={{ color: "#0f172a" }} />
           </IconButton>
@@ -231,6 +233,8 @@ const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose
           <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
             <Button
               variant="contained"
+              onClick={() => navigate(`/voitures/${vehicle.id}/reserver`)}
+              disabled={vehicle.status !== "Disponible"}
               sx={{
                 bgcolor: "#ff6f61",
                 color: "#fff",
@@ -241,8 +245,9 @@ const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose
                 textTransform: "none",
                 fontFamily: "'Inter', sans-serif",
                 "&:hover": { bgcolor: "#ff4d40" },
+                "&:disabled": { bgcolor: "#bdbdbd", color: "#fff" },
               }}
-              aria-label="Réserver ce véhicule"
+              aria-label={`Réserver ${vehicle.brand} ${vehicle.model}`}
             >
               Réserver Maintenant
             </Button>
@@ -670,7 +675,8 @@ const VehiclesPage: React.FC = () => {
                           <Button
                             size="medium"
                             variant="contained"
-                            onClick={() => navigate(`/voitures/${vehicle.id}`)}
+                            onClick={() => navigate(`/voitures/${vehicle.id}/reserver`)}
+                            disabled={vehicle.status !== "Disponible"} // Added disabled prop
                             sx={{
                               bgcolor: "#ff6f61",
                               color: "#fff",
@@ -681,6 +687,7 @@ const VehiclesPage: React.FC = () => {
                               textTransform: "none",
                               fontFamily: "'Inter', sans-serif",
                               "&:hover": { bgcolor: "#ff4d40" },
+                              "&:disabled": { bgcolor: "#bdbdbd", color: "#fff" }, // Added disabled style
                             }}
                             aria-label={`Réserver ${vehicle.brand} ${vehicle.model}`}
                           >

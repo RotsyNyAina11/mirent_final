@@ -28,7 +28,7 @@ import { motion } from "framer-motion";
 const navItems = [
   { label: "Accueil", path: "/accueil" },
   { label: "Nos voitures", path: "/list-vehicule" },
-  { label: "Mes réservations", path: "/reservations" },
+  { label: "Mes réservations", path: "/reservations-list" },
   { label: "Contact", path: "#contact" },
 ];
 

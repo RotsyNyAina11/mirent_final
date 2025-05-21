@@ -22,6 +22,7 @@ import {
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import Navbar from "../components/Navbar";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -33,78 +34,12 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BuildIcon from "@mui/icons-material/Build";
 import image from "/src/assets/bg.jpeg";
+import { Vehicle, fetchVehicles, fetchVehicleTypes, fetchVehicleStatuses } from "../../redux/features/vehicle/vehiclesSlice";
+import { RootState } from "../../redux/store";
+import { useAppDispatch } from "../../hooks";
 
-// Données fictives pour les voitures
-const mockVehicles = [
-  {
-    id: 1,
-    brand: "Toyota",
-    model: "Corolla",
-    status: "Disponible",
-    type: "Berline",
-    image: "/src/assets/1.jpg",
-    description: "La Toyota Corolla est une berline fiable et économique, parfaite pour les trajets urbains et les longues distances. Équipée d'un moteur hybride, elle offre un excellent rendement énergétique.",
-    features: ["Climatisation", "Système hybride", "Caméra de recul", "Bluetooth"],
-  },
-  {
-    id: 2,
-    brand: "Honda",
-    model: "Civic",
-    status: "Réservé",
-    type: "Berline",
-    image: "/src/assets/1.jpg",
-    description: "La Honda Civic combine style et performance avec une conduite dynamique. Idéale pour ceux qui recherchent confort et technologie.",
-    features: ["Écran tactile", "Régulateur de vitesse", "Sièges chauffants", "Aide au stationnement"],
-  },
-  {
-    id: 3,
-    brand: "BMW",
-    model: "Serie 3",
-    status: "Disponible",
-    type: "Berline",
-    image: "/src/assets/1.jpg",
-    description: "La BMW Série 3 offre une expérience de conduite premium avec des finitions haut de gamme et des technologies avancées.",
-    features: ["Suspension adaptative", "Toit ouvrant", "Système de navigation", "Intérieur cuir"],
-  },
-  {
-    id: 4,
-    brand: "Mercedes",
-    model: "Classe C",
-    status: "En maintenance",
-    type: "Berline",
-    image: "/src/assets/1.jpg",
-    description: "La Mercedes Classe C est synonyme de luxe et de confort, avec des équipements de pointe et une conduite fluide.",
-    features: ["Sièges électriques", "Éclairage d'ambiance", "Assistance à la conduite", "Son premium"],
-  },
-  {
-    id: 5,
-    brand: "Volkswagen",
-    model: "Tiguan",
-    status: "Disponible",
-    type: "SUV",
-    image: "/src/assets/1.jpg",
-    description: "Le Volkswagen Tiguan est un SUV polyvalent, idéal pour les familles et les aventures en plein air, avec un espace généreux.",
-    features: ["4x4", "Coffre spacieux", "Écran multifonction", "Démarrage sans clé"],
-  },
-  {
-    id: 6,
-    brand: "Audi",
-    model: "Q5",
-    status: "Réservé",
-    type: "SUV",
-    image: "/src/assets/1.jpg",
-    description: "L'Audi Q5 allie élégance et robustesse, avec des performances tout-terrain et un intérieur raffiné.",
-    features: ["Quattro 4x4", "Toit panoramique", "Volant multifonction", "Écran tête haute"],
-  },
-];
-
-// Marques, types et statuts pour les filtres
-const brands = ["Toutes", "Toyota", "Honda", "BMW", "Mercedes", "Volkswagen", "Audi"];
-const types = ["Tous", "Berline", "SUV", "Coupé", "Cabriolet"];
-const statuses = ["Tous", "Disponible", "Réservé", "En maintenance"];
-
-// Composant VehicleDetails pour le popover
-const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose: () => void }> = ({ vehicle, onClose }) => {
+// Composant VehicleDetails
+const VehicleDetails: React.FC<{ vehicle: Vehicle | null; onClose: () => void }> = ({ vehicle, onClose }) => {
   const navigate = useNavigate();
   const buttonVariants = {
     hover: { scale: 1.05, boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)" },
@@ -165,8 +100,8 @@ const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose
           <CardMedia
             component="img"
             height="200"
-            image={vehicle.image || "https://via.placeholder.com/500x200?text=Image+Indisponible"}
-            alt={`${vehicle.brand} ${vehicle.model}`}
+            image={vehicle.imageUrl || "https://via.placeholder.com/500x200?text=Image+Indisponible"}
+            alt={`${vehicle.marque} ${vehicle.modele}`}
             sx={{ objectFit: "cover", borderTopLeftRadius: 8, borderTopRightRadius: 8 }}
           />
         </Box>
@@ -176,28 +111,28 @@ const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose
             fontWeight="bold"
             sx={{ color: "#0f172a", mb: 2, fontFamily: "'Inter', sans-serif", fontSize: "1.5rem" }}
           >
-            {vehicle.brand} {vehicle.model}
+            {vehicle.marque} {vehicle.modele}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
             <Chip
               icon={<DirectionsCarIcon />}
-              label={vehicle.type}
+              label={vehicle.type.type}
               sx={{ bgcolor: "#e3f2fd", color: "#1976d2", fontWeight: 600, fontFamily: "'Inter', sans-serif" }}
             />
             <Chip
               icon={
-                vehicle.status === "Disponible" ? (
+                vehicle.status.status === "Disponible" ? (
                   <CheckCircleIcon />
-                ) : vehicle.status === "Réservé" ? (
+                ) : vehicle.status.status === "Réservé" ? (
                   <CancelIcon />
                 ) : (
                   <BuildIcon />
                 )
               }
-              label={vehicle.status}
+              label={vehicle.status.status}
               sx={{
-                bgcolor: vehicle.status === "Disponible" ? "#e8f5e9" : vehicle.status === "Réservé" ? "#fff3e0" : "#ffebee",
-                color: vehicle.status === "Disponible" ? "#2e7d32" : vehicle.status === "Réservé" ? "#ff9800" : "#d32f2f",
+                bgcolor: vehicle.status.status === "Disponible" ? "#e8f5e9" : vehicle.status.status === "Réservé" ? "#fff3e0" : "#ffebee",
+                color: vehicle.status.status === "Disponible" ? "#2e7d32" : vehicle.status.status === "Réservé" ? "#ff9800" : "#d32f2f",
                 fontWeight: 600,
                 fontFamily: "'Inter', sans-serif",
               }}
@@ -207,34 +142,28 @@ const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose
             variant="body2"
             sx={{ color: "#475569", mb: 2, lineHeight: 1.7, fontFamily: "'Inter', sans-serif" }}
           >
-            {vehicle.description}
+            Immatriculation: {vehicle.immatriculation}
           </Typography>
           <Typography
             variant="subtitle1"
             fontWeight="bold"
             sx={{ color: "#0f172a", mb: 1.5, fontFamily: "'Inter', sans-serif" }}
           >
-            Caractéristiques
+            Nombre de places
           </Typography>
-          <Grid container spacing={1}>
-            {vehicle.features.map((feature, index) => (
-              <Grid item xs={12} sm={6} key={index}>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#1976d2", fontWeight: 500, fontFamily: "'Inter', sans-serif" }}
-                >
-                  • {feature}
-                </Typography>
-              </Grid>
-            ))}
-          </Grid>
+          <Typography
+            variant="body2"
+            sx={{ color: "#1976d2", fontWeight: 500, fontFamily: "'Inter', sans-serif" }}
+          >
+            {vehicle.nombrePlace} places
+          </Typography>
         </CardContent>
         <CardActions sx={{ p: 3, pt: 0, display: "flex", gap: 2, justifyContent: "center" }}>
           <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
             <Button
               variant="contained"
               onClick={() => navigate(`/voitures/${vehicle.id}/reserver`)}
-              disabled={vehicle.status !== "Disponible"}
+              disabled={vehicle.status.status !== "Disponible"}
               sx={{
                 bgcolor: "#ff6f61",
                 color: "#fff",
@@ -247,7 +176,7 @@ const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose
                 "&:hover": { bgcolor: "#ff4d40" },
                 "&:disabled": { bgcolor: "#bdbdbd", color: "#fff" },
               }}
-              aria-label={`Réserver ${vehicle.brand} ${vehicle.model}`}
+              aria-label={`Réserver ${vehicle.marque} ${vehicle.modele}`}
             >
               Réserver Maintenant
             </Button>
@@ -280,29 +209,49 @@ const VehicleDetails: React.FC<{ vehicle: typeof mockVehicles[0] | null; onClose
 
 const VehiclesPage: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const {
+    vehicles,
+    vehiclesLoading,
+    vehiclesError,
+    vehiclesType,
+    vehiclesTypeLoading,
+    vehiclesTypeError,
+    vehiclesStatus,
+    vehiclesStatusLoading,
+    vehiclesStatusError,
+  } = useSelector((state: RootState) => state.vehicles);
+
   const [page, setPage] = useState(1);
   const [brandFilter, setBrandFilter] = useState("Toutes");
   const [typeFilter, setTypeFilter] = useState("Tous");
   const [statusFilter, setStatusFilter] = useState("Tous");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(null);
   const itemsPerPage = 6;
 
-  // Simuler un chargement
+  // Charger les données au montage du composant
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 800);
-  }, []);
+    dispatch(fetchVehicles());
+    dispatch(fetchVehicleTypes());
+    dispatch(fetchVehicleStatuses());
+  }, [dispatch]);
 
-  // Filtrage des voitures
-  const filteredVehicles = mockVehicles.filter((vehicle) => {
-    const matchesBrand = brandFilter === "Toutes" || vehicle.brand === brandFilter;
-    const matchesType = typeFilter === "Tous" || vehicle.type === typeFilter;
-    const matchesStatus = statusFilter === "Tous" || vehicle.status === statusFilter;
+  // Filtres dynamiques à partir des données Redux
+  const brands = ["Toutes", ...new Set(vehicles.map((v) => v.marque))];
+  const types = ["Tous", ...vehiclesType.map((t) => t.type)];
+  const statuses = ["Tous", ...vehiclesStatus.map((s) => s.status)];
+
+  // Filtrage des véhicules
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    const matchesBrand = brandFilter === "Toutes" || vehicle.marque === brandFilter;
+    const matchesType = typeFilter === "Tous" || vehicle.type.type === typeFilter;
+    const matchesStatus = statusFilter === "Tous" || vehicle.status.status === statusFilter;
     const matchesSearch = searchQuery
-      ? vehicle.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        vehicle.model.toLowerCase().includes(searchQuery.toLowerCase())
+      ? vehicle.marque.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        vehicle.modele.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        vehicle.immatriculation.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
     return matchesBrand && matchesType && matchesStatus && matchesSearch;
   });
@@ -354,7 +303,7 @@ const VehiclesPage: React.FC = () => {
     setSelectedVehicleId(null);
   };
 
-  const selectedVehicle = mockVehicles.find((v) => v.id === selectedVehicleId) || null;
+  const selectedVehicle = vehicles.find((v) => v.id === selectedVehicleId) || null;
 
   return (
     <Box
@@ -416,6 +365,15 @@ const VehiclesPage: React.FC = () => {
           </Typography>
         </motion.div>
 
+        {/* Affichage des erreurs */}
+        {(vehiclesError || vehiclesTypeError || vehiclesStatusError) && (
+          <Box sx={{ mb: 4, textAlign: "center" }}>
+            <Typography color="error" sx={{ fontFamily: "'Inter', sans-serif" }}>
+              Erreur : {vehiclesError || vehiclesTypeError || vehiclesStatusError}
+            </Typography>
+          </Box>
+        )}
+
         {/* Filtres */}
         <Box
           sx={{
@@ -432,7 +390,7 @@ const VehiclesPage: React.FC = () => {
           }}
         >
           <TextField
-            label="Rechercher (marque, modèle)"
+            label="Rechercher (marque, modèle, immatriculation)"
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -450,7 +408,7 @@ const VehiclesPage: React.FC = () => {
               sx: { borderRadius: 8, py: 0.5 },
             }}
             InputLabelProps={{ sx: { fontFamily: "'Inter', sans-serif" } }}
-            aria-label="Rechercher une voiture par marque ou modèle"
+            aria-label="Rechercher une voiture par marque, modèle ou immatriculation"
           />
           <FormControl
             sx={{
@@ -569,7 +527,7 @@ const VehiclesPage: React.FC = () => {
 
         {/* Grille des voitures */}
         <Grid container spacing={{ xs: 2, md: 3 }}>
-          {isLoading
+          {(vehiclesLoading || vehiclesTypeLoading || vehiclesStatusLoading)
             ? Array.from(new Array(6)).map((_, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
                   <Skeleton
@@ -617,8 +575,8 @@ const VehiclesPage: React.FC = () => {
                       <CardMedia
                         component="img"
                         height="240"
-                        image={vehicle.image || "https://via.placeholder.com/500x240?text=Image+Indisponible"}
-                        alt={`${vehicle.brand} ${vehicle.model}`}
+                        image={vehicle.imageUrl || "https://via.placeholder.com/500x240?text=Image+Indisponible"}
+                        alt={`${vehicle.marque} ${vehicle.modele}`}
                         sx={{ objectFit: "cover", borderTopLeftRadius: 8, borderTopRightRadius: 8 }}
                       />
                       <CardContent sx={{ flexGrow: 1, p: 3 }}>
@@ -633,7 +591,7 @@ const VehiclesPage: React.FC = () => {
                             fontFamily: "'Inter', sans-serif",
                           }}
                         >
-                          {vehicle.brand} {vehicle.model}
+                          {vehicle.marque} {vehicle.modele}
                         </Typography>
                         <Typography
                           variant="body2"
@@ -643,12 +601,12 @@ const VehiclesPage: React.FC = () => {
                             fontFamily: "'Inter', sans-serif",
                           }}
                         >
-                          {vehicle.type}
+                          {vehicle.type.type}
                         </Typography>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                          {vehicle.status === "Disponible" ? (
+                          {vehicle.status.status === "Disponible" ? (
                             <CheckCircleIcon sx={{ color: "#2e7d32", fontSize: "1.2rem" }} />
-                          ) : vehicle.status === "Réservé" ? (
+                          ) : vehicle.status.status === "Réservé" ? (
                             <CancelIcon sx={{ color: "#ff9800", fontSize: "1.2rem" }} />
                           ) : (
                             <BuildIcon sx={{ color: "#d32f2f", fontSize: "1.2rem" }} />
@@ -657,16 +615,16 @@ const VehiclesPage: React.FC = () => {
                             variant="body1"
                             sx={{
                               color:
-                                vehicle.status === "Disponible"
+                                vehicle.status.status === "Disponible"
                                   ? "#2e7d32"
-                                  : vehicle.status === "Réservé"
+                                  : vehicle.status.status === "Réservé"
                                   ? "#ff9800"
                                   : "#d32f2f",
                               fontWeight: 600,
                               fontFamily: "'Inter', sans-serif",
                             }}
                           >
-                            {vehicle.status}
+                            {vehicle.status.status}
                           </Typography>
                         </Box>
                       </CardContent>
@@ -676,7 +634,7 @@ const VehiclesPage: React.FC = () => {
                             size="medium"
                             variant="contained"
                             onClick={() => navigate(`/voitures/${vehicle.id}/reserver`)}
-                            disabled={vehicle.status !== "Disponible"} // Added disabled prop
+                            disabled={vehicle.status.status !== "Disponible"}
                             sx={{
                               bgcolor: "#ff6f61",
                               color: "#fff",
@@ -687,9 +645,9 @@ const VehiclesPage: React.FC = () => {
                               textTransform: "none",
                               fontFamily: "'Inter', sans-serif",
                               "&:hover": { bgcolor: "#ff4d40" },
-                              "&:disabled": { bgcolor: "#bdbdbd", color: "#fff" }, // Added disabled style
+                              "&:disabled": { bgcolor: "#bdbdbd", color: "#fff" },
                             }}
-                            aria-label={`Réserver ${vehicle.brand} ${vehicle.model}`}
+                            aria-label={`Réserver ${vehicle.marque} ${vehicle.modele}`}
                           >
                             Réserver
                           </Button>
@@ -711,7 +669,7 @@ const VehiclesPage: React.FC = () => {
                               "&:hover": { borderColor: "#1565c0", bgcolor: "rgba(25, 118, 210, 0.08)" },
                             }}
                             startIcon={<InfoIcon />}
-                            aria-label={`Voir les détails de ${vehicle.brand} ${vehicle.model}`}
+                            aria-label={`Voir les détails de ${vehicle.marque} ${vehicle.modele}`}
                           >
                             Détails
                           </Button>
@@ -741,7 +699,7 @@ const VehiclesPage: React.FC = () => {
         </Grid>
 
         {/* Pagination */}
-        {totalPages > 1 && !isLoading && (
+        {totalPages > 1 && !vehiclesLoading && (
           <Box sx={{ mt: 8, display: "flex", justifyContent: "center" }}>
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}

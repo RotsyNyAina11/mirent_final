@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -19,16 +19,25 @@ import {
   IconButton,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { RootState } from "../../../redux/store";
-import { fetchVehicleTypes } from "../../../redux/features/vehicle/vehiclesSlice";
-
-
+import {
+  fetchVehicleTypes,
+  addVehicleType as addVehicleTypeAction,
+  updateVehicleType as updateVehicleTypeAction,
+  deleteVehicleType as deleteVehicleTypeAction,
+  VehicleType as VehicleTypeState, // Renommer pour éviter la confusion avec l'interface locale
+} from "../../../redux/features/vehicle/vehiclesSlice";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
 // Couleurs personnalisées (alignées avec l'image)
 const primaryColor = "#1976d2"; // Bleu pour les boutons et icônes
@@ -91,16 +100,34 @@ const VehicleTypes: React.FC = () => {
   const { vehiclesType, vehiclesTypeLoading, vehiclesTypeError } = useSelector(
     (state: RootState) => state.vehicles
   );
-  const [filteredTypes, setFilteredTypes] = useState<VehicleType[]>(vehiclesType);
+  const [filteredTypes, setFilteredTypes] =
+    useState<VehicleType[]>(vehiclesType);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [newVehicleType, setNewVehicleType] = useState("");
+  const [editingVehicleType, setEditingVehicleType] =
+    useState<VehicleType | null>(null);
+  const [deletingVehicleTypeId, setDeletingVehicleTypeId] = useState<
+    number | null
+  >(null);
 
   // Récupérer les types de véhicules au montage du composant
   useEffect(() => {
-    dispatch(fetchVehicleTypes() as any); 
+    dispatch(fetchVehicleTypes() as any);
   }, [dispatch]);
 
+  // Filtrer les types de véhicules en fonction du terme de recherche
+  useEffect(() => {
+    const filtered = vehiclesType.filter((type) =>
+      type.type.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredTypes(filtered);
+    setPage(0); // Réinitialiser la page lors de la recherche
+  }, [searchTerm, vehiclesType]);
 
   // Gérer le changement de page
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -108,7 +135,9 @@ const VehicleTypes: React.FC = () => {
   };
 
   // Gérer le changement du nombre de lignes par page
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -118,20 +147,78 @@ const VehicleTypes: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  // Placeholder pour les actions (à implémenter selon vos besoins)
-  const handleEdit = (id: number) => {
-    console.log(`Modifier le type avec l'ID: ${id}`);
-    // Implémenter la logique pour modifier un type
+  const handleOpenAddDialog = () => {
+    setNewVehicleType("");
+    setOpenAddDialog(true);
   };
 
-  const handleDelete = (id: number) => {
-    console.log(`Supprimer le type avec l'ID: ${id}`);
-    // Implémenter la logique pour supprimer un type
+  const handleCloseAddDialog = () => {
+    setOpenAddDialog(false);
+  };
+
+  const handleAddVehicleType = () => {
+    if (newVehicleType.trim()) {
+      dispatch(
+        addVehicleTypeAction({ id: Date.now(), type: newVehicleType }) as any
+      );
+      handleCloseAddDialog();
+    }
+  };
+
+  const handleOpenEditDialog = (vehicleType: VehicleType) => {
+    setEditingVehicleType({ ...vehicleType });
+    setOpenEditDialog(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditingVehicleType(null);
+    setOpenEditDialog(false);
+  };
+
+  const handleEditVehicleType = () => {
+    if (editingVehicleType && editingVehicleType.type.trim()) {
+      dispatch(
+        updateVehicleTypeAction(editingVehicleType as VehicleTypeState) as any
+      );
+      handleCloseEditDialog();
+    }
+  };
+
+  const handleOpenDeleteDialog = (id: number) => {
+    setDeletingVehicleTypeId(id);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeletingVehicleTypeId(null);
+    setOpenDeleteDialog(false);
+  };
+
+  const handleDeleteVehicleType = () => {
+    if (deletingVehicleTypeId !== null) {
+      dispatch(deleteVehicleTypeAction(deletingVehicleTypeId) as any);
+      handleCloseDeleteDialog();
+    }
   };
 
   const handleExportCSV = () => {
     console.log("Exporter les types de véhicules en CSV");
-    // Implémenter la logique pour exporter en CSV
+    // Implémenter la logique pour exporter en CSV (peut-être via une librairie comme 'papaparse')
+    const csvData = filteredTypes
+      .map((type) => `${type.id},${type.type}`)
+      .join("\n");
+    const csvHeader = "ID,Type\n";
+    const csvString = csvHeader + csvData;
+
+    const blob = new Blob([csvString], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.setAttribute("href", url);
+    a.setAttribute("download", "vehicle_types.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   };
 
   return (
@@ -159,7 +246,12 @@ const VehicleTypes: React.FC = () => {
       </Typography>
 
       {/* Barre d'actions */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Box display="flex" gap={2}>
           <SearchField
             variant="outlined"
@@ -193,6 +285,7 @@ const VehicleTypes: React.FC = () => {
         <ActionButton
           variant="contained"
           startIcon={<AddIcon />}
+          onClick={handleOpenAddDialog}
           sx={{
             backgroundColor: primaryColor,
             color: "#fff",
@@ -207,7 +300,12 @@ const VehicleTypes: React.FC = () => {
 
       {/* Gestion du chargement et des erreurs */}
       {vehiclesTypeLoading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="200px"
+        >
           <CircularProgress sx={{ color: primaryColor }} />
         </Box>
       ) : vehiclesTypeError ? (
@@ -224,16 +322,22 @@ const VehicleTypes: React.FC = () => {
               boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <Table sx={{ minWidth: 650 }} aria-label="tableau des types de véhicules">
+            <Table
+              sx={{ minWidth: 650 }}
+              aria-label="tableau des types de véhicules"
+            >
               <TableHead>
                 <TableRow sx={{ backgroundColor: "#fafafa" }}>
                   <TableCell sx={{ fontWeight: "600", color: textColor }}>
                     <Box display="flex" alignItems="center" gap={1}>
                       Type
-                      <ArrowUpwardIcon sx={{ fontSize: "16px", color: "#888" }} />
+                      {/* Placeholder for sorting icon, implement if needed */}
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: "600", color: textColor }} align="right">
+                  <TableCell
+                    sx={{ fontWeight: "600", color: textColor }}
+                    align="right"
+                  >
                     Actions
                   </TableCell>
                 </TableRow>
@@ -242,7 +346,9 @@ const VehicleTypes: React.FC = () => {
                 {filteredTypes.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={2} align="center">
-                      <Typography color={textColor}>Aucun type de véhicule trouvé</Typography>
+                      <Typography color={textColor}>
+                        Aucun type de véhicule trouvé
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -257,16 +363,18 @@ const VehicleTypes: React.FC = () => {
                           },
                         }}
                       >
-                        <TableCell sx={{ color: textColor }}>{type.type}</TableCell>
+                        <TableCell sx={{ color: textColor }}>
+                          {type.type}
+                        </TableCell>
                         <TableCell align="right">
                           <IconButton
-                            onClick={() => handleEdit(type.id)}
+                            onClick={() => handleOpenEditDialog(type)}
                             sx={{ color: primaryColor }}
                           >
                             <EditIcon />
                           </IconButton>
                           <IconButton
-                            onClick={() => handleDelete(type.id)}
+                            onClick={() => handleOpenDeleteDialog(type.id)}
                             sx={{ color: errorColor }}
                           >
                             <DeleteIcon />
@@ -289,15 +397,102 @@ const VehicleTypes: React.FC = () => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             labelRowsPerPage="Lignes par page :"
-            labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`}
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from}–${to} de ${count}`
+            }
             sx={{
-              "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
-                color: textColor,
-              },
+              "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
+                {
+                  color: textColor,
+                },
             }}
           />
         </>
       )}
+
+      {/* Dialog d'ajout */}
+      <Dialog open={openAddDialog} onClose={handleCloseAddDialog}>
+        <DialogTitle>Ajouter un type de véhicule</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Type de véhicule"
+            fullWidth
+            variant="outlined"
+            value={newVehicleType}
+            onChange={(e) => setNewVehicleType(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAddDialog}>Annuler</Button>
+          <Button
+            variant="contained"
+            onClick={handleAddVehicleType}
+            sx={{ backgroundColor: primaryColor }}
+          >
+            Ajouter
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog d'édition */}
+      <Dialog open={openEditDialog} onClose={handleCloseEditDialog}>
+        <DialogTitle>Modifier le type de véhicule</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Type de véhicule"
+            fullWidth
+            variant="outlined"
+            value={editingVehicleType?.type || ""}
+            onChange={(e) =>
+              setEditingVehicleType((prev) =>
+                prev ? { ...prev, type: e.target.value } : null
+              )
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditDialog}>Annuler</Button>
+          <Button
+            variant="contained"
+            onClick={handleEditVehicleType}
+            sx={{ backgroundColor: primaryColor }}
+            disabled={!editingVehicleType?.type.trim()}
+          >
+            Enregistrer
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog de suppression */}
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Confirmer la suppression"}
+        </DialogTitle>
+        <DialogContent>
+          <Typography id="alert-dialog-description">
+            Êtes-vous sûr de vouloir supprimer ce type de véhicule ?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog}>Annuler</Button>
+          <Button
+            onClick={handleDeleteVehicleType}
+            autoFocus
+            sx={{ color: errorColor }}
+          >
+            Supprimer
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

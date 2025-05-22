@@ -51,7 +51,8 @@ const Footer: React.FC = () => {
               <img src={logo} alt="Mirent Location" style={{ height: "2em" }} />
             </Typography>
             <Typography color="gray">Email : mirent.mdg@gmail.com</Typography>
-            <Typography color="gray">Tél : +261 34 00 000 00</Typography>
+            <Typography color="gray">Tél : +261 38 13 690 04</Typography>
+            <Typography color="gray"> LOT II P Ter Avaradoha</Typography>
             <Typography color="gray">Antananarivo, Madagascar</Typography>
           </Grid>
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Grid } from "@mui/material";
-import LocationList from "../../../admin/Components/lieux/locationList";
+import LocationList from "../../Components/lieux/locationList";
 
 const LocationsPage: React.FC = () => {
   return (

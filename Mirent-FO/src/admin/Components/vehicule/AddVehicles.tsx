@@ -16,12 +16,7 @@ import {
   SelectChangeEvent,
   InputAdornment,
 } from "@mui/material";
-import {
-  createVehicle,
-  fetchVehicles,
-  Vehicle,
-} from "../../../redux/features/vehicle/vehiclesSlice";
-import { useAppDispatch } from "../../../hooks";
+
 import { toast } from "react-toastify";
 import {
   AiOutlineCar,
@@ -30,6 +25,12 @@ import {
   AiOutlineClose,
 } from "react-icons/ai";
 import { CameraAltOutlined } from "@mui/icons-material";
+import { useAppDispatch } from "../../../hooks";
+import {
+  createVehicle,
+  fetchVehicles,
+  Vehicle,
+} from "../../../redux/features/vehicle/vehiclesSlice";
 
 interface AddVehicleProps {
   open: boolean;

@@ -78,8 +78,8 @@ const NavLinkButton = styled(
 
 const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
   const [openCommande, setOpenCommande] = useState(false);
+  const [openVehicules, setOpenVehicules] = useState(false); // Nouvel état pour le sous-menu Véhicules
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [openVehicules, setOpenVehicules] = useState(false);
 
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
@@ -104,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
   };
 
   const handleVehiculesClick = () => {
-    setOpenVehicules(!openVehicules);
+    setOpenVehicules(!openVehicules); // Gestion du clic pour ouvrir/fermer le sous-menu
   };
 
   const toggleCollapse = () => {
@@ -119,7 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
   };
 
   return (
-    <>
+    <React.Fragment>
       {/* En-tête sticky avec le logo */}
       <Box
         bgcolor="white"
@@ -274,7 +274,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                 <Home />
               </ListItemIcon>
               <ListItemText
-                primary="Accueil"
+                primary="Acceuil"
                 primaryTypographyProps={{
                   fontSize: "14px",
                   fontWeight: "500",
@@ -568,6 +568,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               </Tooltip>
             </List>
           </Collapse>
+
           {/* Liste des Clients */}
           <Tooltip title="Liste des Clients" placement="right">
             <NavLinkButton
@@ -634,6 +635,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           </Tooltip>
 
           {/* Lieux de Location */}
+
           <Tooltip title="Lieux de Location" placement="right">
             <NavLinkButton
               to="/admin/lieux"
@@ -778,7 +780,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           </Box>
         </List>
       </Drawer>
-    </>
+    </React.Fragment>
   );
 };
 

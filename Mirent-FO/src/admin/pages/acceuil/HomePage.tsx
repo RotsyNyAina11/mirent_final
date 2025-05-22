@@ -1,5 +1,6 @@
 import { Container, Grid } from "@mui/material";
-import Accueil from "../../../admin/Components/acceuil/Accueil";
+
+import Accueil from "../../../admin/Components/acceuil/Acceuil";
 
 const Home: React.FC = () => {
   return (

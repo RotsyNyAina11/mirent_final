@@ -38,12 +38,10 @@ import {
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useDispatch, useSelector } from "react-redux";
 
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import { AppDispatch, RootState } from "../../../redux/store";
-import {
-  fetchVehicles,
-  Vehicle,
-} from "../../../redux/features/vehicle/vehiclesSlice";
+import { fetchVehicles, Vehicle } from "../../../redux/features/vehicle/vehiclesSlice";
+
 
 // Thème personnalisé (identique à LocationList.tsx et VehiclesList.tsx)
 const theme = createTheme({

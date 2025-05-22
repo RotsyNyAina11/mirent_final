@@ -9,6 +9,7 @@ exports.__esModule = true;
 exports.Devis = void 0;
 var typeorm_1 = require("typeorm");
 var client_entity_1 = require("./client.entity");
+// import { User } from './user.entity';
 var devis_item_entity_1 = require("./devis-item.entity");
 var Devis = /** @class */ (function () {
     function Devis() {

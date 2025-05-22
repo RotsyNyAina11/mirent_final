@@ -7,9 +7,9 @@ import {
 import "react-toastify/dist/ReactToastify.css";
 
 import MainLayout from "../layouts/MainLayouts";
-import Performat from "../admin/pages/proforma/ProformaPage";
+import Performat from "../admin/pages/proforma/ProformaList";
 import Devis from "../admin/pages/Devis/DevisPage";
-import ProformaPage from "../admin/pages/proforma/ProformaPage";
+import ProformaPage from "../admin/pages/proforma/proformaPage";
 import Commande from "../admin/pages/commande/CommandePage";
 import LocationsPage from "../admin/pages/lieux/locationPage";
 import ContratPage from "../admin/pages/contrat/contratPage";
@@ -85,15 +85,14 @@ const AdminRoutes = () => {
         }
       />
 
-      {/*
-        <Route
-          path="/proformas"
-          element={
-            <MainLayout>
-              <ProformaPage />
-            </MainLayout>
-          }
-        />*/}
+      <Route
+        path="/proformas"
+        element={
+          <MainLayout>
+            <ProformaPage />
+          </MainLayout>
+        }
+      />
 
       {/* Route pour la page Table proforma */}
       <Route

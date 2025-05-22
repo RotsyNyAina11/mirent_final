@@ -1,15 +1,11 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import "react-toastify/dist/ReactToastify.css";
 import Login from "./Component/login/Login";
 import Register from "./Component/register/Register";
 import ClientRoutes from "./routes/clientRoute";
-import AdminRoutes from "./routes/adminRoute";
+import AdminRoutes from "./routes/adminRoutes";
 
 const App: React.FC = () => {
   return (
@@ -17,6 +13,7 @@ const App: React.FC = () => {
       <Routes>
         {/* Authentification */}
         <Route path="/login" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
 
         {/* Client */}

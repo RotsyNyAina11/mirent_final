@@ -19,17 +19,14 @@ import {
   AiOutlineTag,
 } from "react-icons/ai";
 import { CameraAltOutlined } from "@mui/icons-material";
+import { useState, useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import {
   updateVehicle,
   Vehicle,
-  fetchVehicleTypes,
-  fetchVehicleStatuses,
 } from "../../../redux/features/vehicle/vehiclesSlice";
-import { useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../../redux/store";
-import { RootState } from "../../../redux/store";
-import { toast } from "react-toastify";
+import { AppDispatch, RootState } from "../../../redux/store";
 
 interface EditVehicleProps {
   open: boolean;

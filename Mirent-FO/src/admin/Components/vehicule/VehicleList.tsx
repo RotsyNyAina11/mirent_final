@@ -1,15 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useAppDispatch } from "../../../hooks";
 import { useSelector } from "react-redux";
-import {
-  deleteVehicle,
-  fetchVehicles,
-  fetchVehicleStatuses,
-  fetchVehicleTypes,
-  Vehicle,
-  VehicleStatus,
-  VehicleType,
-} from "../../../redux/features/vehicle/vehiclesSlice";
 import {
   Box,
   TextField,
@@ -51,8 +41,18 @@ import {
   TwoWheeler,
   FilterList,
 } from "@mui/icons-material";
-import AddVehicle from "./AddVehicle";
-import EditVehicle from "./EditVehicle";
+import { useAppDispatch } from "../../../hooks";
+import {
+  deleteVehicle,
+  fetchVehicles,
+  fetchVehicleStatuses,
+  fetchVehicleTypes,
+  Vehicle,
+  VehicleStatus,
+  VehicleType,
+} from "../../../redux/features/vehicle/vehiclesSlice";
+import EditVehicle from "./EditVehicles";
+import AddVehicle from "./AddVehicles";
 
 // Thème personnalisé (identique à LocationList.tsx)
 const theme = createTheme({

@@ -16,6 +16,7 @@ import { MailerModule } from './mailer/mailer.module';
 import { DevisController } from './devis/devis.controller';
 import { DevisModule } from './devis/devis.module';
 
+
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),

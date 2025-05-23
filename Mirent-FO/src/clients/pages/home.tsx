@@ -30,7 +30,7 @@ const ClientHome = () => {
   };
 
   return (
-    <Box>
+    <Box sx={{ pb: 8, pt: { xs: 10, md: 12 } }}>
         <Navbar />
 
       {/* HERO */}
@@ -227,7 +227,7 @@ const ClientHome = () => {
         </Container>
       </Box>
 
-      {/* VÉHICULES POPULAIRES */}
+      {/*Nos VÉHICULES */}
       <Box sx={{ py: 10, bgcolor: "#0f172a" }}>
         <Container maxWidth="lg">
           <Typography
@@ -241,7 +241,7 @@ const ClientHome = () => {
               color: "#f3f4f6",
             }}
           >
-            Véhicules Populaires
+           Nos Véhicules 
           </Typography>
           <Grid container spacing={4}>
             {[1, 2, 3].map((_, index) => (

@@ -389,11 +389,11 @@ const Navbar: React.FC = () => {
                 right: 20,
                 transform: "rotate(45deg)",
                 boxShadow: 1,
-              }}
+              }} 
             />
             <Stack spacing={1}>
               {[
-                { label: "Mes réservations", path: "/reservations" },
+                { label: "Mes réservations", path: "/reservations-list" },
                 { label: "Mon profil", path: "/profile" },
               ].map((item) => (
                 <motion.div key={item.label} variants={buttonVariants} whileHover="hover" whileTap="tap">

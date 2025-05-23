@@ -80,14 +80,8 @@ const ReservationList: React.FC = () => {
   };
 
   return (
-    <Box>
+    <Box sx={{ pb: 8, pt: { xs: 10, md: 12 } }}>
       <Navbar />
-      <Box 
-          sx={{ 
-            p: 4, 
-            pt: 15, 
-          }}
-      >
         <Typography variant="h5" mb={3} fontWeight="bold" align="center">
           Mes réservations
         </Typography>
@@ -199,7 +193,6 @@ const ReservationList: React.FC = () => {
             color="primary"
           />
         </Box>
-      </Box>
     </Box>
   );
 };

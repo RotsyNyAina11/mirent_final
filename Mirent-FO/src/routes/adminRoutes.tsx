@@ -6,11 +6,12 @@ import Types from "../admin/pages/type/type";
 import ClientPage from "../admin/pages/clients/ClientPage";
 import ProformaPage from "../admin/pages/proforma/proformaPage";
 import LocationsPage from "../admin/pages/lieux/locationPage";
+import UserProfile from "../Components/profile/userProfile";
 
 const AdminRoutes = () => {
     return (
         <Routes>
-            <Route path="/" element={<Navigate to="admin/home" />} />
+            <Route path="/" element={<Navigate to="home" />} />
             <Route
                 path="home"
                 element={
@@ -61,6 +62,15 @@ const AdminRoutes = () => {
                 element={
                     <MainLayout>
                     <LocationsPage />
+                    </MainLayout>
+                }
+            />
+
+            <Route
+                path="profile"
+                element={
+                    <MainLayout>
+                        <UserProfile />
                     </MainLayout>
                 }
             />

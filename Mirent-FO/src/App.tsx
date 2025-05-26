@@ -9,7 +9,8 @@ import Login from "./components/login/Login";
 import Register from "./components/register/Register";
 import ClientRoutes from "./routes/ClientRoute";
 import AdminRoutes from "./routes/AdminRoutes";
-import UserProfile from "./components/profile/userProfile";
+import UserProfile from "./Components/profile/userProfile";
+
 
 
 

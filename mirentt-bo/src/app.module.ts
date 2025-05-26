@@ -12,7 +12,6 @@ import { PrixsModule } from './prixs/prixs.module';
 import { ClientModule } from './client/client.module';
 import { ProformaModule } from './proforma/proforma.module';
 import { MailerModule } from './mailer/mailer.module';
-import { ReservationsModule } from './reservations/reservations.module';
 
 
 
@@ -34,7 +33,6 @@ import { ReservationsModule } from './reservations/reservations.module';
     PrixsModule,
     ProformaModule,
     MailerModule,
-    ReservationsModule
   ],
 })
 export class AppModule {}

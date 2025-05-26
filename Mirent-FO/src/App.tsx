@@ -9,6 +9,7 @@ import Login from "./components/login/Login";
 import Register from "./components/register/Register";
 import ClientRoutes from "./routes/ClientRoute";
 import AdminRoutes from "./routes/AdminRoutes";
+import UserProfile from "./components/profile/userProfile";
 
 
 
@@ -20,6 +21,9 @@ const App: React.FC = () => {
         {/* Authentification */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />}/>
+
+        {/* User profile */}
+        <Route path="/userProfile" element={<UserProfile />} />
 
         {/* Client */}
         <Route path="/*" element={<ClientRoutes />} />

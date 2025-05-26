@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { Region } from '../types/region';
+import axios from "axios";
+import { Region } from "../types/region";
 
-const API_URL = 'http://localhost:3000/regions';
+const API_URL = "http://localhost:3000/regions";
 
 export const RegionsService = {
   findAllWithDetails: async (): Promise<Region[]> => {
@@ -9,12 +9,12 @@ export const RegionsService = {
     return response.data;
   },
 
-  createFull: async (region: Omit<Region, 'id'>): Promise<Region> => {
+  createFull: async (region: Omit<Region, "id">): Promise<Region> => {
     try {
       const response = await axios.post(API_URL, region);
       return response.data;
     } catch (error) {
-      console.error('Error creating region:', error);
+      console.error("Error creating region:", error);
       throw error;
     }
   },

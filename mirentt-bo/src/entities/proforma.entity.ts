@@ -1,7 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Client } from './client.entity';
 import { ProformaItem } from './proformat-item.entity';
-import { NumericTransformer } from '../numeric.transformer'; // Assurez-vous que le chemin est correct
+import { NumericTransformer } from '../numeric.transformer'; // Vérifie le chemin du fichier
 
 export enum ProformaStatus {
   BROUILLON = 'Brouillon',
@@ -18,7 +26,10 @@ export class Proforma {
   @Column({ unique: true })
   proformaNumber: string;
 
-  @ManyToOne(() => Client, client => client.proformas, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Client, (client) => client.proformas, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   client: Client;
 
   @Column()
@@ -30,10 +41,18 @@ export class Proforma {
   @Column({ nullable: true })
   notes?: string;
 
-  @OneToMany(() => ProformaItem, item => item.proforma, { eager: true, cascade: true })
+  @OneToMany(() => ProformaItem, (item) => item.proforma, {
+    eager: true,
+    cascade: true,
+  })
   items: ProformaItem[];
 
-  @Column('decimal', { precision: 10, scale: 2, default: 0, transformer: new NumericTransformer() })
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: new NumericTransformer(),
+  })
   totalAmount: number;
 
   @Column({

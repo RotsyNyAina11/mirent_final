@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { RegionService } from './regions.service';
 import { Region } from 'src/entities/region.entity';
 import { Prix } from 'src/entities/prix.entity';
-import { CreateRegionDto } from './create-region.dto';
 
+import { CreateRegionDto } from './create-region.dto';
 
 @Controller('regions')
 export class RegionController {
@@ -20,12 +28,18 @@ export class RegionController {
   }
 
   @Put(':id')
-  async updateFull(@Param('id') id: number, @Body() region: Partial<Region>): Promise<Region> {
+  async updateFull(
+    @Param('id') id: number,
+    @Body() region: Partial<Region>,
+  ): Promise<Region> {
     return this.regionService.updateFull(id, region);
   }
 
   @Put(':id/prix')
-  async updatePrix(@Param('id') id: number, @Body('prix') prix: number): Promise<Prix> {
+  async updatePrix(
+    @Param('id') id: number,
+    @Body('prix') prix: number,
+  ): Promise<Prix> {
     return this.regionService.updatePrix(id, prix);
   }
 

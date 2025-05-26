@@ -1,4 +1,291 @@
+{
+  /*
+  <<<<<<< HEAD
+// src/redux/features/proforma/proformaSlice.ts
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { Proforma } from "../../../models/Proforma";
+
+// Définition de l'état initial du slice
+interface ProformaState {
+  proformas: Proforma[]; // Liste des proformas
+  loading: boolean; // Indicateur de chargement
+  error: string | null; // Erreur éventuelle
+}
+
+const initialState: ProformaState = {
+  proformas: [],
+=======
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+
+// Interface pour un proforma
+interface Proforma {
+  id: number;
+  client: { id: number; lastName: string };
+  proformaNumber: string;
+  date: string;
+  contractReference?: string;
+  notes?: string;
+  totalAmount: number;
+  status: "En attente" | "Confirmé" | "Annulé";
+  items: ProformaItem[];
+}
+
+// Interface pour un élément de proforma
+interface ProformaItem {
+  id: number;
+  vehicle: { id: number; nom: string };
+  region: { id: number; nom_region: string };
+  prix: { id: number; prix: number };
+  dateDepart: string;
+  dateRetour: string;
+  nombreJours: number;
+  subTotal: number;
+}
+
+// Interface pour les données de création de proforma
+interface CreateProformaData {
+  clientLastName: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  date: string;
+  contractReference?: string;
+  notes?: string;
+  items: CreateProformaItemData[];
+}
+
+interface CreateProformaItemData {
+  vehicleCriteria: { marque?: string; modele?: string; type?: string };
+  regionName: string;
+  dateDepart: string;
+  dateRetour: string;
+}
+
+// Interface pour les critères de recherche de véhicules disponibles
+interface FindAvailableVehiclesCriteria {
+  marque?: string;
+  modele?: string;
+  type?: string;
+  dateDepart: string;
+  dateRetour: string;
+}
+
+// Interface pour un véhicule
+interface Vehicle {
+  id: number;
+  nom: string;
+  marque: string;
+  modele: string;
+  type: { id: number; type: string };
+  status: { id: number; status: string };
+}
+
+// État initial
+interface ProformasState {
+  proformas: Proforma[];
+  availableVehicles: Vehicle[];
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: ProformasState = {
+  proformas: [],
+  availableVehicles: [],
+>>>>>>> 41a7ba639d797058ff3f9caae41861a8c0253f1e
+  loading: false,
+  error: null,
+};
+
+<<<<<<< HEAD
+// Action asynchrone pour récupérer les proformas
+export const fetchProformas = createAsyncThunk(
+  "proforma/fetchProformas",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch("http://localhost:3000/proforma");
+      if (!response.ok) {
+        throw new Error("Failed to fetch proformas.");
+      }
+      return (await response.json()) as Proforma[];
+
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Action asynchrone pour créer une nouvelle proforma
+export const createProforma = createAsyncThunk(
+  "proforma/create",
+  async (proforma: Omit<Proforma, "id">, { rejectWithValue }) => {
+    try {
+      console.log("Données envoyées :", JSON.stringify(proforma, null, 2));
+
+      const response = await fetch("http://localhost:3000/proforma", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(proforma),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Réponse du serveur :", errorText);
+        throw new Error(
+          "Erreur lors de la création de la proforma : " + errorText
+        );
+      }
+
+      return (await response.json()) as Proforma;
+    } catch (error: any) {
+      console.error("Erreur attrapée :", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Action asynchrone pour mettre à jour une proforma existante
+export const updateProforma = createAsyncThunk(
+  "proforma/update",
+  async (proforma: Proforma, { rejectWithValue }) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/proforma/${proforma.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(proforma),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la mise à jour de la proforma");
+      }
+
+      return (await response.json()) as Proforma;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Slice Redux pour gérer l'état des proformas
+const proformaSlice = createSlice({
+  name: "proforma",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+
+
+      .addCase(
+        fetchProformas.fulfilled,
+        (state, action: PayloadAction<Proforma[]>) => {
+          state.loading = false;
+          state.proformas = action.payload;
+        }
+      )
+      .addCase(fetchProformas.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(createProforma.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        createProforma.fulfilled,
+        (state, action: PayloadAction<Proforma>) => {
+          state.loading = false;
+          state.proformas.push(action.payload);
+        }
+      )
+      .addCase(createProforma.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateProforma.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        updateProforma.fulfilled,
+        (state, action: PayloadAction<Proforma>) => {
+          state.loading = false;
+          const index = state.proformas.findIndex(
+            (proforma) => proforma.id === action.payload.id
+          );
+          if (index >= 0) {
+            state.proformas[index] = action.payload;
+          }
+        }
+      )
+      .addCase(updateProforma.rejected, (state, action) => {
+=======
+      .addCase(fetchProformas.fulfilled, (state, action) => {
+        state.loading = false;
+        state.proformas = action.payload;
+      })
+      .addCase(fetchProformas.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Récupération des véhicules disponibles
+    builder
+      .addCase(fetchAvailableVehicles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAvailableVehicles.fulfilled, (state, action) => {
+        state.loading = false;
+        state.availableVehicles = action.payload;
+      })
+      .addCase(fetchAvailableVehicles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Suppression d'un proforma
+    builder
+      .addCase(deleteProforma.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProforma.fulfilled, (state, action) => {
+        state.loading = false;
+        state.proformas = state.proformas.filter((proforma) => proforma.id !== action.payload);
+      })
+      .addCase(deleteProforma.rejected, (state, action) => {
+>>>>>>> 41a7ba639d797058ff3f9caae41861a8c0253f1e
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+  },
+});
+
+<<<<<<< HEAD
+// Sélecteurs pour récupérer les informations de l'état dans le store
+export const selectProformasLoading = (state: { proforma: ProformaState }) =>
+  state.proforma.loading;
+export const selectProformasError = (state: { proforma: ProformaState }) =>
+  state.proforma.error;
+export const selectProformas = (state: { proforma: ProformaState }) =>
+  state.proforma.proformas;
+
+export default proformaSlice.reducer;
+=======
+// Exporter les actions
+export const { setError } = proformasSlice.actions;
+
+// Exporter le reducer
+export default proformasSlice.reducer;
+>>>>>>> 41a7ba639d797058ff3f9caae41861a8c0253f1e
+*/
+}
+
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 // Interface pour un proforma
 interface Proforma {
@@ -79,17 +366,19 @@ const initialState: ProformasState = {
 
 // Thunk pour créer un proforma
 export const createProforma = createAsyncThunk(
-  'proformas/createProforma',
+  "proformas/createProforma",
   async (proformaData: CreateProformaData, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:3000/proforma', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://localhost:3000/proforma", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(proformaData),
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur lors de la création du proforma');
+        throw new Error(
+          errorData.message || "Erreur lors de la création du proforma"
+        );
       }
       const data = await response.json();
       return data;
@@ -101,13 +390,15 @@ export const createProforma = createAsyncThunk(
 
 // Thunk pour récupérer tous les proformas
 export const fetchProformas = createAsyncThunk(
-  'proformas/fetchProformas',
+  "proformas/fetchProformas",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:3000/proforma');
+      const response = await fetch("http://localhost:3000/proforma");
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur lors de la récupération des proformas');
+        throw new Error(
+          errorData.message || "Erreur lors de la récupération des proformas"
+        );
       }
       const data = await response.json();
       return data;
@@ -119,14 +410,19 @@ export const fetchProformas = createAsyncThunk(
 
 // Thunk pour récupérer les véhicules disponibles
 export const fetchAvailableVehicles = createAsyncThunk(
-  'proformas/fetchAvailableVehicles',
+  "proformas/fetchAvailableVehicles",
   async (criteria: FindAvailableVehiclesCriteria, { rejectWithValue }) => {
     try {
       const query = new URLSearchParams(criteria as any).toString();
-      const response = await fetch(`http://localhost:3000/proforma/available-vehicles?${query}`);
+      const response = await fetch(
+        `http://localhost:3000/proforma/available-vehicles?${query}`
+      );
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur lors de la récupération des véhicules disponibles');
+        throw new Error(
+          errorData.message ||
+            "Erreur lors de la récupération des véhicules disponibles"
+        );
       }
       const data = await response.json();
       return data;
@@ -138,16 +434,18 @@ export const fetchAvailableVehicles = createAsyncThunk(
 
 // Thunk pour supprimer un proforma
 export const deleteProforma = createAsyncThunk(
-  'proformas/deleteProforma',
+  "proformas/deleteProforma",
   async (id: number, { rejectWithValue }) => {
     try {
       const response = await fetch(`http://localhost:3000/proforma/${id}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur lors de la suppression du proforma');
+        throw new Error(
+          errorData.message || "Erreur lors de la suppression du proforma"
+        );
       }
       return id;
     } catch (error: any) {
@@ -158,7 +456,7 @@ export const deleteProforma = createAsyncThunk(
 
 // Slice Redux
 const proformasSlice = createSlice({
-  name: 'proformas',
+  name: "proformas",
   initialState,
   reducers: {
     setError: (state, action: PayloadAction<string>) => {
@@ -219,7 +517,9 @@ const proformasSlice = createSlice({
       })
       .addCase(deleteProforma.fulfilled, (state, action) => {
         state.loading = false;
-        state.proformas = state.proformas.filter((proforma) => proforma.id !== action.payload);
+        state.proformas = state.proformas.filter(
+          (proforma) => proforma.id !== action.payload
+        );
       })
       .addCase(deleteProforma.rejected, (state, action) => {
         state.loading = false;

@@ -16,6 +16,7 @@ import {
   SelectChangeEvent,
   InputAdornment,
 } from "@mui/material";
+
 import { toast } from "react-toastify";
 import {
   AiOutlineCar,
@@ -25,11 +26,18 @@ import {
 } from "react-icons/ai";
 import { CameraAltOutlined } from "@mui/icons-material";
 import { useAppDispatch } from "../../../hooks";
-import { createVehicle, fetchVehicles, Vehicle } from "../../../redux/features/vehicle/vehiclesSlice";
+import {
+  createVehicle,
+  fetchVehicles,
+  Vehicle,
+} from "../../../redux/features/vehicle/vehiclesSlice";
 
 interface AddVehicleProps {
   open: boolean;
   onClose: () => void;
+  vehicleId: number;
+  currentStatus: string;
+  onSuccess?: () => void;
 }
 
 const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
@@ -50,6 +58,20 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [imageFile, setImageFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    const getStatuses = async () => {
+      try {
+        const data = await Promise.all([
+          fetch("http://localhost:3000/status").then((res) => res.json()),
+        ]);
+        setVehicleStatuses(data.map((item: any) => item.status)); // ou item.name selon ton modèle
+      } catch (error) {
+        console.error("Erreur :", error);
+      }
+    };
+    getStatuses();
+  }, []);
 
   useEffect(() => {
     const fetchVehicleData = async () => {
@@ -79,7 +101,9 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
         }
       } catch (err) {
         console.error("Erreur lors de la récupération des données:", err);
-        toast.error("Une erreur s'est produite lors du chargement des données.");
+        toast.error(
+          "Une erreur s'est produite lors du chargement des données."
+        );
       } finally {
         setIsLoading(false);
       }
@@ -395,6 +419,7 @@ const AddVehicle: React.FC<AddVehicleProps> = ({ open, onClose }) => {
                 onChange={handleSelectStatus}
                 displayEmpty
                 inputProps={{ "aria-label": "Statut" }}
+                style={{ minWidth: 120 }}
               >
                 <MenuItem disabled value="">
                   Sélectionnez un statut

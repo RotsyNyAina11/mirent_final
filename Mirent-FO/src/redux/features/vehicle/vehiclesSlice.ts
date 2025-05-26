@@ -97,6 +97,75 @@ export const fetchVehicleTypes = createAsyncThunk(
     }
   }
 );
+// modifier le type de vehicule
+export const updateVehicleType = createAsyncThunk(
+  "vehicles/updateVehicleType",
+  async (vehicle: Vehicle, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/type/${vehicle.type.id}`,
+        vehicle.type
+      );
+      return response.data as VehicleType;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error updating vehicle type:", error.message);
+        return rejectWithValue(error.message);
+      } else {
+        console.error(
+          "An unknown error occurred while updating vehicle type:",
+          error
+        );
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  }
+);
+//ajouter un type de vehicule
+export const addVehicleType = createAsyncThunk(
+  "vehicles/addVehicleType",
+  async (vehicleType: VehicleType, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/type",
+        vehicleType
+      );
+      return response.data as VehicleType;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error adding vehicle type:", error.message);
+        return rejectWithValue(error.message);
+      } else {
+        console.error(
+          "An unknown error occurred while adding vehicle type:",
+          error
+        );
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  }
+);
+// supprimer un type de vehicule
+export const deleteVehicleType = createAsyncThunk(
+  "vehicles/deleteVehicleType",
+  async (id: number, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/type/${id}`);
+      return id;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error deleting vehicle type:", error.message);
+        return rejectWithValue(error.message);
+      } else {
+        console.error(
+          "An unknown error occurred while deleting vehicle type:",
+          error
+        );
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  }
+);
 
 // Affcher les vehicules
 export const fetchVehicles = createAsyncThunk(
@@ -181,6 +250,14 @@ const vehiclesSlice = createSlice({
         state.vehiclesLoading = false; // Correction
         state.vehicles = action.payload;
       })
+      .addCase(updateVehicleType.fulfilled, (state, action) => {
+        const index = state.vehiclesType.findIndex(
+          (t) => t.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.vehiclesType[index] = action.payload;
+        }
+      })
       .addCase(fetchVehicles.rejected, (state, action) => {
         state.vehiclesLoading = false; // Correction
         state.vehiclesError = action.payload as string; // Correction
@@ -206,6 +283,7 @@ const vehiclesSlice = createSlice({
         state.vehiclesError = action.payload as string;
         console.error("Failed to update vehicle:", action.payload);
       })
+
       .addCase(deleteVehicle.fulfilled, (state, action) => {
         state.vehicles = state.vehicles.filter(
           (vehicle) => vehicle.id !== action.payload

@@ -6,11 +6,8 @@ import { RegionService } from './regions.service';
 import { RegionController } from './regions.controller';
 
 @Module({
-      imports: [
-          TypeOrmModule.forFeature([Region, Prix]),
-          RegionsModule
-      ],
-      controllers: [RegionController],
-      providers: [RegionService],
+  imports: [TypeOrmModule.forFeature([Region, Prix]), RegionsModule],
+  controllers: [RegionController],
+  providers: [RegionService],
 })
 export class RegionsModule {}

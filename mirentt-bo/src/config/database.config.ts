@@ -6,12 +6,16 @@ import { Region } from '../entities/region.entity';
 import { Status } from '../entities/status.entity';
 import { Type } from '../entities/type.entity';
 import { Vehicule } from '../entities/vehicle.entity';
+
 import { Prix } from 'src/entities/prix.entity';
 import { Client } from '../entities/client.entity';
 import { ProformaItem } from 'src/entities/proformat-item.entity';
 import { Proforma } from 'src/entities/proforma.entity';
-import { User } from 'src/auth/entities/user.entity';
 
+import { Devis } from 'src/entities/devis.entity';
+import { DevisItem } from 'src/entities/devis-item.entity';
+
+import { User } from 'src/auth/entities/user.entity';
 
 dotenv.config();
 
@@ -32,7 +36,10 @@ export const typeOrmConfig: DataSourceOptions = {
     Client,
     Prix,
     ProformaItem,
-    Proforma
+    Proforma,
+    Devis,
+    DevisItem,
   ],
+
   synchronize: true,
 };

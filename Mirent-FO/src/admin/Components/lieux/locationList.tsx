@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -32,150 +32,165 @@ import {
   TableSortLabel,
   Fade,
   Tooltip,
-} from '@mui/material';
-import { Delete, Edit, Add, Search, FilterList, FileDownload, LocationOn, Map, AttachMoney } from '@mui/icons-material';
-import { toast, ToastContainer } from 'react-toastify';
-import { useDispatch } from 'react-redux';
-import Papa from 'papaparse';
-import { AppDispatch } from '../../../redux/store';
-import { Region } from '../../../types/region';
-import { RegionsService } from '../../../services/regions.service';
-import { addRegion, updateRegion } from '../../../redux/features/lieux/locationSlice';
+} from "@mui/material";
+import {
+  Delete,
+  Edit,
+  Add,
+  Search,
+  FilterList,
+  FileDownload,
+  LocationOn,
+  Map,
+  AttachMoney,
+} from "@mui/icons-material";
+import { toast, ToastContainer } from "react-toastify";
+import { useDispatch } from "react-redux";
+import Papa from "papaparse";
+import { AppDispatch } from "../../../redux/store";
+import { Region } from "../../../types/region";
+import { RegionsService } from "../../../services/regions.service";
+import {
+  addRegion,
+  updateRegion,
+} from "../../../redux/features/lieux/locationSlice";
 
 // Styles personnalisés (unchanged)
 const PrimaryButton = styled(Button)(({ theme }) => ({
-  backgroundColor: '#3b82f6',
+  backgroundColor: "#3b82f6",
   color: theme.palette.common.white,
-  padding: '8px 16px',
-  borderRadius: '8px',
-  textTransform: 'none',
+  padding: "8px 16px",
+  borderRadius: "8px",
+  textTransform: "none",
   fontWeight: 500,
-  '&:hover': {
-    backgroundColor: '#2563eb',
-    transform: 'scale(1.02)',
-    transition: 'all 0.3s ease',
+  "&:hover": {
+    backgroundColor: "#2563eb",
+    transform: "scale(1.02)",
+    transition: "all 0.3s ease",
   },
-  '&.Mui-disabled': {
-    backgroundColor: '#d1d5db',
-    color: '#6b7280',
+  "&.Mui-disabled": {
+    backgroundColor: "#d1d5db",
+    color: "#6b7280",
   },
 }));
 
 const CancelButton = styled(Button)(({}) => ({
-  color: '#6b7280',
-  borderColor: '#d1d5db',
-  padding: '8px 16px',
-  borderRadius: '8px',
-  textTransform: 'none',
+  color: "#6b7280",
+  borderColor: "#d1d5db",
+  padding: "8px 16px",
+  borderRadius: "8px",
+  textTransform: "none",
   fontWeight: 500,
-  '&:hover': {
-    borderColor: '#9ca3af',
-    backgroundColor: '#f3f4f6',
-    transform: 'scale(1.02)',
-    transition: 'all 0.3s ease',
+  "&:hover": {
+    borderColor: "#9ca3af",
+    backgroundColor: "#f3f4f6",
+    transform: "scale(1.02)",
+    transition: "all 0.3s ease",
   },
 }));
 
 const SearchField = styled(TextField)(({}) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
-    backgroundColor: '#fff',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-    '& fieldset': {
-      borderColor: '#d1d5db',
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "12px",
+    backgroundColor: "#fff",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+    "& fieldset": {
+      borderColor: "#d1d5db",
     },
-    '&:hover fieldset': {
-      borderColor: '#9ca3af',
+    "&:hover fieldset": {
+      borderColor: "#9ca3af",
     },
-    '&.Mui-focused fieldset': {
-      borderColor: '#3b82f6',
+    "&.Mui-focused fieldset": {
+      borderColor: "#3b82f6",
     },
   },
-  '& .MuiInputBase-input': {
-    fontSize: '0.9rem',
-    color: '#1f2937',
+  "& .MuiInputBase-input": {
+    fontSize: "0.9rem",
+    color: "#1f2937",
   },
 }));
 
 const FilterField = styled(TextField)(({}) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '8px',
-    '& fieldset': {
-      borderColor: '#d1d5db',
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    "& fieldset": {
+      borderColor: "#d1d5db",
     },
-    '&:hover fieldset': {
-      borderColor: '#9ca3af',
+    "&:hover fieldset": {
+      borderColor: "#9ca3af",
     },
-    '&.Mui-focused fieldset': {
-      borderColor: '#3b82f6',
-    },
-  },
-  '& .MuiInputBase-input': {
-    fontSize: '0.9rem',
-    color: '#1f2937',
-  },
-}));
-
-const FormField = styled(TextField)(({  }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '8px',
-    backgroundColor: '#fff',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-    '& fieldset': {
-      borderColor: '#d1d5db',
-    },
-    '&:hover fieldset': {
-      borderColor: '#9ca3af',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#3b82f6',
+    "&.Mui-focused fieldset": {
+      borderColor: "#3b82f6",
     },
   },
-  '& .MuiInputLabel-root': {
-    color: '#6b7280',
-    fontSize: '0.9rem',
-  },
-  '& .MuiInputLabel-root.Mui-focused': {
-    color: '#3b82f6',
-  },
-  '& .MuiInputBase-input': {
-    fontSize: '0.9rem',
-    color: '#1f2937',
+  "& .MuiInputBase-input": {
+    fontSize: "0.9rem",
+    color: "#1f2937",
   },
 }));
 
-const ErrorText = styled(Typography)(({ }) => ({
-  color: '#ef4444',
-  fontSize: '0.8rem',
-  marginTop: '4px',
-  marginLeft: '14px',
+const FormField = styled(TextField)(({}) => ({
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    backgroundColor: "#fff",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+    "& fieldset": {
+      borderColor: "#d1d5db",
+    },
+    "&:hover fieldset": {
+      borderColor: "#9ca3af",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#3b82f6",
+    },
+  },
+  "& .MuiInputLabel-root": {
+    color: "#6b7280",
+    fontSize: "0.9rem",
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#3b82f6",
+  },
+  "& .MuiInputBase-input": {
+    fontSize: "0.9rem",
+    color: "#1f2937",
+  },
+}));
+
+const ErrorText = styled(Typography)(({}) => ({
+  color: "#ef4444",
+  fontSize: "0.8rem",
+  marginTop: "4px",
+  marginLeft: "14px",
 }));
 
 const LocationList = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Jusqu'à 600px
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Jusqu'à 600px
 
   const [regions, setRegions] = useState<Region[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [regionToDelete, setRegionToDelete] = useState<Region | null>(null);
-  const [formValues, setFormValues] = useState<Omit<Region, 'id' | 'prix'>>({
-    nom_region: '',
+  const [formValues, setFormValues] = useState<Omit<Region, "id" | "prix">>({
+    nom_region: "",
     nom_district: null,
   });
   const [prixValue, setPrixValue] = useState<number>(0);
-  const [errors, setErrors] = useState<{ nom_region?: string; prix?: string }>({});
-  const [searchQuery, setSearchQuery] = useState('');
+  const [errors, setErrors] = useState<{ nom_region?: string; prix?: string }>(
+    {}
+  );
+  const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [districtFilter, setDistrictFilter] = useState('');
+  const [districtFilter, setDistrictFilter] = useState("");
   const [priceRange, setPriceRange] = useState<number[]>([0, 1000000]);
   const [maxPrice, setMaxPrice] = useState(1000000);
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
-  const [orderBy, setOrderBy] = useState<keyof Region>('nom_region');
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [orderBy, setOrderBy] = useState<keyof Region>("nom_region");
 
   useEffect(() => {
     fetchRegions();
@@ -184,13 +199,21 @@ const LocationList = () => {
   const fetchRegions = async () => {
     try {
       const data = await RegionsService.findAllWithDetails();
-      const sortedRegions = data.sort((a, b) => a.nom_region.localeCompare(b.nom_region));
+      const sortedRegions = data.sort((a, b) =>
+        a.nom_region.localeCompare(b.nom_region)
+      );
       setRegions(sortedRegions);
-      const max = Math.max(...sortedRegions.map((r) => r.prix.prix), 1000000);
+
+      // Filtrer les régions qui ont un prix valide
+      const prixValides = sortedRegions
+        .filter((r) => r.prix && r.prix.prix != null)
+        .map((r) => r.prix.prix);
+
+      const max = prixValides.length > 0 ? Math.max(...prixValides) : 1000000;
       setMaxPrice(max);
       setPriceRange([0, max]);
     } catch (error) {
-      console.error('Error fetching regions:', error);
+      console.error("Error fetching regions:", error);
     }
   };
 
@@ -199,7 +222,7 @@ const LocationList = () => {
     setFormValues(
       region
         ? { nom_region: region.nom_region, nom_district: region.nom_district }
-        : { nom_region: '', nom_district: null }
+        : { nom_region: "", nom_district: null }
     );
     setPrixValue(region ? region.prix.prix : 0);
     setErrors({});
@@ -209,7 +232,7 @@ const LocationList = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedRegion(null);
-    setFormValues({ nom_region: '', nom_district: null });
+    setFormValues({ nom_region: "", nom_district: null });
     setPrixValue(0);
     setErrors({});
   };
@@ -224,24 +247,24 @@ const LocationList = () => {
     const parsedValue = parseFloat(event.target.value);
     if (!isNaN(parsedValue)) {
       setPrixValue(parsedValue);
-      validateField('prix', parsedValue);
+      validateField("prix", parsedValue);
     } else {
       setPrixValue(0);
-      validateField('prix', 0);
+      validateField("prix", 0);
     }
   };
 
   const validateField = (name: string, value: string | number) => {
     const newErrors = { ...errors };
-    if (name === 'nom_region') {
-      if (!value || (typeof value === 'string' && value.trim() === '')) {
-        newErrors.nom_region = 'Le nom de la région est requis';
+    if (name === "nom_region") {
+      if (!value || (typeof value === "string" && value.trim() === "")) {
+        newErrors.nom_region = "Le nom de la région est requis";
       } else {
         delete newErrors.nom_region;
       }
-    } else if (name === 'prix') {
-      if (typeof value === 'number' && value < 0) {
-        newErrors.prix = 'Le prix doit être supérieur ou égal à 0';
+    } else if (name === "prix") {
+      if (typeof value === "number" && value < 0) {
+        newErrors.prix = "Le prix doit être supérieur ou égal à 0";
       } else {
         delete newErrors.prix;
       }
@@ -251,19 +274,19 @@ const LocationList = () => {
 
   const validateForm = () => {
     const newErrors: { nom_region?: string; prix?: string } = {};
-    if (!formValues.nom_region || formValues.nom_region.trim() === '') {
-      newErrors.nom_region = 'Le nom de la région est requis';
+    if (!formValues.nom_region || formValues.nom_region.trim() === "") {
+      newErrors.nom_region = "Le nom de la région est requis";
     }
     if (prixValue < 0) {
-      newErrors.prix = 'Le prix doit être supérieur ou égal à 0';
+      newErrors.prix = "Le prix doit être supérieur ou égal à 0";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const resetRegionName = () => {
-    setFormValues({ ...formValues, nom_region: '' });
-    validateField('nom_region', '');
+    setFormValues({ ...formValues, nom_region: "" });
+    validateField("nom_region", "");
   };
 
   const resetDistrictName = () => {
@@ -272,7 +295,7 @@ const LocationList = () => {
 
   const resetPrice = () => {
     setPrixValue(0);
-    validateField('prix', 0);
+    validateField("prix", 0);
   };
 
   const handleSave = async () => {
@@ -291,19 +314,19 @@ const LocationList = () => {
           })
         );
         fetchRegions();
-        toast.success('Région modifiée avec succès');
+        toast.success("Région modifiée avec succès");
       } else {
         const newRegion = {
           ...formValues,
           prix: { prix: prixValue },
         };
         await dispatch(addRegion(newRegion as Region)).unwrap();
-        toast.success('Région ajoutée avec succès');
+        toast.success("Région ajoutée avec succès");
       }
       fetchRegions();
       handleCloseDialog();
     } catch (err: any) {
-      toast.error(err.message || 'Erreur lors de la sauvegarde de la région');
+      toast.error(err.message || "Erreur lors de la sauvegarde de la région");
     }
   };
 
@@ -311,41 +334,55 @@ const LocationList = () => {
     try {
       if (regionToDelete) {
         await RegionsService.removeRegion(regionToDelete.id);
-        toast.success('Région supprimée avec succès');
+        toast.success("Région supprimée avec succès");
       }
       fetchRegions();
       setRegionToDelete(null);
       setOpenDeleteDialog(false);
     } catch (error) {
-      console.error('Error deleting region:', error);
-      toast.error('Erreur lors de la suppression');
+      console.error("Error deleting region:", error);
+      toast.error("Erreur lors de la suppression");
     }
   };
 
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
   // Tri des colonnes
   const handleRequestSort = (property: keyof Region) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
   // Filtres
   const filteredRegions = regions.filter((region) => {
-    const matchesSearch = region.nom_region.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = region.nom_region
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
     const matchesDistrict = districtFilter
-      ? region.nom_district?.toLowerCase().includes(districtFilter.toLowerCase())
+      ? region.nom_district
+          ?.toLowerCase()
+          .includes(districtFilter.toLowerCase())
       : true;
+
     const matchesPrice =
-      region.prix.prix >= priceRange[0] && region.prix.prix <= priceRange[1];
+      region.prix?.prix != null &&
+      region.prix.prix >= priceRange[0] &&
+      region.prix.prix <= priceRange[1];
+
     return matchesSearch && matchesDistrict && matchesPrice;
   });
 
@@ -354,15 +391,15 @@ const LocationList = () => {
       let aValue: any = a[orderBy];
       let bValue: any = b[orderBy];
 
-      if (orderBy === 'prix') {
+      if (orderBy === "prix") {
         aValue = a.prix.prix;
         bValue = b.prix.prix;
-      } else if (orderBy === 'nom_district') {
-        aValue = a.nom_district || '';
-        bValue = b.nom_district || '';
+      } else if (orderBy === "nom_district") {
+        aValue = a.nom_district || "";
+        bValue = b.nom_district || "";
       }
 
-      if (order === 'asc') {
+      if (order === "asc") {
         return aValue < bValue ? -1 : 1;
       } else {
         return aValue > bValue ? -1 : 1;
@@ -379,14 +416,14 @@ const LocationList = () => {
   const exportToCSV = () => {
     const csvData = sortedRegions.map((region) => ({
       Région: region.nom_region,
-      District: region.nom_district || 'N/A',
-      'Prix (Ar)': region.prix.prix,
+      District: region.nom_district || "N/A",
+      "Prix (Ar)": region.prix.prix,
     }));
     const csv = Papa.unparse(csvData);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', 'regions.csv');
+    link.setAttribute("download", "regions.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -395,14 +432,29 @@ const LocationList = () => {
   return (
     <>
       <ToastContainer />
-      <Grid container spacing={3} sx={{ padding: isMobile ? 2 : 3, backgroundColor: '#f9fafb', minHeight: '100vh' }}>
+      <Grid
+        container
+        spacing={3}
+        sx={{
+          padding: isMobile ? 2 : 3,
+          backgroundColor: "#f9fafb",
+          minHeight: "100vh",
+        }}
+      >
         {/* Titre et description */}
         <Grid item xs={12}>
-          <Typography variant="h4" sx={{ fontWeight: 600, color: '#1f2937', marginBottom: 1 }}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 600, color: "#1f2937", marginBottom: 1 }}
+          >
             Gestion des Lieux de Location
           </Typography>
-          <Typography variant="body1" sx={{ fontSize: '0.9rem', color: '#6b7280' }}>
-            Gérer les lieux de location : ajouter, modifier ou supprimer des régions.
+          <Typography
+            variant="body1"
+            sx={{ fontSize: "0.9rem", color: "#6b7280" }}
+          >
+            Gérer les lieux de location : ajouter, modifier ou supprimer des
+            régions.
           </Typography>
         </Grid>
 
@@ -410,18 +462,25 @@ const LocationList = () => {
         <Grid item xs={12}>
           <Toolbar
             sx={{
-              justifyContent: 'space-between',
-              flexDirection: isMobile ? 'column' : 'row',
+              justifyContent: "space-between",
+              flexDirection: isMobile ? "column" : "row",
               gap: isMobile ? 2 : 0,
               padding: 0,
-              position: 'sticky',
-              top: '64px',
-              backgroundColor: '#f9fafb',
+              position: "sticky",
+              top: "64px",
+              backgroundColor: "#f9fafb",
               zIndex: 2,
               mb: 2,
             }}
           >
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', width: isMobile ? '100%' : 'auto' }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                flexWrap: "wrap",
+                width: isMobile ? "100%" : "auto",
+              }}
+            >
               <SearchField
                 placeholder="Rechercher une région..."
                 value={searchQuery}
@@ -431,49 +490,53 @@ const LocationList = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Search sx={{ color: '#6b7280' }} />
+                      <Search sx={{ color: "#6b7280" }} />
                     </InputAdornment>
                   ),
                 }}
-                sx={{ width: isMobile ? '100%' : '300px' }}
+                sx={{ width: isMobile ? "100%" : "300px" }}
               />
               <Button
                 variant="outlined"
                 startIcon={<FilterList />}
                 onClick={() => setFilterOpen(!filterOpen)}
                 sx={{
-                  borderColor: '#d1d5db',
-                  color: '#1f2937',
-                  borderRadius: '8px',
-                  textTransform: 'none',
-                  '&:hover': {
-                    borderColor: '#9ca3af',
-                    backgroundColor: '#f3f4f6',
+                  borderColor: "#d1d5db",
+                  color: "#1f2937",
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  "&:hover": {
+                    borderColor: "#9ca3af",
+                    backgroundColor: "#f3f4f6",
                   },
                 }}
               >
                 Filtres
               </Button>
             </Box>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
               <Button
                 variant="outlined"
                 startIcon={<FileDownload />}
                 onClick={exportToCSV}
                 sx={{
-                  borderColor: '#d1d5db',
-                  color: '#1f2937',
-                  borderRadius: '8px',
-                  textTransform: 'none',
-                  '&:hover': {
-                    borderColor: '#9ca3af',
-                    backgroundColor: '#f3f4f6',
+                  borderColor: "#d1d5db",
+                  color: "#1f2937",
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  "&:hover": {
+                    borderColor: "#9ca3af",
+                    backgroundColor: "#f3f4f6",
                   },
                 }}
               >
                 Exporter CSV
               </Button>
-              <PrimaryButton variant="contained" startIcon={<Add />} onClick={() => handleOpenDialog()}>
+              <PrimaryButton
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() => handleOpenDialog()}
+              >
                 Ajouter une région
               </PrimaryButton>
             </Box>
@@ -486,13 +549,16 @@ const LocationList = () => {
             <Box
               sx={{
                 p: 2,
-                backgroundColor: '#fff',
-                borderRadius: '12px',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                backgroundColor: "#fff",
+                borderRadius: "12px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                 mb: 2,
               }}
             >
-              <Typography variant="body1" sx={{ fontWeight: 500, mb: 2, color: '#1f2937' }}>
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: 500, mb: 2, color: "#1f2937" }}
+              >
                 Filtres
               </Typography>
               <Grid container spacing={2}>
@@ -507,17 +573,19 @@ const LocationList = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="body2" sx={{ color: '#6b7280', mb: 1 }}>
+                  <Typography variant="body2" sx={{ color: "#6b7280", mb: 1 }}>
                     Plage de prix (Ar): {priceRange[0]} - {priceRange[1]}
                   </Typography>
                   <Slider
                     value={priceRange}
-                    onChange={(e, newValue) => setPriceRange(newValue as number[])}
+                    onChange={(e, newValue) =>
+                      setPriceRange(newValue as number[])
+                    }
                     valueLabelDisplay="auto"
                     min={0}
                     max={maxPrice}
                     step={1000}
-                    sx={{ color: '#3b82f6' }}
+                    sx={{ color: "#3b82f6" }}
                   />
                 </Grid>
               </Grid>
@@ -536,12 +604,12 @@ const LocationList = () => {
                     key={region.id}
                     sx={{
                       mb: 2,
-                      borderRadius: '12px',
-                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                      backgroundColor: '#fff',
-                      '&:hover': {
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                        transition: 'box-shadow 0.3s ease',
+                      borderRadius: "12px",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                      backgroundColor: "#fff",
+                      "&:hover": {
+                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                        transition: "box-shadow 0.3s ease",
                       },
                     }}
                   >
@@ -550,18 +618,21 @@ const LocationList = () => {
                         {region.nom_region}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        District: {region.nom_district || 'N/A'}
+                        District: {region.nom_district || "N/A"}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         Prix: {region.prix.prix} Ar
                       </Typography>
                     </CardContent>
-                    <CardActions sx={{ justifyContent: 'flex-end', p: 1 }}>
+                    <CardActions sx={{ justifyContent: "flex-end", p: 1 }}>
                       <IconButton
                         onClick={() => handleOpenDialog(region)}
                         sx={{
-                          color: '#3b82f6',
-                          '&:hover': { backgroundColor: '#dbeafe', transition: 'background-color 0.3s ease' },
+                          color: "#3b82f6",
+                          "&:hover": {
+                            backgroundColor: "#dbeafe",
+                            transition: "background-color 0.3s ease",
+                          },
                         }}
                         aria-label="Modifier la région"
                       >
@@ -573,8 +644,11 @@ const LocationList = () => {
                           setOpenDeleteDialog(true);
                         }}
                         sx={{
-                          color: '#ef4444',
-                          '&:hover': { backgroundColor: '#fee2e2', transition: 'background-color 0.3s ease' },
+                          color: "#ef4444",
+                          "&:hover": {
+                            backgroundColor: "#fee2e2",
+                            transition: "background-color 0.3s ease",
+                          },
                         }}
                         aria-label="Supprimer la région"
                       >
@@ -584,7 +658,12 @@ const LocationList = () => {
                   </Card>
                 ))
               ) : (
-                <Typography variant="body1" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  textAlign="center"
+                  sx={{ py: 4 }}
+                >
                   Aucune région trouvée.
                 </Typography>
               )}
@@ -595,54 +674,87 @@ const LocationList = () => {
               component={Paper}
               elevation={0}
               sx={{
-                maxHeight: '400px',
-                overflow: 'auto',
-                borderRadius: '12px',
-                backgroundColor: '#fff',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                maxHeight: "400px",
+                overflow: "auto",
+                borderRadius: "12px",
+                backgroundColor: "#fff",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
               }}
             >
               <Table>
                 <TableHead
                   sx={{
-                    backgroundColor: '#f3f4f6',
-                    position: 'sticky',
+                    backgroundColor: "#f3f4f6",
+                    position: "sticky",
                     top: 0,
                     zIndex: 1,
                   }}
                 >
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 500, color: '#6b7280', fontSize: '0.85rem' }}>
+                    <TableCell
+                      sx={{
+                        fontWeight: 500,
+                        color: "#6b7280",
+                        fontSize: "0.85rem",
+                      }}
+                    >
                       <TableSortLabel
-                        active={orderBy === 'nom_region'}
-                        direction={orderBy === 'nom_region' ? order : 'asc'}
-                        onClick={() => handleRequestSort('nom_region')}
-                        sx={{ color: '#6b7280', '&:hover': { color: '#1f2937' } }}
+                        active={orderBy === "nom_region"}
+                        direction={orderBy === "nom_region" ? order : "asc"}
+                        onClick={() => handleRequestSort("nom_region")}
+                        sx={{
+                          color: "#6b7280",
+                          "&:hover": { color: "#1f2937" },
+                        }}
                       >
                         Région
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 500, color: '#6b7280', fontSize: '0.85rem' }}>
+                    <TableCell
+                      sx={{
+                        fontWeight: 500,
+                        color: "#6b7280",
+                        fontSize: "0.85rem",
+                      }}
+                    >
                       <TableSortLabel
-                        active={orderBy === 'nom_district'}
-                        direction={orderBy === 'nom_district' ? order : 'asc'}
-                        onClick={() => handleRequestSort('nom_district')}
-                        sx={{ color: '#6b7280', '&:hover': { color: '#1f2937' } }}
+                        active={orderBy === "nom_district"}
+                        direction={orderBy === "nom_district" ? order : "asc"}
+                        onClick={() => handleRequestSort("nom_district")}
+                        sx={{
+                          color: "#6b7280",
+                          "&:hover": { color: "#1f2937" },
+                        }}
                       >
                         District
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 500, color: '#6b7280', fontSize: '0.85rem' }}>
+                    <TableCell
+                      sx={{
+                        fontWeight: 500,
+                        color: "#6b7280",
+                        fontSize: "0.85rem",
+                      }}
+                    >
                       <TableSortLabel
-                        active={orderBy === 'prix'}
-                        direction={orderBy === 'prix' ? order : 'asc'}
-                        onClick={() => handleRequestSort('prix')}
-                        sx={{ color: '#6b7280', '&:hover': { color: '#1f2937' } }}
+                        active={orderBy === "prix"}
+                        direction={orderBy === "prix" ? order : "asc"}
+                        onClick={() => handleRequestSort("prix")}
+                        sx={{
+                          color: "#6b7280",
+                          "&:hover": { color: "#1f2937" },
+                        }}
                       >
                         Prix (Ar)
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 500, color: '#6b7280', fontSize: '0.85rem' }}>
+                    <TableCell
+                      sx={{
+                        fontWeight: 500,
+                        color: "#6b7280",
+                        fontSize: "0.85rem",
+                      }}
+                    >
                       Actions
                     </TableCell>
                   </TableRow>
@@ -653,25 +765,40 @@ const LocationList = () => {
                       <TableRow
                         key={region.id}
                         sx={{
-                          backgroundColor: index % 2 === 0 ? '#fff' : '#f9fafb',
-                          '&:hover': {
-                            backgroundColor: '#f3f4f6',
-                            transition: 'background-color 0.3s ease',
+                          backgroundColor: index % 2 === 0 ? "#fff" : "#f9fafb",
+                          "&:hover": {
+                            backgroundColor: "#f3f4f6",
+                            transition: "background-color 0.3s ease",
                           },
-                          '& td': { borderBottom: 'none' },
+                          "& td": { borderBottom: "none" },
                         }}
                       >
-                        <TableCell sx={{ fontSize: '0.9rem', color: '#1f2937' }}>{region.nom_region}</TableCell>
-                        <TableCell sx={{ fontSize: '0.9rem', color: '#1f2937' }}>
-                          {region.nom_district || <Typography color="text.secondary">N/A</Typography>}
+                        <TableCell
+                          sx={{ fontSize: "0.9rem", color: "#1f2937" }}
+                        >
+                          {region.nom_region}
                         </TableCell>
-                        <TableCell sx={{ fontSize: '0.9rem', color: '#1f2937' }}>{region.prix.prix}</TableCell>
+                        <TableCell
+                          sx={{ fontSize: "0.9rem", color: "#1f2937" }}
+                        >
+                          {region.nom_district || (
+                            <Typography color="text.secondary">N/A</Typography>
+                          )}
+                        </TableCell>
+                        <TableCell
+                          sx={{ fontSize: "0.9rem", color: "#1f2937" }}
+                        >
+                          {region.prix.prix}
+                        </TableCell>
                         <TableCell>
                           <IconButton
                             onClick={() => handleOpenDialog(region)}
                             sx={{
-                              color: '#3b82f6',
-                              '&:hover': { backgroundColor: '#dbeafe', transition: 'background-color 0.3s ease' },
+                              color: "#3b82f6",
+                              "&:hover": {
+                                backgroundColor: "#dbeafe",
+                                transition: "background-color 0.3s ease",
+                              },
                             }}
                             aria-label="Modifier la région"
                           >
@@ -683,8 +810,11 @@ const LocationList = () => {
                               setOpenDeleteDialog(true);
                             }}
                             sx={{
-                              color: '#ef4444',
-                              '&:hover': { backgroundColor: '#fee2e2', transition: 'background-color 0.3s ease' },
+                              color: "#ef4444",
+                              "&:hover": {
+                                backgroundColor: "#fee2e2",
+                                transition: "background-color 0.3s ease",
+                              },
                             }}
                             aria-label="Supprimer la région"
                           >
@@ -695,7 +825,11 @@ const LocationList = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={4} align="center" sx={{ color: '#6b7280', fontSize: '0.9rem', py: 4 }}>
+                      <TableCell
+                        colSpan={4}
+                        align="center"
+                        sx={{ color: "#6b7280", fontSize: "0.9rem", py: 4 }}
+                      >
                         Aucune région trouvée.
                       </TableCell>
                     </TableRow>
@@ -717,10 +851,19 @@ const LocationList = () => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             sx={{
-              '& .MuiTablePagination-selectLabel': { fontSize: '0.85rem', color: '#6b7280' },
-              '& .MuiTablePagination-displayedRows': { fontSize: '0.85rem', color: '#6b7280' },
-              '& .MuiTablePagination-actions': { color: '#3b82f6' },
-              '& .MuiTablePagination-toolbar': { justifyContent: 'flex-end', py: 1 },
+              "& .MuiTablePagination-selectLabel": {
+                fontSize: "0.85rem",
+                color: "#6b7280",
+              },
+              "& .MuiTablePagination-displayedRows": {
+                fontSize: "0.85rem",
+                color: "#6b7280",
+              },
+              "& .MuiTablePagination-actions": { color: "#3b82f6" },
+              "& .MuiTablePagination-toolbar": {
+                justifyContent: "flex-end",
+                py: 1,
+              },
             }}
           />
         </Grid>
@@ -734,25 +877,25 @@ const LocationList = () => {
           TransitionComponent={Fade}
           TransitionProps={{ timeout: 300 }}
           sx={{
-            '& .MuiDialog-paper': {
-              borderRadius: '12px',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-              borderTop: '4px solid #3b82f6',
-              backgroundColor: '#fff',
+            "& .MuiDialog-paper": {
+              borderRadius: "12px",
+              boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
+              borderTop: "4px solid #3b82f6",
+              backgroundColor: "#fff",
             },
           }}
         >
           <DialogTitle
             sx={{
               fontWeight: 600,
-              textAlign: 'center',
-              color: '#1f2937',
+              textAlign: "center",
+              color: "#1f2937",
               py: 3,
-              fontSize: '1.5rem',
-              borderBottom: '1px solid #e5e7eb',
+              fontSize: "1.5rem",
+              borderBottom: "1px solid #e5e7eb",
             }}
           >
-            {selectedRegion ? 'Modifier la région' : 'Ajouter une région'}
+            {selectedRegion ? "Modifier la région" : "Ajouter une région"}
           </DialogTitle>
           <DialogContent sx={{ p: 4 }}>
             <FormField
@@ -775,16 +918,16 @@ const LocationList = () => {
                       <IconButton
                         onClick={resetRegionName}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
+                          if (e.key === "Enter" || e.key === " ") {
                             resetRegionName();
                           }
                         }}
                         sx={{
-                          color: '#6b7280',
-                          '&:hover': {
-                            color: '#3b82f6',
-                            transform: 'scale(1.1)',
-                            transition: 'all 0.2s ease',
+                          color: "#6b7280",
+                          "&:hover": {
+                            color: "#3b82f6",
+                            transform: "scale(1.1)",
+                            transition: "all 0.2s ease",
                           },
                         }}
                         aria-label="Réinitialiser le nom de la région"
@@ -797,9 +940,9 @@ const LocationList = () => {
                 ),
               }}
               inputProps={{
-                'aria-label': errors.nom_region
+                "aria-label": errors.nom_region
                   ? `Nom de la région, erreur : ${errors.nom_region}`
-                  : 'Nom de la région',
+                  : "Nom de la région",
               }}
               error={!!errors.nom_region}
             />
@@ -811,7 +954,7 @@ const LocationList = () => {
               type="text"
               fullWidth
               name="nom_district"
-              value={formValues.nom_district || ''}
+              value={formValues.nom_district || ""}
               onChange={handleInputChange}
               variant="outlined"
               sx={{ mb: 3 }}
@@ -823,16 +966,16 @@ const LocationList = () => {
                       <IconButton
                         onClick={resetDistrictName}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
+                          if (e.key === "Enter" || e.key === " ") {
                             resetDistrictName();
                           }
                         }}
                         sx={{
-                          color: '#6b7280',
-                          '&:hover': {
-                            color: '#3b82f6',
-                            transform: 'scale(1.1)',
-                            transition: 'all 0.2s ease',
+                          color: "#6b7280",
+                          "&:hover": {
+                            color: "#3b82f6",
+                            transform: "scale(1.1)",
+                            transition: "all 0.2s ease",
                           },
                         }}
                         aria-label="Réinitialiser le nom du district"
@@ -844,7 +987,7 @@ const LocationList = () => {
                   </InputAdornment>
                 ),
               }}
-              inputProps={{ 'aria-label': 'Nom du district' }}
+              inputProps={{ "aria-label": "Nom du district" }}
             />
             <FormField
               margin="dense"
@@ -865,16 +1008,16 @@ const LocationList = () => {
                       <IconButton
                         onClick={resetPrice}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
+                          if (e.key === "Enter" || e.key === " ") {
                             resetPrice();
                           }
                         }}
                         sx={{
-                          color: '#6b7280',
-                          '&:hover': {
-                            color: '#3b82f6',
-                            transform: 'scale(1.1)',
-                            transition: 'all 0.2s ease',
+                          color: "#6b7280",
+                          "&:hover": {
+                            color: "#3b82f6",
+                            transform: "scale(1.1)",
+                            transition: "all 0.2s ease",
                           },
                         }}
                         aria-label="Réinitialiser le prix"
@@ -887,9 +1030,9 @@ const LocationList = () => {
                 ),
               }}
               inputProps={{
-                'aria-label': errors.prix
+                "aria-label": errors.prix
                   ? `Prix en Ariary, erreur : ${errors.prix}`
-                  : 'Prix en Ariary',
+                  : "Prix en Ariary",
                 min: 0,
               }}
               error={!!errors.prix}
@@ -899,10 +1042,10 @@ const LocationList = () => {
           <DialogActions
             sx={{
               p: 3,
-              borderTop: '1px solid #e5e7eb',
-              display: 'flex',
-              justifyContent: 'space-between',
-              backgroundColor: '#f9fafb',
+              borderTop: "1px solid #e5e7eb",
+              display: "flex",
+              justifyContent: "space-between",
+              backgroundColor: "#f9fafb",
             }}
           >
             <CancelButton
@@ -924,12 +1067,15 @@ const LocationList = () => {
         </Dialog>
 
         {/* Dialogue de confirmation de suppression */}
-        <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-          <DialogTitle sx={{ fontWeight: 600, color: '#1f2937' }}>
+        <Dialog
+          open={openDeleteDialog}
+          onClose={() => setOpenDeleteDialog(false)}
+        >
+          <DialogTitle sx={{ fontWeight: 600, color: "#1f2937" }}>
             Confirmer la suppression
           </DialogTitle>
           <DialogContent>
-            <DialogContentText sx={{ color: '#1f2937' }}>
+            <DialogContentText sx={{ color: "#1f2937" }}>
               Êtes-vous sûr de vouloir supprimer cette région ?
             </DialogContentText>
           </DialogContent>
@@ -941,13 +1087,13 @@ const LocationList = () => {
               }}
               variant="outlined"
               sx={{
-                color: '#6b7280',
-                borderColor: '#d1d5db',
-                borderRadius: '8px',
-                textTransform: 'none',
-                '&:hover': {
-                  borderColor: '#9ca3af',
-                  backgroundColor: '#f3f4f6',
+                color: "#6b7280",
+                borderColor: "#d1d5db",
+                borderRadius: "8px",
+                textTransform: "none",
+                "&:hover": {
+                  borderColor: "#9ca3af",
+                  backgroundColor: "#f3f4f6",
                 },
               }}
             >
@@ -957,12 +1103,12 @@ const LocationList = () => {
               onClick={handleDelete}
               variant="contained"
               sx={{
-                backgroundColor: '#ef4444',
-                color: '#fff',
-                borderRadius: '8px',
-                textTransform: 'none',
-                '&:hover': {
-                  backgroundColor: '#dc2626',
+                backgroundColor: "#ef4444",
+                color: "#fff",
+                borderRadius: "8px",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "#dc2626",
                 },
               }}
             >

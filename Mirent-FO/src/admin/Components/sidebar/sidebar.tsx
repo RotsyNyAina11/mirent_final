@@ -30,10 +30,13 @@ import {
   Add as AddIcon,
   List as ListIcon, // Icône pour le sous-menu List
   Category as CategoryIcon, // Icône pour le sous-menu Type
+  Search as SearchIcon, // Icône pour la barre de recherche
 } from "@mui/icons-material";
 import PlaceIcon from "@mui/icons-material/Place";
-import { Link as RouterLink } from "react-router-dom";
+import { NavLink, Link as RouterLink } from "react-router-dom";
 import logo from "../../../assets/horizontal.png";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 interface SidebarProps {
   onCollapseChange: (collapsed: boolean) => void;
@@ -47,7 +50,11 @@ const iconColor = primaryColor;
 
 // Style personnalisé pour les boutons de navigation
 const NavLinkButton = styled(
-  ({ to, selected, ...rest }: { to: string; selected?: boolean } & Record<string, unknown>) => (
+  ({
+    to,
+    selected,
+    ...rest
+  }: { to: string; selected?: boolean } & Record<string, unknown>) => (
     <RouterLink to={to} style={{ textDecoration: "none", color: "inherit" }}>
       <ListItemButton {...rest} />
     </RouterLink>
@@ -73,6 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
   const [openCommande, setOpenCommande] = useState(false);
   const [openVehicules, setOpenVehicules] = useState(false); // Nouvel état pour le sous-menu Véhicules
   const [isCollapsed, setIsCollapsed] = useState(false);
+
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const isSmallScreen = useMediaQuery("(max-width: 900px)");
@@ -102,6 +110,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
     onCollapseChange(!isCollapsed);
+  };
+
+  const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    setOpen(!open);
   };
 
   return (
@@ -136,6 +150,31 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               }}
             />
           </RouterLink>
+
+          {/* Barre de recherche */}
+          <Box position="relative">
+            <input
+              type="text"
+              placeholder="Rechercher..."
+              style={{
+                padding: "6px 10px",
+                paddingLeft: "35px",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                width: "180px",
+                fontSize: "14px",
+              }}
+            />
+            <SearchIcon
+              sx={{
+                position: "absolute",
+                left: "10px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontSize: "20px",
+              }}
+            />
+          </Box>
         </Box>
 
         {/* Date, Notification, Avatar */}
@@ -193,7 +232,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               "&:hover": { backgroundColor: "#f0f4f8" },
             }}
           >
-            {isCollapsed ? <ExpandMore fontSize="small" /> : <ExpandLess fontSize="small" />}
+            {isCollapsed ? (
+              <ExpandMore fontSize="small" />
+            ) : (
+              <ExpandLess fontSize="small" />
+            )}
           </IconButton>
         </Box>
 
@@ -201,7 +244,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
         <List sx={{ overflowY: "auto", flexGrow: 1 }}>
           {/* Accueil */}
           <Tooltip
-            title="Accueil"
+            title="Acceuil"
             placement="right"
             componentsProps={{
               tooltip: {
@@ -244,7 +287,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-
           {/* Commandes avec sous-menu */}
           <ListItemButton
             onClick={handleCommandeClick}
@@ -271,15 +313,22 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                 transition: "opacity 0.3s ease-in-out",
               }}
             />
-            {isCollapsed ? null : openCommande ? <ExpandLess /> : <ExpandMore />}
+            {isCollapsed ? null : openCommande ? (
+              <ExpandLess />
+            ) : (
+              <ExpandMore />
+            )}
           </ListItemButton>
           <Collapse in={openCommande} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding sx={{ backgroundColor: "#f0f4f8" }}>
+            <List
+              component="div"
+              disablePadding
+              sx={{ backgroundColor: "#f0f4f8" }}
+            >
               {/* Proformat */}
               <Tooltip title="Proformat" placement="right">
-                <NavLinkButton
-                  to="/admin/proformat"
-                  selected={window.location.pathname === "/proformat"}
+                <ListItemButton
+                  onClick={handleClick}
                   sx={{
                     pl: 6,
                     pr: 4,
@@ -306,8 +355,46 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                       transition: "opacity 0.3s ease-in-out",
                     }}
                   />
-                </NavLinkButton>
+                  {open ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
               </Tooltip>
+
+              <Collapse in={open} timeout="auto" unmountOnExit>
+                <NavLink
+                  to="/admin/proformat/nouveau"
+                  style={{ textDecoration: "none" }}
+                >
+                  <ListItemButton sx={{ pl: 9 }}>
+                    <ListItemIcon sx={{ color: iconColor }}>
+                      <AddCircleOutlineIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Nouveau proformat"
+                      primaryTypographyProps={{
+                        fontSize: "12px",
+                        color: textColor,
+                      }}
+                    />
+                  </ListItemButton>
+                </NavLink>
+                <NavLink
+                  to="/admin/proformat/liste"
+                  style={{ textDecoration: "none" }}
+                >
+                  <ListItemButton sx={{ pl: 9 }}>
+                    <ListItemIcon sx={{ color: iconColor }}>
+                      <ListAltIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Liste des proformats"
+                      primaryTypographyProps={{
+                        fontSize: "12px",
+                        color: textColor,
+                      }}
+                    />
+                  </ListItemButton>
+                </NavLink>
+              </Collapse>
               {/* Devis */}
               <Tooltip title="Devis" placement="right">
                 <NavLinkButton
@@ -376,8 +463,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               </Tooltip>
             </List>
           </Collapse>
-
-          {/* Véhicules avec sous-menu */}
           <ListItemButton
             onClick={handleVehiculesClick}
             sx={{
@@ -403,10 +488,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                 transition: "opacity 0.3s ease-in-out",
               }}
             />
-            {isCollapsed ? null : openVehicules ? <ExpandLess /> : <ExpandMore />}
+            {isCollapsed ? null : openVehicules ? (
+              <ExpandLess />
+            ) : (
+              <ExpandMore />
+            )}
           </ListItemButton>
           <Collapse in={openVehicules} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding sx={{ backgroundColor: "#f0f4f8" }}>
+            <List
+              component="div"
+              disablePadding
+              sx={{ backgroundColor: "#f0f4f8" }}
+            >
               {/* Liste des Véhicules */}
               <Tooltip title="Liste des Véhicules" placement="right">
                 <NavLinkButton
@@ -507,8 +600,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-
-          {/* Créer Proformas */}
+          {/* Créer Proformas 
+          
+          */}
           <Tooltip title="Créer Proformas" placement="right">
             <NavLinkButton
               to="/admin/proformas"
@@ -541,6 +635,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           </Tooltip>
 
           {/* Lieux de Location */}
+
           <Tooltip title="Lieux de Location" placement="right">
             <NavLinkButton
               to="/admin/lieux"
@@ -571,7 +666,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-
           {/* Contact */}
           <Tooltip title="Contact" placement="right">
             <NavLinkButton
@@ -603,14 +697,50 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
+          {/*
+          commande
 
+            <Tooltip title="Commande" placement="right">
+            <NavLinkButton
+              to="/commande"
+              selected={window.location.pathname === "/commande"}
+              sx={{
+                padding: "12px 16px",
+                "& .MuiListItemIcon-root": {
+                  minWidth: "40px",
+                  color: iconColor,
+                  fontSize: "1.4rem",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <ContactMail />
+              </ListItemIcon>
+              <ListItemText
+                primary="Commande"
+                primaryTypographyProps={{
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  color: textColor,
+                }}
+                sx={{
+                  opacity: isCollapsed ? 0 : 1,
+                  transition: "opacity 0.3s ease-in-out",
+                }}
+              />
+            </NavLinkButton>
+          </Tooltip>
+           */}
+        </List>
+
+        <List>
           <Divider sx={{ my: 8, borderColor: "#e0e0e0" }} />
 
           {/* Se Déconnecter */}
           <Box sx={{ mt: "auto", pb: 2 }}>
             <Tooltip title="Se Déconnecter" placement="right">
               <NavLinkButton
-                to="/logout"
+                to="/admin/logout"
                 sx={{
                   mx: 1,
                   padding: "10px 16px",

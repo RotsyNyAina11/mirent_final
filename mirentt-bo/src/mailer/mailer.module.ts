@@ -9,16 +9,16 @@ console.log('__dirname dans MailerModule:', __dirname);
   imports: [
     NestMailerModule.forRoot({
       transport: {
-        host: process.env.SMTP_HOST, 
+        host: process.env.SMTP_HOST,
         port: parseInt(process.env.SMTP_PORT || '587', 10),
-        secure: process.env.SMTP_SECURE === 'true', 
+        secure: process.env.SMTP_SECURE === 'true',
         auth: {
-          user: process.env.SMTP_USER, 
-          pass: process.env.SMTP_PASS, 
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
         },
       },
       defaults: {
-        from: `"Mirent Location" <${process.env.SMTP_FROM_EMAIL}>`, 
+        from: `"Mirent Location" <${process.env.SMTP_FROM_EMAIL}>`,
       },
       template: {
         dir: __dirname + '/templates',

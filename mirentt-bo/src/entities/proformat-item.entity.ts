@@ -1,5 +1,12 @@
 // proforma-item.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
 import { Vehicule } from './vehicle.entity';
 import { Proforma } from './proforma.entity';
 import { Region } from './region.entity';
@@ -36,6 +43,11 @@ export class ProformaItem {
   @Column({ type: 'integer' })
   nombreJours: number;
 
-  @Column('decimal', { precision: 10, scale: 2, default: 0, transformer: new NumericTransformer() })
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: new NumericTransformer(),
+  })
   subTotal: number;
 }

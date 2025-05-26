@@ -1,14 +1,17 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Vehicule } from "./vehicle.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Vehicule } from './vehicle.entity';
 
 @Entity()
 export class Status {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ unique: true, nullable: false })
-    status: string;
+  @Column({ unique: true, nullable: false })
+  status: string;
 
-    @OneToMany(() => Vehicule, (vehicule) => vehicule.type)
-    vehicules: Vehicule[];
+  @OneToMany(() => Vehicule, (vehicule) => vehicule.type)
+  vehiculesByType: Vehicule[];
+
+  @OneToMany(() => Vehicule, (vehicule) => vehicule.status)
+  vehicules: Vehicule[];
 }

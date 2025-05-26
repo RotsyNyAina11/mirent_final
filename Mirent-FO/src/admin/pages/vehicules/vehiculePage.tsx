@@ -1,18 +1,12 @@
-import { Container, Grid} from "@mui/material";
-import VehiclesList from "../../Components/vehicule/VehicleList";
-
-
+import { Container } from "@mui/material";
+import VehiclesList from "../../../admin/Components/vehicule/VehicleList";
 
 const Vehicule: React.FC = () => {
-    return (
-        <Container maxWidth="lg">
-            <Grid container spacing={3}>
-                <Grid item xs={12}>
-                <VehiclesList/>
-                </Grid>
-            </Grid>
-        </Container>
-    );
-}
+  return (
+    <Container>
+      <VehiclesList />
+    </Container>
+  );
+};
 
 export default Vehicule;

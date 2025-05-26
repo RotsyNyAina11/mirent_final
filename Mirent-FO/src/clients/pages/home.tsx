@@ -14,10 +14,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import image from "../../assets/bg.jpeg";
-import Footer from "../components/Footer";
+import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import ReservationForm from "../components/ReservationForm";
-import { motion } from "framer-motion";
+import Footer from "../components/Footer";
 
 const ClientHome = () => {
   const navigate = useNavigate();
@@ -25,7 +25,11 @@ const ClientHome = () => {
 
   const formVariants = {
     hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
     exit: { opacity: 0, y: 50, transition: { duration: 0.3, ease: "easeIn" } },
   };
 
@@ -72,7 +76,8 @@ const ClientHome = () => {
                       textShadow: "1px 1px 2px rgba(0,0,0,0.6)",
                     }}
                   >
-                    Une large sélection de véhicules disponibles partout à Madagascar.
+                    Une large sélection de véhicules disponibles partout à
+                    Madagascar.
                   </Typography>
                   <Button
                     onClick={() => setShowForm(true)}
@@ -180,7 +185,11 @@ const ClientHome = () => {
             fontWeight="bold"
             align="center"
             gutterBottom
-            sx={{ color: "#f3f4f6", fontSize: { xs: "2rem", md: "2.75rem" }, mb: 4 }}
+            sx={{
+              color: "#f3f4f6",
+              fontSize: { xs: "2rem", md: "2.75rem" },
+              mb: 4,
+            }}
           >
             Nos Avantages
           </Typography>
@@ -267,7 +276,8 @@ const ClientHome = () => {
                       Toyota RAV4
                     </Typography>
                     <Typography variant="body2" color="#d1d5db">
-                      Confortable, économique et parfaite pour les routes malgaches.
+                      Confortable, économique et parfaite pour les routes
+                      malgaches.
                     </Typography>
                     <Button
                       onClick={() => navigate("/catalogue")}
@@ -303,7 +313,8 @@ const ClientHome = () => {
             Prêt à réserver votre prochaine voiture ?
           </Typography>
           <Typography variant="body1" sx={{ mb: 4 }}>
-            Profitez d’un service rapide, fiable et abordable. Réservez dès maintenant !
+            Profitez d’un service rapide, fiable et abordable. Réservez dès
+            maintenant !
           </Typography>
           <Button
             variant="contained"

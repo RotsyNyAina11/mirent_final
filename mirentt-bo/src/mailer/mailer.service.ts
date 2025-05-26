@@ -5,11 +5,15 @@ import { Injectable } from '@nestjs/common';
 export class MailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendProforma(to: string, proforma: any, pdfBuffer: Buffer): Promise<void> {
+  async sendProforma(
+    to: string,
+    proforma: any,
+    pdfBuffer: Buffer,
+  ): Promise<void> {
     await this.mailerService.sendMail({
       to,
       subject: `Votre facture proforma N° ${proforma.proformaNumber}`,
-      template: './proforma', 
+      template: './proforma',
       context: {
         proforma: proforma,
       },

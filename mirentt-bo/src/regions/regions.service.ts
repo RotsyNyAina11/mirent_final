@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Prix } from 'src/entities/prix.entity';
 import { Region } from 'src/entities/region.entity';
 import { Repository } from 'typeorm';
-import { CreateRegionDto } from './create-region.dto';
 
+import { CreateRegionDto } from './create-region.dto';
 
 @Injectable()
 export class RegionService {
@@ -29,12 +29,12 @@ export class RegionService {
 
       console.log('Region received:', region);
       console.log('Prix data:', region.prix);
-  
+
       console.log('Prix created:', prix);
-  
+
       await this.prixRepository.save(prix);
       region.prix = prix;
-  
+
       return this.regionRepository.save(region);
     } catch (error) {
       console.error('Error creating region:', error);
@@ -43,7 +43,10 @@ export class RegionService {
   }
 
   async updatePrix(regionId: number, prixValue: number): Promise<Prix> {
-    const region = await this.regionRepository.findOne({ where: { id: regionId }, relations: ['prix'] });
+    const region = await this.regionRepository.findOne({
+      where: { id: regionId },
+      relations: ['prix'],
+    });
     if (!region) {
       throw new Error('Region not found');
     }
@@ -58,8 +61,14 @@ export class RegionService {
     return this.prixRepository.save(prix);
   }
 
-  async updateFull(regionId: number, updatedRegion: Partial<Region>): Promise<Region> {
-    const region = await this.regionRepository.findOne({ where: { id: regionId }, relations: ['prix'] });
+  async updateFull(
+    regionId: number,
+    updatedRegion: Partial<Region>,
+  ): Promise<Region> {
+    const region = await this.regionRepository.findOne({
+      where: { id: regionId },
+      relations: ['prix'],
+    });
     if (!region) {
       throw new Error('Region not found');
     }
@@ -76,7 +85,11 @@ export class RegionService {
         region.prix.prix = updatedRegion.prix.prix;
         await this.prixRepository.save(region.prix);
       } else {
-        const newPrix = this.prixRepository.create({ prix: updatedRegion.prix.prix, region: region });
+        const newPrix = this.prixRepository.create({
+          prix: updatedRegion.prix.prix,
+          region: region,
+        });
+
         await this.prixRepository.save(newPrix);
         region.prix = newPrix;
       }
@@ -86,7 +99,10 @@ export class RegionService {
   }
 
   async remove(regionId: number): Promise<void> {
-    const region = await this.regionRepository.findOne({ where: { id: regionId }, relations: ['prix'] });
+    const region = await this.regionRepository.findOne({
+      where: { id: regionId },
+      relations: ['prix'],
+    });
     if (!region) {
       throw new Error('Region not found');
     }

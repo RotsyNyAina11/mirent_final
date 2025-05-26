@@ -7,7 +7,12 @@ type ReservationFormProps = {
 };
 
 const ReservationForm = ({ onClose }: ReservationFormProps) => {
-  const { control, handleSubmit, formState: { errors }, reset } = useForm({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
     defaultValues: {
       startCity: "",
       returnCity: "",
@@ -40,7 +45,11 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ color: "#0f172a" }}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
+      sx={{ color: "#0f172a" }}
+    >
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>
           <Controller
@@ -226,7 +235,11 @@ const ReservationForm = ({ onClose }: ReservationFormProps) => {
               "&:hover": { bgcolor: "#2563eb" },
             }}
           >
-            {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Rechercher"}
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Rechercher"
+            )}
           </Button>
         </Grid>
       </Grid>

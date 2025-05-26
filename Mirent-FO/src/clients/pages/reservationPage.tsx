@@ -27,10 +27,11 @@ import BuildIcon from "@mui/icons-material/Build";
 import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import Navbar from "../components/Navbar";
 import dayjs, { Dayjs } from "dayjs";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import Navbar from "../components/Navbar";
+
 
 // Types
 interface Vehicle {
@@ -153,7 +154,6 @@ const VehicleSummary: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => (
   </Card>
 );
 
-// Interface pour les données de réservation
 interface ReservationData {
   startDate: Dayjs;
   endDate: Dayjs;
@@ -162,8 +162,6 @@ interface ReservationData {
   email: string;
   region: string;
 }
-
-// Formulaire de réservation
 const ReservationForm: React.FC<{
   onSubmit: (data: ReservationData) => void;
   vehicle: Vehicle;
@@ -199,7 +197,7 @@ const ReservationForm: React.FC<{
         endDate: endDate!,
         fullName,
         phone,
-        email,
+        email, 
         region,
       });
     }

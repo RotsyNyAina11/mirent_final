@@ -35,6 +35,11 @@ export class ClientController {
   async findAll(): Promise<Client[]> {
     return this.clientService.findAll();
   }
+  /**ajoutt */
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.clientService.findOne(id); // Utilisez le service pour récupérer le client
+  }
 
   @Put(':id')
   @UseInterceptors(

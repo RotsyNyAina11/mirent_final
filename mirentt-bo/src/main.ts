@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './filters/all-eceptionfilters';
 import 'reflect-metadata';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -22,7 +23,7 @@ async function bootstrap() {
 
   // Middleware pour ajouter les en-têtes CORS aux fichiers statiques
   app.use('/uploads', (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); 
+    res.header('Access-Control-Allow-Origin', '*');
     res.header(
       'Access-Control-Allow-Methods',
       'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -35,15 +36,18 @@ async function bootstrap() {
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
   // Ajout de la validation globale pour sécuriser les entrées
- app.useGlobalPipes(
+  app.useGlobalPipes(
     new ValidationPipe({
-     whitelist: true, 
-     forbidNonWhitelisted: true, 
-      //transform: true, 
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      //transform: true,
     }),
- );
+  );
 
-  const PORT = process.env.PORT || 3000; 
+  const PORT = process.env.PORT || 3000;
+  const logger = new Logger('Main');
+  app.useGlobalFilters(new AllExceptionsFilter());
+  app.enableCors();
 
   await app.listen(PORT);
   Logger.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);

@@ -1,18 +1,11 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
-import Login from "./components/login/Login";
 import Register from "./components/register/Register";
-import ClientRoutes from "./routes/ClientRoute";
-import AdminRoutes from "./routes/AdminRoutes";
-import UserProfile from "./Components/profile/userProfile";
-
-
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./Component/login/Login";
+import UserProfile from "./components/profile/userProfile";
+import ClientRoutes from "./routes/clientRoute";
+import AdminRoutes from "./routes/adminRoutes";
 
 
 const App: React.FC = () => {

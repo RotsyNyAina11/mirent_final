@@ -1,8 +1,5 @@
 import { Container, Grid } from "@mui/material";
-import CreateProforma from "../../Components/proforma/createProforma";
-import ProformasList from "../../Components/proforma/proformaList";
-
-
+import CreateProforma from "../../Components/Proforma/createProforma";
 
 const ProformaPage: React.FC = () => {
   return (
@@ -11,10 +8,6 @@ const ProformaPage: React.FC = () => {
         {/* Formulaire de création de proforma */}
         <Grid item xs={12}>
           <CreateProforma />
-        </Grid>
-        {/* Liste des proformas */}
-        <Grid item xs={12}>
-          <ProformasList />
         </Grid>
       </Grid>
     </Container>

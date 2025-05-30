@@ -147,37 +147,53 @@ const CancelButton = styled(IconButton)(({ theme }) => ({
 // Interfaces pour les données
 interface Booking {
   id: number;
+  quoteNumber: string;
   client: string;
   car: string;
+  destination: string;
   startDate: string;
   endDate: string;
-  status: "En cours" | "Confirmé" | "En attente";
+  expirationDate: string;
+  status: "En attente" | "En cours" | "Confirmé";
+  totalPrice: number;
 }
 
 const recentBookings: Booking[] = [
   {
     id: 1,
+    quoteNumber: "DEV-123456",
     client: "Antoine Dupont",
     car: "Peugeot 3008",
+    destination: "Tour de ville",
     startDate: "24/03/2025",
     endDate: "26/03/2025",
+    expirationDate: "23/04/2025",
     status: "En cours",
+    totalPrice: 600000,
   },
   {
     id: 2,
+    quoteNumber: "DEV-123457",
     client: "Marie Leclerc",
     car: "Renault Captur",
+    destination: "Évasion en montagne",
     startDate: "25/03/2025",
     endDate: "28/03/2025",
+    expirationDate: "24/04/2025",
     status: "Confirmé",
+    totalPrice: 900000,
   },
   {
     id: 3,
+    quoteNumber: "DEV-123458",
     client: "Pierre Bernard",
     car: "Citroën C4",
+    destination: "Conduite côtière",
     startDate: "26/03/2025",
     endDate: "29/03/2025",
+    expirationDate: "25/04/2025",
     status: "En attente",
+    totalPrice: 720000,
   },
 ];
 

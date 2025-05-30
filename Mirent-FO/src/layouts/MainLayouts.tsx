@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, useMediaQuery } from "@mui/material";
-
-import Sidebar from "../admin/Components/Sidebar/sidebar";
+import Sidebar from "../admin/Components/sidebar/sidebar";
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isSmallScreen = useMediaQuery("(max-width: 900px)");

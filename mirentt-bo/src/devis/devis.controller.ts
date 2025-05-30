@@ -1,47 +1,37 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+// src/devis/devis.controller.ts
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { DevisService } from './devis.service';
-import { CreateDevisDto } from './create-devis.dto';
-import { UpdateDevisDto } from './update-devis.dto';
+import { CreateDevisDto } from './dto/create-devis.dto';
+import { UpdateDevisDto } from './dto/update-devis.dto';
 
-@Controller('devis')
+@Controller('devis') // Route de base pour cette API
 export class DevisController {
   constructor(private readonly devisService: DevisService) {}
 
-  // Créer un nouveau devis
   @Post()
+  @HttpCode(HttpStatus.CREATED) // Retourne un statut 201 Created
   create(@Body() createDevisDto: CreateDevisDto) {
     return this.devisService.create(createDevisDto);
   }
 
-  // Récupérer tous les devis
   @Get()
   findAll() {
     return this.devisService.findAll();
   }
 
-  // Récupérer un seul devis par ID
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.devisService.findOne(+id);
+    return this.devisService.findOne(id);
   }
 
-  // Mettre à jour un devis
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDevisDto: UpdateDevisDto) {
-    return this.devisService.update(+id, updateDevisDto);
+    return this.devisService.update(id, updateDevisDto);
   }
 
-  // Supprimer un devis
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT) // Retourne un statut 204 No Content pour une suppression réussie
   remove(@Param('id') id: string) {
-    return this.devisService.remove(+id);
+    return this.devisService.remove(id);
   }
 }

@@ -8,5 +8,6 @@ import { Client } from 'src/entities/client.entity';
   imports: [TypeOrmModule.forFeature([Client])],
   controllers: [ClientController],
   providers: [ClientService],
+  exports: [ClientService, TypeOrmModule],
 })
 export class ClientModule {}

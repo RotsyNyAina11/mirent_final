@@ -10,7 +10,7 @@ import { CreateRegionDto } from './create-region.dto';
 export class RegionService {
   constructor(
     @InjectRepository(Region)
-    private regionRepository: Repository<Region>,
+    public regionRepository: Repository<Region>,
     @InjectRepository(Prix)
     private prixRepository: Repository<Prix>,
   ) {}

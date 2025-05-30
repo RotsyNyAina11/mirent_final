@@ -325,6 +325,39 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               disablePadding
               sx={{ backgroundColor: "#f0f4f8" }}
             >
+            {/* Nouveau Commande */}
+            <Tooltip title="Nouveau" placement="right">
+              <NavLinkButton
+                to="/admin/createCommande"
+                selected={window.location.pathname === "/admin/createCommande"}
+                  sx={{
+                    pl: 6,
+                    pr: 4,
+                    py: 1,
+                    "& .MuiListItemIcon-root": {
+                      minWidth: "40px",
+                      color: iconColor,
+                      fontSize: "1.4rem",
+                    },
+                  }}
+              >
+                <ListItemIcon>
+                  <AddCircleOutlineIcon fontSize="small"  />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Nouveau"
+                  primaryTypographyProps={{
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: textColor,
+                  }}
+                  sx={{
+                    opacity: isCollapsed ? 0 : 1,
+                    transition: "opacity 0.3s ease-in-out",
+                  }}
+                />
+              </NavLinkButton>
+            </Tooltip>
               {/* Proformat */}
               <Tooltip title="Proformat" placement="right">
                 <ListItemButton
@@ -395,39 +428,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                   </ListItemButton>
                 </NavLink>
               </Collapse>
-              {/* Devis */}
-              <Tooltip title="Devis" placement="right">
-                <NavLinkButton
-                  to="/admin/devis"
-                  selected={window.location.pathname === "/devis"}
-                  sx={{
-                    pl: 6,
-                    pr: 4,
-                    py: 1,
-                    "& .MuiListItemIcon-root": {
-                      minWidth: "40px",
-                      color: iconColor,
-                      fontSize: "1.4rem",
-                    },
-                  }}
-                >
-                  <ListItemIcon>
-                    <AddShoppingCart />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Devis"
-                    primaryTypographyProps={{
-                      fontSize: "13px",
-                      fontWeight: "500",
-                      color: textColor,
-                    }}
-                    sx={{
-                      opacity: isCollapsed ? 0 : 1,
-                      transition: "opacity 0.3s ease-in-out",
-                    }}
-                  />
-                </NavLinkButton>
-              </Tooltip>
+
               {/* Facture */}
               <Tooltip title="Facture" placement="right">
                 <NavLinkButton
@@ -601,7 +602,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
             </NavLinkButton>
           </Tooltip>
           {/* Créer Proformas 
-          
           */}
           <Tooltip title="Créer Proformas" placement="right">
             <NavLinkButton
@@ -734,6 +734,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
         </List>
 
         <List>
+
           <Divider sx={{ my: 8, borderColor: "#e0e0e0" }} />
 
           {/* Se Déconnecter */}

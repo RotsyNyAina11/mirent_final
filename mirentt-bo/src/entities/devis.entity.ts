@@ -1,48 +1,42 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+// src/devis/entities/devis.entity.ts
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
 import { Client } from './client.entity';
-// import { User } from './user.entity';
-import { DevisItem } from './devis-item.entity';
-import { Prix } from './prix.entity';
-@Entity()
+
+@Entity('devis') 
 export class Devis {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid') 
+  id: string;
 
-  @Column()
-  dateCreation: Date;
+  @Column({ type: 'jsonb', nullable: true }) 
+  items: { description: string; quantity: number; unitPrice: number; }[];
 
-  @Column({ unique: true })
-  numeroDevis: string;
+  @Column({ type: 'date' }) 
+  startDate: Date;
 
-  @ManyToOne(() => Client, (client) => client.devis, { nullable: true })
-  client: Client;
+  @Column({ type: 'date' }) 
+  endDate: Date;
 
-  @OneToMany(() => DevisItem, (item) => item.devis, { cascade: true })
-  items: DevisItem[];
+  @Column({ default: false }) 
+  includesFuel: boolean;
 
-  @Column('decimal', { precision: 10, scale: 2, nullable: true })
-  prixCarburant: number;
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true }) 
+  fuelCostPerDay?: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  prixTotal: number;
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  totalAmount: number;
 
-  @Column({ nullable: true })
-  totalEnLettre: string;
-
-  @Column({ nullable: true })
-  signatureClient: string;
+  @Column({ default: 'pending' }) 
+  status: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => Client, (client) => client.devis)
+  client: Client;
+
+  @Column()
+  clientId: number;
 }

@@ -232,7 +232,7 @@ const ReservationForm: React.FC<{
               <DatePicker
                 label="Date de début"
                 value={startDate}
-                onChange={(newValue) => setStartDate(newValue)}
+                onChange={(newValue) => setStartDate(newValue as Dayjs | null)}
                 minDate={dayjs()}
                 slotProps={{
                   textField: {
@@ -249,7 +249,7 @@ const ReservationForm: React.FC<{
               <DatePicker
                 label="Date de fin"
                 value={endDate}
-                onChange={(newValue) => setEndDate(newValue)}
+                onChange={(newValue) => setEndDate(newValue as Dayjs | null)}
                 minDate={startDate || dayjs()}
                 slotProps={{
                   textField: {

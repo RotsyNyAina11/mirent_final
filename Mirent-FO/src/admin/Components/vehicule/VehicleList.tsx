@@ -29,24 +29,9 @@ import {
   useMediaQuery,
   Toolbar,
 } from "@mui/material";
-<<<<<<< HEAD
-import { ThemeProvider } from "@mui/material/styles";
-import { styled } from "@mui/material/styles";
 import { Delete, SearchOutlined, Edit, Add, DirectionsCar, LocalShipping, TwoWheeler, FilterList } from "@mui/icons-material";
-=======
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { styled } from "@mui/material/styles";
-import {
-  Delete,
-  SearchOutlined,
-  Edit,
-  Add,
-  DirectionsCar,
-  LocalShipping,
-  TwoWheeler,
-  FilterList,
-} from "@mui/icons-material";
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
 import { useAppDispatch } from "../../../hooks";
 import {
   deleteVehicle,
@@ -60,9 +45,6 @@ import {
 import EditVehicle from "./EditVehicles";
 import AddVehicle from "./AddVehicles";
 
-<<<<<<< HEAD
-// Styles personnalisés avec ajustements responsive
-=======
 // Thème personnalisé (identique à LocationList.tsx)
 const theme = createTheme({
   palette: {
@@ -133,7 +115,6 @@ const theme = createTheme({
 });
 
 // Styles personnalisés (alignés avec LocationList.tsx)
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
 const PrimaryButton = styled(Button)(({ theme }) => ({
   backgroundColor: "#3b82f6",
   color: theme.palette.common.white,
@@ -141,10 +122,7 @@ const PrimaryButton = styled(Button)(({ theme }) => ({
   borderRadius: "8px",
   textTransform: "none",
   fontWeight: 500,
-<<<<<<< HEAD
   fontSize: "0.875rem",
-=======
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
   "&:hover": {
     backgroundColor: "#2563eb",
     transform: "scale(1.02)",
@@ -163,10 +141,7 @@ const SecondaryButton = styled(Button)(({ theme }) => ({
   borderRadius: "8px",
   textTransform: "none",
   fontWeight: 500,
-<<<<<<< HEAD
   fontSize: "0.875rem",
-=======
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
   "&:hover": {
     backgroundColor: "#dc2626",
     transform: "scale(1.02)",
@@ -178,21 +153,14 @@ const SecondaryButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-<<<<<<< HEAD
 const CancelButton = styled(Button)(() => ({
-=======
-const CancelButton = styled(Button)(({ theme }) => ({
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
   color: "#6b7280",
   borderColor: "#d1d5db",
   padding: "8px 16px",
   borderRadius: "8px",
   textTransform: "none",
   fontWeight: 500,
-<<<<<<< HEAD
   fontSize: "0.875rem",
-=======
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
   "&:hover": {
     borderColor: "#9ca3af",
     backgroundColor: "#f3f4f6",
@@ -201,11 +169,7 @@ const CancelButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-<<<<<<< HEAD
 const SearchField = styled(TextField)(() => ({
-=======
-const SearchField = styled(TextField)(({ theme }) => ({
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
   "& .MuiOutlinedInput-root": {
     borderRadius: "12px",
     backgroundColor: "#fff",
@@ -221,44 +185,8 @@ const SearchField = styled(TextField)(({ theme }) => ({
     },
   },
   "& .MuiInputBase-input": {
-<<<<<<< HEAD
     fontSize: { xs: "0.85rem", sm: "0.9rem" },
     padding: { xs: "8px 12px", sm: "10px 14px" },
-=======
-    fontSize: "0.9rem",
-    color: "#1f2937",
-  },
-}));
-
-const FilterField = styled(TextField)(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "8px",
-    "& fieldset": {
-      borderColor: "#d1d5db",
-    },
-    "&:hover fieldset": {
-      borderColor: "#9ca3af",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#3b82f6",
-    },
-  },
-  "& .MuiInputBase-input": {
-    fontSize: "0.9rem",
-    color: "#1f2937",
-  },
-}));
-
-const DashboardCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(2),
-  borderRadius: "12px",
-  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-  backgroundColor: "#fff",
-  transition: "box-shadow 0.3s ease, transform 0.2s ease-in-out",
-  "&:hover": {
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-    transform: "scale(1.02)",
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
   },
 }));
 
@@ -365,9 +293,6 @@ const VehiclesList: React.FC = () => {
       return false;
     }
   };
-
-<<<<<<< HEAD
-=======
   // Gestion de la sélection des véhicules
   const handleSelectAllVehicles = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -382,7 +307,6 @@ const VehiclesList: React.FC = () => {
     }
   };
 
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
   const handleSelectVehicle = (id: number) => {
     setSelectedVehicles((prev) =>
       prev.includes(id)
@@ -410,7 +334,6 @@ const VehiclesList: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-<<<<<<< HEAD
       <Box sx={{ maxWidth: "95%", margin: "auto", mt: { xs: 2, sm: 4 }, mb: 8 }}>
         <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ padding: { xs: 1, sm: 3 }, backgroundColor: "#f9fafb", minHeight: "100vh" }}>
           {/* Header */}
@@ -420,32 +343,6 @@ const VehiclesList: React.FC = () => {
             </Typography>
             <Typography variant="body1" sx={{ fontSize: { xs: "0.85rem", sm: "0.9rem" }, color: "#6b7280" }}>
               Recherchez, filtrez, modifiez ou supprimez les véhicules de votre agence.
-=======
-      <Box sx={{ maxWidth: "95%", margin: "auto", mt: 4, mb: 8 }}>
-        <Grid
-          container
-          spacing={3}
-          sx={{
-            padding: isMobile ? 2 : 3,
-            backgroundColor: "#f9fafb",
-            minHeight: "100vh",
-          }}
-        >
-          {/* Header */}
-          <Grid item xs={12}>
-            <Typography
-              variant="h5"
-              sx={{ fontWeight: 600, color: "text.primary", marginBottom: 1 }}
-            >
-              Liste des Véhicules
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ fontSize: "0.9rem", color: "#6b7280" }}
-            >
-              Recherchez, filtrez, modifiez ou supprimez les véhicules de votre
-              agence.
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
             </Typography>
           </Grid>
 
@@ -454,36 +351,17 @@ const VehiclesList: React.FC = () => {
             <Toolbar
               sx={{
                 justifyContent: "space-between",
-<<<<<<< HEAD
                 flexDirection: { xs: "column", sm: "row" },
                 gap: { xs: 1.5, sm: 0 },
                 padding: 0,
                 position: "sticky",
                 top: { xs: "56px", sm: "64px" },
-=======
-                flexDirection: isMobile ? "column" : "row",
-                gap: isMobile ? 2 : 0,
-                padding: 0,
-                position: "sticky",
-                top: "64px",
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                 backgroundColor: "#f9fafb",
                 zIndex: 2,
                 mb: { xs: 1, sm: 2 },
               }}
             >
-<<<<<<< HEAD
               <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 1, width: { xs: "100%", sm: "auto" }, alignItems: { xs: "stretch", sm: "center" } }}>
-=======
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 1,
-                  flexWrap: "wrap",
-                  width: isMobile ? "100%" : "auto",
-                }}
-              >
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                 <SearchField
                   placeholder="Rechercher un véhicule..."
                   variant="outlined"
@@ -508,10 +386,7 @@ const VehiclesList: React.FC = () => {
                     color: "#1f2937",
                     borderRadius: "8px",
                     textTransform: "none",
-<<<<<<< HEAD
                     width: { xs: "100%", sm: "auto" },
-=======
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                     "&:hover": {
                       borderColor: "#9ca3af",
                       backgroundColor: "#f3f4f6",
@@ -521,11 +396,7 @@ const VehiclesList: React.FC = () => {
                   Filtres
                 </Button>
               </Box>
-<<<<<<< HEAD
               <Box sx={{ display: "flex", gap: 1, width: { xs: "100%", sm: "auto" } }}>
-=======
-              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                 <PrimaryButton
                   startIcon={<Add />}
                   onClick={() => setShowAddVehicle(true)}
@@ -544,7 +415,6 @@ const VehiclesList: React.FC = () => {
             <Grid item xs={12}>
               <Toolbar
                 sx={{
-<<<<<<< HEAD
                   justifyContent: { xs: "center", sm: "space-between" },
                   flexDirection: { xs: "column", sm: "row" },
                   gap: { xs: 1, sm: 0 },
@@ -555,30 +425,11 @@ const VehiclesList: React.FC = () => {
                   mb: { xs: 1, sm: 2 },
                   position: "sticky",
                   top: { xs: "108px", sm: "120px" },
-=======
-                  justifyContent: "space-between",
-                  flexDirection: isMobile ? "column" : "row",
-                  gap: isMobile ? 2 : 0,
-                  p: 2,
-                  backgroundColor: "#fff",
-                  borderRadius: "12px",
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                  mb: 2,
-                  position: "sticky",
-                  top: "120px",
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                   zIndex: 1,
                   alignItems: { xs: "center", sm: "center" },
                 }}
               >
-<<<<<<< HEAD
                 <Typography variant="body1" sx={{ fontWeight: 500, color: "#1f2937", textAlign: { xs: "center", sm: "left" } }}>
-=======
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: 500, color: "#1f2937" }}
-                >
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                   {selectedVehicles.length} véhicule(s) sélectionné(s)
                 </Typography>
                 <SecondaryButton
@@ -598,7 +449,6 @@ const VehiclesList: React.FC = () => {
             <Collapse in={filterOpen}>
               <Box
                 sx={{
-<<<<<<< HEAD
                   p: { xs: 1, sm: 2 },
                   backgroundColor: "#fff",
                   borderRadius: "12px",
@@ -607,19 +457,6 @@ const VehiclesList: React.FC = () => {
                 }}
               >
                 <Typography variant="body1" sx={{ fontWeight: 500, mb: 1, color: "#1f2937", fontSize: { xs: "0.85rem", sm: "0.9rem" } }}>
-=======
-                  p: 2,
-                  backgroundColor: "#fff",
-                  borderRadius: "12px",
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                  mb: 2,
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: 500, mb: 2, color: "#1f2937" }}
-                >
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                   Filtres
                 </Typography>
                 <Grid container spacing={1}>
@@ -693,7 +530,6 @@ const VehiclesList: React.FC = () => {
             {loading ? (
               <Grid container spacing={{ xs: 2, sm: 3 }}>
                 {[...Array(rowsPerPage)].map((_, idx) => (
-<<<<<<< HEAD
                   <Grid item xs={12} key={idx}>
                     <Card sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, p: { xs: 1, sm: 2 }, borderRadius: 3 }}>
                       <Skeleton
@@ -725,23 +561,6 @@ const VehiclesList: React.FC = () => {
                         }}
                       />
                     </Card>
-=======
-                  <Grid item xs={12} sm={6} md={4} key={idx}>
-                    <DashboardCard>
-                      <Skeleton
-                        variant="rectangular"
-                        width="100%"
-                        height={180}
-                      />
-                      <Skeleton
-                        variant="text"
-                        width="60%"
-                        sx={{ marginTop: 1 }}
-                      />
-                      <Skeleton variant="text" width="40%" />
-                      <Skeleton variant="text" width="80%" />
-                    </DashboardCard>
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                   </Grid>
                 ))}
               </Grid>
@@ -750,15 +569,7 @@ const VehiclesList: React.FC = () => {
                 Erreur de chargement des données. Veuillez réessayer plus tard.
               </Typography>
             ) : filteredVehicles.length === 0 ? (
-<<<<<<< HEAD
               <Typography variant="body1" color="text.secondary" textAlign="center" sx={{ fontSize: { xs: "0.85rem", sm: "0.9rem" } }}>
-=======
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                textAlign="center"
-              >
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                 Aucun véhicule trouvé.
               </Typography>
             ) : (
@@ -775,19 +586,11 @@ const VehiclesList: React.FC = () => {
                       }}
                     >
                       {/* Case à cocher et image */}
-<<<<<<< HEAD
                       <Box sx={{ position: "relative", width: { xs: "100%", sm: 200 }, height: { xs: 120, sm: 150 }, mb: { xs: 1, sm: 0 }, mr: { sm: 2 } }}>
                         <Checkbox
                           checked={selectedVehicles.includes(veh.id)}
                           onChange={() => handleSelectVehicle(veh.id)}
                           sx={{ position: "absolute", top: 8, left: 8, zIndex: 1 }}
-=======
-                      <Box sx={{ position: "relative" }}>
-                        <Checkbox
-                          checked={selectedVehicles.includes(veh.id)}
-                          onChange={() => handleSelectVehicle(veh.id)}
-                          sx={{ position: "absolute", top: 8, left: 8 }}
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                           aria-label={`Sélectionner le véhicule ${veh.nom}`}
                         />
                         {veh.imageUrl && isValidImageUrl(veh.imageUrl) ? (
@@ -818,39 +621,17 @@ const VehiclesList: React.FC = () => {
                               borderRadius: 2,
                             }}
                           >
-<<<<<<< HEAD
                             {vehicleTypesRedux.find((t) => t.id === veh.type?.id)?.type.toLowerCase().includes("voiture") ? (
                               <DirectionsCar sx={{ fontSize: { xs: "3rem", sm: "4rem" }, color: "#ccc" }} />
                             ) : vehicleTypesRedux.find((t) => t.id === veh.type?.id)?.type.toLowerCase().includes("camion") ? (
                               <LocalShipping sx={{ fontSize: { xs: "3rem", sm: "4rem" }, color: "#ccc" }} />
                             ) : (
                               <TwoWheeler sx={{ fontSize: { xs: "3rem", sm: "4rem" }, color: "#ccc" }} />
-=======
-                            {vehicleTypesRedux
-                              .find((t) => t.id === veh.type?.id)
-                              ?.type.toLowerCase()
-                              .includes("voiture") ? (
-                              <DirectionsCar
-                                sx={{ fontSize: "4rem", color: "#ccc" }}
-                              />
-                            ) : vehicleTypesRedux
-                                .find((t) => t.id === veh.type?.id)
-                                ?.type.toLowerCase()
-                                .includes("camion") ? (
-                              <LocalShipping
-                                sx={{ fontSize: "4rem", color: "#ccc" }}
-                              />
-                            ) : (
-                              <TwoWheeler
-                                sx={{ fontSize: "4rem", color: "#ccc" }}
-                              />
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                             )}
                           </Box>
                         )}
                       </Box>
                       {/* Informations du véhicule */}
-<<<<<<< HEAD
                       <Box
                         sx={{
                           flexGrow: 1,
@@ -869,100 +650,6 @@ const VehiclesList: React.FC = () => {
                         <Typography variant="body2">Immatriculation: {veh.immatriculation}</Typography>
                         <Typography variant="body2">Type: {vehicleTypesRedux.find((t) => t.id === veh.type?.id)?.type}</Typography>
                         <Typography variant="body2">Places: {veh.nombrePlace}</Typography>
-=======
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold", mt: 2 }}
-                      >
-                        {veh.nom}
-                      </Typography>
-                      <Typography variant="body1" sx={{ color: "#555" }}>
-                        {veh.marque} - {veh.modele}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Immatriculation: {veh.immatriculation}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Type:{" "}
-                        {
-                          vehicleTypesRedux.find((t) => t.id === veh.type?.id)
-                            ?.type
-                        }
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Places: {veh.nombrePlace}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Statut:{" "}
-                        <span
-                          style={{
-                            color:
-                              vehicleStatusesRedux.find(
-                                (s) => s.id === veh.status?.id
-                              )?.status === "Disponible"
-                                ? "green"
-                                : "red",
-                          }}
-                        >
-                          {
-                            vehicleStatusesRedux.find(
-                              (s) => s.id === veh.status?.id
-                            )?.status
-                          }
-                        </span>
-                      </Typography>
-                      {/* Boutons d'action */}
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          mt: 2,
-                        }}
-                      >
-                        <Tooltip title="Modifier le véhicule">
-                          <IconButton
-                            onClick={() => handleEditClick(veh)}
-                            sx={{
-                              color: "primary.main",
-                              "&:hover": {
-                                backgroundColor: "primary.light",
-                                transition: "background-color 0.3s ease",
-                              },
-                            }}
-                            aria-label={`Modifier le véhicule ${veh.nom}`}
-                          >
-                            <Edit />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                          title={
-                            selectedVehicles.length > 0
-                              ? "Désélectionnez les véhicules pour supprimer individuellement"
-                              : "Supprimer le véhicule"
-                          }
-                        >
-                          <span>
-                            <IconButton
-                              onClick={() => {
-                                setVehicleToDelete(veh);
-                                setOpenDeleteDialog(true);
-                              }}
-                              disabled={selectedVehicles.length > 0}
-                              sx={{
-                                color: "error.main",
-                                "&:hover": {
-                                  backgroundColor: "secondary.light",
-                                  transition: "background-color 0.3s ease",
-                                },
-                                "&.Mui-disabled": { color: "#d1d5db" },
-                              }}
-                              aria-label={`Supprimer le véhicule ${veh.nom}`}
-                            >
-                              <Delete />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                       </Box>
                       {/* Statut et actions */}
                       <Stack
@@ -1026,26 +713,10 @@ const VehiclesList: React.FC = () => {
                 setCurrentPage(0);
               }}
               sx={{
-<<<<<<< HEAD
                 "& .MuiTablePagination-selectLabel": { fontSize: { xs: "0.75rem", sm: "0.85rem" }, color: "text.secondary" },
                 "& .MuiTablePagination-displayedRows": { fontSize: { xs: "0.75rem", sm: "0.85rem" }, color: "text.secondary" },
                 "& .MuiTablePagination-actions": { color: "primary.main" },
                 "& .MuiTablePagination-toolbar": { justifyContent: "center", py: { xs: 0.5, sm: 1 } },
-=======
-                "& .MuiTablePagination-selectLabel": {
-                  fontSize: "0.85rem",
-                  color: "text.secondary",
-                },
-                "& .MuiTablePagination-displayedRows": {
-                  fontSize: "0.85rem",
-                  color: "text.secondary",
-                },
-                "& .MuiTablePagination-actions": { color: "primary.main" },
-                "& .MuiTablePagination-toolbar": {
-                  justifyContent: "flex-end",
-                  py: 1,
-                },
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
               }}
             />
           </Grid>
@@ -1057,13 +728,8 @@ const VehiclesList: React.FC = () => {
             fullScreen={isMobile}
             sx={{
               "& .MuiDialog-paper": {
-<<<<<<< HEAD
                 borderRadius: { xs: 0, sm: "12px" },
                 boxShadow: { xs: "none", sm: "0 4px 16px rgba(0, 0, 0, 0.15)" },
-=======
-                borderRadius: "12px",
-                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                 backgroundColor: "#fff",
               },
             }}
@@ -1082,11 +748,7 @@ const VehiclesList: React.FC = () => {
             <DialogContent sx={{ p: { xs: 2, sm: 4 } }}>
               <DialogContentText
                 id="confirm-delete-description"
-<<<<<<< HEAD
                 sx={{ color: "#1f2937", fontSize: { xs: "0.9rem", sm: "1rem" }, textAlign: "center" }}
-=======
-                sx={{ color: "#1f2937", fontSize: "1rem", textAlign: "center" }}
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
               >
                 Êtes-vous sûr de vouloir supprimer le véhicule{" "}
                 {vehicleToDelete?.nom} ?
@@ -1127,13 +789,8 @@ const VehiclesList: React.FC = () => {
             fullScreen={isMobile}
             sx={{
               "& .MuiDialog-paper": {
-<<<<<<< HEAD
                 borderRadius: { xs: 0, sm: "12px" },
                 boxShadow: { xs: "none", sm: "0 4px 16px rgba(0, 0, 0, 0.15)" },
-=======
-                borderRadius: "12px",
-                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
                 backgroundColor: "#fff",
               },
             }}
@@ -1152,11 +809,7 @@ const VehiclesList: React.FC = () => {
             <DialogContent sx={{ p: { xs: 2, sm: 4 } }}>
               <DialogContentText
                 id="confirm-delete-selected-description"
-<<<<<<< HEAD
                 sx={{ color: "#1f2937", fontSize: { xs: "0.9rem", sm: "1rem" }, textAlign: "center" }}
-=======
-                sx={{ color: "#1f2937", fontSize: "1rem", textAlign: "center" }}
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
               >
                 Êtes-vous sûr de vouloir supprimer {selectedVehicles.length}{" "}
                 véhicule(s) sélectionné(s) ?
@@ -1230,8 +883,7 @@ const VehiclesList: React.FC = () => {
           {showAddVehicle && (
             <AddVehicle
               open={showAddVehicle}
-              onClose={() => setShowAddVehicle(false)}
-            />
+              onClose={() => setShowAddVehicle(false)} vehicleId={0} currentStatus={""}            />
           )}
         </Grid>
       </Box>

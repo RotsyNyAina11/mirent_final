@@ -17,7 +17,7 @@ import { UpdateVehiculeDto } from './updateVehicule.dto';
 export class VehiclesService {
   constructor(
     @InjectRepository(Vehicule)
-    private readonly vehiculeRepository: Repository<Vehicule>,
+    public vehiculeRepository: Repository<Vehicule>,
     @InjectRepository(Type)
     private readonly typeRepository: Repository<Type>,
     @InjectRepository(Status)

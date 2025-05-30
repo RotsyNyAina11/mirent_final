@@ -14,5 +14,6 @@ import { TypeModule } from 'src/type/type.module';
     ],
     controllers: [VehiclesController],
     providers: [VehiclesService],
+    exports: [VehiclesService, TypeOrmModule]
 })
 export class VehiclesModule {}

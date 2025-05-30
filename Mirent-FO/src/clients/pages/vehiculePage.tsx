@@ -18,7 +18,7 @@ import {
   Popover,
 } from "@mui/material";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react"; // Import useCallback
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Navbar from "../components/Navbar";
@@ -39,7 +39,7 @@ import {
 } from "../../redux/features/vehicle/vehiclesSlice";
 import { RootState } from "../../redux/store";
 import { useAppDispatch } from "../../hooks";
-import VehicleDetails from "../components/VehiclesDetails";
+import VehicleDetails from "../components/VehiclesDetails"; // Ensure VehicleDetails can handle null prop
 
 const VehiclesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -76,8 +76,8 @@ const VehiclesPage: React.FC = () => {
     dispatch(fetchVehicleStatuses());
   }, [dispatch]);
 
-
   // Filtres dynamiques à partir des données Redux
+  // Ensure that unique brands are extracted correctly, handling potential duplicates from `vehicles` array
   const brands = ["Toutes", ...new Set(vehicles.map((v) => v.marque))];
   const types = ["Tous", ...vehiclesType.map((t) => t.type)];
   const statuses = ["Tous", ...vehiclesStatus.map((s) => s.status)];
@@ -95,14 +95,14 @@ const VehiclesPage: React.FC = () => {
     return matchesBrand && matchesType && matchesStatus && matchesSearch;
   });
 
-  // Réinitialiser les filtres
-  const resetFilters = () => {
+  // Réinitialiser les filtres (using useCallback)
+  const resetFilters = useCallback(() => {
     setBrandFilter("Toutes");
     setTypeFilter("Tous");
     setStatusFilter("Tous");
     setSearchQuery("");
     setPage(1);
-  };
+  }, []);
 
   // Pagination
   const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage);
@@ -130,18 +130,20 @@ const VehiclesPage: React.FC = () => {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 1000], [0, 250]);
 
-  // Gestion du popover
-  const handleOpenPopover = (
-    event: React.MouseEvent<HTMLElement>,
-    vehicleId: number
-  ) => {
-    setPopoverAnchor(event.currentTarget);
-    setSelectedVehicleId(vehicleId);
-  };
-  const handleClosePopover = () => {
+  // Gestion du popover (using useCallback)
+  const handleOpenPopover = useCallback(
+    (event: React.MouseEvent<HTMLElement>, vehicleId: number) => {
+      setPopoverAnchor(event.currentTarget);
+      setSelectedVehicleId(vehicleId);
+    },
+    []
+  );
+
+  const handleClosePopover = useCallback(() => {
     setPopoverAnchor(null);
     setSelectedVehicleId(null);
-  };
+  }, []);
+
   const selectedVehicle = vehicles.find((v) => v.id === selectedVehicleId) || null;
 
   return (
@@ -259,12 +261,14 @@ const VehiclesPage: React.FC = () => {
                 borderRadius: 8,
                 "& .MuiSelect-select": { py: 1.5 },
               }}
+              disabled={vehiclesLoading} // Disable while loading brands
             >
               {brands.map((brand) => (
                 <MenuItem key={brand} value={brand}>
                   {brand}
                 </MenuItem>
               ))}
+              {vehiclesLoading && <MenuItem disabled>Chargement...</MenuItem>}
             </Select>
           </FormControl>
 
@@ -287,12 +291,14 @@ const VehiclesPage: React.FC = () => {
                 borderRadius: 8,
                 "& .MuiSelect-select": { py: 1.5 },
               }}
+              disabled={vehiclesTypeLoading} // Disable while loading types
             >
               {types.map((type) => (
                 <MenuItem key={type} value={type}>
                   {type}
                 </MenuItem>
               ))}
+              {vehiclesTypeLoading && <MenuItem disabled>Chargement...</MenuItem>}
             </Select>
           </FormControl>
 
@@ -315,12 +321,14 @@ const VehiclesPage: React.FC = () => {
                 borderRadius: 8,
                 "& .MuiSelect-select": { py: 1.5 },
               }}
+              disabled={vehiclesStatusLoading} // Disable while loading statuses
             >
               {statuses.map((status) => (
                 <MenuItem key={status} value={status}>
                   {status}
                 </MenuItem>
               ))}
+              {vehiclesStatusLoading && <MenuItem disabled>Chargement...</MenuItem>}
             </Select>
           </FormControl>
 
@@ -346,11 +354,14 @@ const VehiclesPage: React.FC = () => {
         {/* Grille des véhicules */}
         <Grid container spacing={4}>
           {vehiclesLoading || vehiclesTypeLoading || vehiclesStatusLoading
-            ? Array.from(new Array(6)).map((_, index) => (
+            ? Array.from(new Array(itemsPerPage)).map((_, index) => ( // Use itemsPerPage for skeleton count
                 <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Skeleton variant="rectangular" height={240} animation="wave" />
-                  <Skeleton width="80%" />
-                  <Skeleton width="60%" />
+                  <Skeleton variant="rectangular" height={240} animation="wave" sx={{ borderRadius: 2 }} />
+                  <Box sx={{ pt: 1.5, pb: 2, px: 1 }}>
+                    <Skeleton width="80%" height={30} />
+                    <Skeleton width="60%" height={20} />
+                    <Skeleton width="40%" height={20} />
+                  </Box>
                 </Grid>
               ))
             : paginatedVehicles.length > 0
@@ -362,7 +373,18 @@ const VehiclesPage: React.FC = () => {
                     initial="hidden"
                     animate="visible"
                   >
-                    <Card>
+                    <Card
+                      sx={{
+                        borderRadius: 2, // Applied to Card
+                        boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.1)", // Applied to Card
+                        bgcolor: "#ffffff", // Applied to Card
+                        transition: "transform 0.3s ease, box-shadow 0.3s ease", // Applied to Card
+                        "&:hover": {
+                          transform: "translateY(-10px)", // Applied to Card
+                          boxShadow: "0px 12px 32px rgba(0, 0, 0, 0.2)", // Applied to Card
+                        },
+                      }}
+                    >
                       <CardMedia
                         component="img"
                         height="240"
@@ -396,7 +418,7 @@ const VehiclesPage: React.FC = () => {
                           sx={{
                             color: "#475569",
                             mb: 1.5,
-                          fontFamily: "'Inter', sans-serif",
+                            fontFamily: "'Inter', sans-serif",
                           }}
                         >
                           {vehicle.type.type}
@@ -434,109 +456,48 @@ const VehiclesPage: React.FC = () => {
                           </Typography>
                         </Box>
                       </CardContent>
-                      <CardActions
-                        sx={{
-                          p: 3,
-                          pt: 0,
-                          display: "flex",
-                          flexDirection: "column",
-                          borderRadius: 2,
-                          boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.1)",
-                          bgcolor: "#ffffff",
-                          transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                          "&:hover": {
-                            transform: "translateY(-10px)",
-                            boxShadow: "0px 12px 32px rgba(0, 0, 0, 0.2)",
-                          },
-                        }}
-                      >
-                        <CardMedia
-                          component="img"
-                          height="240"
-                          image={vehicle.imageUrl || "https://via.placeholder.com/500x240 "}
-                          alt={`${vehicle.marque} ${vehicle.modele}`}
-                          sx={{ objectFit: "cover" }}
-                        />
-                        <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                          <Typography
-                            gutterBottom
-                            variant="h6"
-                            component="div"
-                            fontWeight="bold"
-                            sx={{ color: "#1e293b" }}
+                      <CardActions sx={{ p: 3, pt: 0, display: "flex", gap: 2, justifyContent: "center" }}>
+                        <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                          <Button
+                            size="medium"
+                            variant="contained"
+                            onClick={() => navigate(`/voitures/${vehicle.id}/reserver`)}
+                            disabled={vehicle.status.status !== "Disponible"}
+                            sx={{
+                              bgcolor: "#f97316",
+                              color: "#fff",
+                              borderRadius: 8,
+                              px: 3,
+                              py: 1.5,
+                              fontWeight: 600,
+                              textTransform: "none",
+                              "&:hover": { bgcolor: "#ea580c" },
+                              "&:disabled": { bgcolor: "#d1d5db", color: "#fff" },
+                            }}
                           >
-                            {vehicle.marque} {vehicle.modele}
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: "#64748b", mb: 1.5 }}>
-                            {vehicle.type.type}
-                          </Typography>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            {vehicle.status.status === "Disponible" ? (
-                              <CheckCircleIcon sx={{ color: "#16a34a", fontSize: "1.2rem" }} />
-                            ) : vehicle.status.status === "Réservé" ? (
-                              <CancelIcon sx={{ color: "#ea580c", fontSize: "1.2rem" }} />
-                            ) : (
-                              <BuildIcon sx={{ color: "#be123c", fontSize: "1.2rem" }} />
-                            )}
-                            <Typography
-                              variant="body1"
-                              sx={{
-                                color:
-                                  vehicle.status.status === "Disponible"
-                                    ? "#16a34a"
-                                    : vehicle.status.status === "Réservé"
-                                    ? "#ea580c"
-                                    : "#be123c",
-                                fontWeight: 600,
-                              }}
-                            >
-                              {vehicle.status.status}
-                            </Typography>
-                          </Box>
-                        </CardContent>
-                        <CardActions sx={{ p: 3, pt: 0, display: "flex", gap: 2, justifyContent: "center" }}>
-                          <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                            <Button
-                              size="medium"
-                              variant="contained"
-                              onClick={() => navigate(`/voitures/${vehicle.id}/reserver`)}
-                              disabled={vehicle.status.status !== "Disponible"}
-                              sx={{
-                                bgcolor: "#f97316",
-                                color: "#fff",
-                                borderRadius: 8,
-                                px: 3,
-                                py: 1.5,
-                                fontWeight: 600,
-                                textTransform: "none",
-                                "&:hover": { bgcolor: "#ea580c" },
-                                "&:disabled": { bgcolor: "#d1d5db", color: "#fff" },
-                              }}
-                            >
-                              Réserver
-                            </Button>
-                          </motion.div>
-                          <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                            <Button
-                              size="medium"
-                              variant="outlined"
-                              onClick={(e) => handleOpenPopover(e, vehicle.id)}
-                              sx={{
-                                borderColor: "#3b82f6",
-                                color: "#3b82f6",
-                                borderRadius: 8,
-                                px: 3,
-                                py: 1.5,
-                                fontWeight: 600,
-                                textTransform: "none",
-                                "&:hover": { borderColor: "#1d4ed8", bgcolor: "rgba(59, 130, 246, 0.08)" },
-                              }}
-                              startIcon={<InfoIcon />}
-                            >
-                              Détails
-                            </Button>
-                          </motion.div>
-                        </CardActions>
+                            Réserver
+                          </Button>
+                        </motion.div>
+                        <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                          <Button
+                            size="medium"
+                            variant="outlined"
+                            onClick={(e) => handleOpenPopover(e, vehicle.id)}
+                            sx={{
+                              borderColor: "#3b82f6",
+                              color: "#3b82f6",
+                              borderRadius: 8,
+                              px: 3,
+                              py: 1.5,
+                              fontWeight: 600,
+                              textTransform: "none",
+                              "&:hover": { borderColor: "#1d4ed8", bgcolor: "rgba(59, 130, 246, 0.08)" },
+                            }}
+                            startIcon={<InfoIcon />}
+                          >
+                            Détails
+                          </Button>
+                        </motion.div>
                       </CardActions>
                     </Card>
                   </motion.div>
@@ -595,7 +556,8 @@ const VehiclesPage: React.FC = () => {
             },
           }}
         >
-          <VehicleDetails  vehicle={selectedVehicle} onClose={handleClosePopover} />
+          {/* Ensure VehicleDetails component can handle 'null' for vehicle prop */}
+          <VehicleDetails vehicle={selectedVehicle} onClose={handleClosePopover} />
         </Popover>
       </Container>
     </Box>

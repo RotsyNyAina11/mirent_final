@@ -13,7 +13,6 @@ import { PrixsModule } from './prixs/prixs.module';
 import { ClientModule } from './client/client.module';
 import { ProformaModule } from './proforma/proforma.module';
 import { MailerModule } from './mailer/mailer.module';
-import { DevisController } from './devis/devis.controller';
 import { DevisModule } from './devis/devis.module';
 
 
@@ -34,11 +33,8 @@ import { DevisModule } from './devis/devis.module';
     PrixsModule,
     ProformaModule,
     MailerModule,
-<<<<<<< HEAD
-=======
     DevisModule,
->>>>>>> e4e577046ffa219bcbcb095b302da8ff20af3e87
   ],
-  controllers: [DevisController],
+  controllers: [],
 })
 export class AppModule {}

@@ -20,6 +20,7 @@ import ProformaList from "../admin/pages/proforma/ProformaList";
 import UserProfile from "../components/profile/userProfile";
 import ContratPage from "../admin/pages/contrat/contratPage";
 import ContactPage from "../admin/pages/Contact/ContactPage";
+import QuoteForm from "../admin/pages/Quote/quoteForm";
 
 
 const AdminRoutes = () => {
@@ -51,6 +52,15 @@ const AdminRoutes = () => {
         element={
           <MainLayout>
             <Vehicule />
+          </MainLayout>
+        }
+      />
+
+      <Route
+        path="createCommande"
+        element={
+          <MainLayout>
+            <QuoteForm />
           </MainLayout>
         }
       />
@@ -110,15 +120,6 @@ const AdminRoutes = () => {
                     </MainLayout>
                 }
             />
-      {/* Route pour la page de Devis sur la commande */}
-      <Route
-        path="devis"
-        element={
-          <MainLayout>
-            <Devis />
-          </MainLayout>
-        }
-      />
 
       {/* Route pour la page des lieux */}
       <Route

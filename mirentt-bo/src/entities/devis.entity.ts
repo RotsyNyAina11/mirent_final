@@ -35,10 +35,7 @@ export class Devis {
   prixTotal: number;
 
   @Column({ nullable: true })
-  totalEnLettre: string;
-
-  @Column({ nullable: true })
-  signatureClient: string;
+  remarque: string;
 
   @CreateDateColumn()
   createdAt: Date;

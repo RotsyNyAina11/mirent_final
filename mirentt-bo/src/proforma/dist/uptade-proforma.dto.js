@@ -14,53 +14,49 @@ var UpdateProformaItemDto = /** @class */ (function () {
     }
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsInt(),
-        class_validator_1.IsPositive()
+        class_validator_1.IsInt()
+    ], UpdateProformaItemDto.prototype, "clientId");
+    __decorate([
+        class_validator_1.IsOptional()
+    ], UpdateProformaItemDto.prototype, "vehicleCriteria");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsString()
+    ], UpdateProformaItemDto.prototype, "regionName");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_transformer_1.Transform(function (_a) {
+            var value = _a.value;
+            return new Date(value);
+        }),
+        class_validator_1.IsDate()
+    ], UpdateProformaItemDto.prototype, "dateDepart");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_transformer_1.Transform(function (_a) {
+            var value = _a.value;
+            return new Date(value);
+        }),
+        class_validator_1.IsDate()
+    ], UpdateProformaItemDto.prototype, "dateRetour");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsInt()
+    ], UpdateProformaItemDto.prototype, "prixId");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsInt()
     ], UpdateProformaItemDto.prototype, "proformaId");
     __decorate([
         class_validator_1.IsOptional(),
         class_validator_1.IsInt(),
         class_validator_1.IsPositive()
-    ], UpdateProformaItemDto.prototype, "vehicleId");
-    __decorate([
-        class_validator_1.IsOptional(),
-        class_validator_1.IsInt(),
-        class_validator_1.IsPositive()
-    ], UpdateProformaItemDto.prototype, "regionId");
-    __decorate([
-        class_validator_1.IsOptional(),
-        class_validator_1.IsInt(),
-        class_validator_1.IsPositive()
-    ], UpdateProformaItemDto.prototype, "prixId");
-    __decorate([
-        class_validator_1.IsOptional(),
-        class_validator_1.IsDateString(),
-        class_transformer_1.Type(function () { return Date; }) // Ajoutez Type pour la transformation correcte de la chaîne en Date
-    ], UpdateProformaItemDto.prototype, "dateDepart");
-    __decorate([
-        class_validator_1.IsOptional(),
-        class_validator_1.IsDateString(),
-        class_transformer_1.Type(function () { return Date; }) // Ajoutez Type pour la transformation correcte de la chaîne en Date
-    ], UpdateProformaItemDto.prototype, "dateRetour");
-    __decorate([
-        class_validator_1.IsOptional(),
-        class_validator_1.IsInt()
     ], UpdateProformaItemDto.prototype, "nombreJours");
     __decorate([
         class_validator_1.IsOptional(),
-        class_transformer_1.Type(function () { return Number; }),
-        class_validator_1.IsNumber({ maxDecimalPlaces: 2 })
+        class_validator_1.IsNumber(),
+        class_validator_1.IsPositive()
     ], UpdateProformaItemDto.prototype, "subTotal");
-    __decorate([
-        class_validator_1.IsOptional(),
-        class_transformer_1.Type(function () { return Number; }),
-        class_validator_1.IsNumber({ maxDecimalPlaces: 2 })
-    ], UpdateProformaItemDto.prototype, "totalAmount");
-    __decorate([
-        class_validator_1.IsOptional(),
-        class_transformer_1.Type(function () { return Number; }),
-        class_validator_1.IsNumber({ maxDecimalPlaces: 2 })
-    ], UpdateProformaItemDto.prototype, "carburant");
     return UpdateProformaItemDto;
 }());
 exports.UpdateProformaItemDto = UpdateProformaItemDto;

@@ -14,8 +14,20 @@ import { MailService } from 'src/mailer/mailer.service';
 import { PdfService } from 'src/pdf/pdf.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Proforma, ProformaItem, Vehicule, Region, Prix, Status, Client,Type])],
-    providers: [ProformaService, MailService, PdfService],
-    controllers: [ProformaController],
+  imports: [
+    TypeOrmModule.forFeature([
+      Proforma,
+      ProformaItem,
+      Vehicule,
+      Region,
+      Prix,
+      Status,
+      Client,
+      Type,
+    ]),
+  ],
+  providers: [ProformaService, MailService, PdfService],
+  controllers: [ProformaController],
+  exports: [ProformaService],
 })
 export class ProformaModule {}

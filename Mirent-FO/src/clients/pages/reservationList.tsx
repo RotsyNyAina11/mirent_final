@@ -21,8 +21,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Navbar from "../components/Navbar";
-import image from "../../assets/bg.jpeg";
-import { MotionConfig } from "framer-motion";
 
 const fakeReservations = [
   {

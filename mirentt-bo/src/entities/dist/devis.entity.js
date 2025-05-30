@@ -37,10 +37,7 @@ var Devis = /** @class */ (function () {
     ], Devis.prototype, "prixTotal");
     __decorate([
         typeorm_1.Column({ nullable: true })
-    ], Devis.prototype, "totalEnLettre");
-    __decorate([
-        typeorm_1.Column({ nullable: true })
-    ], Devis.prototype, "signatureClient");
+    ], Devis.prototype, "remarque");
     __decorate([
         typeorm_1.CreateDateColumn()
     ], Devis.prototype, "createdAt");

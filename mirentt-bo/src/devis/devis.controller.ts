@@ -3,45 +3,45 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { DevisService } from './devis.service';
-import { CreateDevisDto } from './create-devis.dto';
+import { CreateDevisItemDto } from './create-devis.dto';
 import { UpdateDevisDto } from './update-devis.dto';
+import { Devis } from 'src/entities/devis.entity';
 
 @Controller('devis')
 export class DevisController {
   constructor(private readonly devisService: DevisService) {}
 
-  // Créer un nouveau devis
   @Post()
-  create(@Body() createDevisDto: CreateDevisDto) {
+  async create(@Body() createDevisDto: CreateDevisItemDto): Promise<Devis> {
     return this.devisService.create(createDevisDto);
   }
 
-  // Récupérer tous les devis
   @Get()
-  findAll() {
+  async findAll(): Promise<Devis[]> {
     return this.devisService.findAll();
   }
 
-  // Récupérer un seul devis par ID
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.devisService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Devis> {
+    return this.devisService.findOne(id);
   }
 
-  // Mettre à jour un devis
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDevisDto: UpdateDevisDto) {
-    return this.devisService.update(+id, updateDevisDto);
+  @Put(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDevisDto: UpdateDevisDto,
+  ): Promise<Devis> {
+    return this.devisService.update(id, updateDevisDto);
   }
 
-  // Supprimer un devis
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.devisService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.devisService.remove(id);
   }
 }

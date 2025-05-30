@@ -40,9 +40,6 @@ export class DevisItem {
   @Column()
   nombreJours: number;
 
-  @Column({ type: 'decimal' })
-  prixUnitaire: number;
-
   @Column()
   prixCarburant: number;
 

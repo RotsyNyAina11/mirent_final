@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { TextField, Button, MenuItem, Grid, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { Prix, Region } from "../../../types/region";
+import { useNavigate } from "react-router-dom";
 
 type Client = { id: number; [key: string]: any };
 type Vehicle = { id: number; [key: string]: any };
@@ -12,9 +13,7 @@ interface DevisForm {
   numeroDevis: string;
   prixCarburant: number;
   prixTotal: number;
-  totalEnLettre: string;
-  signatureClient: string;
-  clientId: number;
+  remarque: string;
   items: DevisItem[];
 }
 
@@ -37,9 +36,7 @@ const CreateDevis = () => {
     numeroDevis: "",
     prixTotal: 0,
     prixCarburant: 0,
-    totalEnLettre: "",
-    signatureClient: "",
-    clientId: 0,
+    remarque: "",
     items: [
       {
         devisId: 0,
@@ -81,7 +78,7 @@ const CreateDevis = () => {
     const fetchPrix = async () => {
       const response = await fetch("http://localhost:3000/prixs");
       const data = await response.json();
-      console.log("Data prixs :", data); // 🔍
+      console.log("Data prixs :", data);
       setPrix(data);
     };
 
@@ -159,9 +156,7 @@ const CreateDevis = () => {
       numeroDevis: form.numeroDevis,
       prixCarburant: 0,
       prixTotal: days * Number(form.items[0].prixUnitaire),
-      totalEnLettre: "",
-      signatureClient: "",
-      clientId: Number(form.clientId),
+      remarque: "",
       items: [
         {
           vehiculeId: Number(form.items[0].vehiculeId),
@@ -216,21 +211,13 @@ const CreateDevis = () => {
           fullWidth
         />
       </Grid>
-      <Grid item xs={6}>
-        <TextField
-          label="Numéro de devis"
-          name="numeroDevis"
-          value={form.numeroDevis}
-          onChange={handleChange}
-          fullWidth
-        />
-      </Grid>
+
       <Grid item xs={6}>
         <TextField
           select
           label="Client"
           name="client"
-          value={form.clientId}
+          value={form.clientName}
           onChange={handleChange}
           fullWidth
         >
@@ -359,18 +346,9 @@ const CreateDevis = () => {
 
       <Grid item xs={6}>
         <TextField
-          label="Total en lettre"
-          name="totalEnLettre"
-          value={form.totalEnLettre}
-          onChange={handleChange}
-          fullWidth
-        />
-      </Grid>
-      <Grid item xs={6}>
-        <TextField
-          label="Signature client"
-          name="signatureClient"
-          value={form.signatureClient}
+          label="Remarque"
+          name="remarque"
+          value={form.remarque}
           onChange={handleChange}
           fullWidth
         />

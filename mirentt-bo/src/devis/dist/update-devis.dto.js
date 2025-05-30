@@ -43,10 +43,7 @@ var UpdateDevisDto = /** @class */ (function () {
     ], UpdateDevisDto.prototype, "items");
     __decorate([
         class_validator_1.IsOptional()
-    ], UpdateDevisDto.prototype, "commentaire");
-    __decorate([
-        class_validator_1.IsOptional()
-    ], UpdateDevisDto.prototype, "valide");
+    ], UpdateDevisDto.prototype, "remarque");
     return UpdateDevisDto;
 }());
 exports.UpdateDevisDto = UpdateDevisDto;

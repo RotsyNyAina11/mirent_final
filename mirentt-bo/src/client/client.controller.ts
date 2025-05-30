@@ -21,10 +21,14 @@ import { UpdateClientDto } from 'src/client/updateClient.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { ProformaService } from 'src/proforma/proforma.service';
 
 @Controller('clients')
 export class ClientController {
-  constructor(private readonly clientService: ClientService) {}
+  constructor(
+    private readonly clientService: ClientService,
+    private readonly proformaService: ProformaService,
+  ) {}
 
   @Get('client-count')
   async getClientCount(): Promise<number> {
@@ -110,5 +114,31 @@ export class ClientController {
       throw new NotFoundException(`Client avec ID ${id} introuvable`);
     }
     return { message: 'Client supprimé avec succès' };
+  }
+
+  @Get(':clientId/proforma-items')
+  async getClientProformaItems(
+    @Param('clientId', ParseIntPipe) clientId: number,
+  ) {
+    console.log(
+      `Backend: Requête reçue pour les items de proforma du client ID: ${clientId}`,
+    );
+    try {
+      const items =
+        await this.proformaService.getProformaItemsByClientId(clientId);
+      console.log(
+        `Backend: ${items.length} items de proforma trouvés pour le client ID: ${clientId}`,
+      );
+      return items;
+    } catch (error) {
+      console.error(
+        `Backend: Erreur lors de la récupération des items de proforma pour le client ${clientId}:`,
+        error,
+      );
+
+      throw new InternalServerErrorException(
+        'Erreur lors du chargement des items de proforma.',
+      );
+    }
   }
 }

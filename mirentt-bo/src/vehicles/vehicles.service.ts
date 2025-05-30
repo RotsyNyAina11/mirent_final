@@ -187,18 +187,45 @@ export class VehiclesService {
   }
 
   async initStatuses(): Promise<void> {
-    const statusNames = [
-      'Disponible',
-      'Indisponible',
-      'Maintenance',
-      'Réservé',
-    ];
+    const statusNames = ['Disponible', 'Maintenance', 'Réservé'];
 
     for (const name of statusNames) {
       const existing = await this.statusRepository.findOneBy({ status: name });
       if (!existing) {
         await this.statusRepository.save({ status: name });
       }
+    }
+  }
+
+  async removeIndisponibleStatus(): Promise<void> {
+    const indisponibleStatus = await this.statusRepository.findOneBy({
+      status: 'Indisponible',
+    });
+
+    if (indisponibleStatus) {
+      const defaultStatus = await this.statusRepository.findOneBy({
+        status: 'Disponible',
+      }); // ou 'Maintenance'
+
+      if (!defaultStatus) {
+        throw new NotFoundException(
+          'Statut "Disponible" non trouvé pour la réaffectation.',
+        );
+      }
+
+      // Met à jour tous les véhicules qui ont le statut "Indisponible"
+      const vehicles = await this.vehiculeRepository.find({
+        where: { status: { id: indisponibleStatus.id } },
+        relations: ['status'],
+      });
+
+      for (const vehicle of vehicles) {
+        vehicle.status = defaultStatus;
+        await this.vehiculeRepository.save(vehicle);
+      }
+
+      // Supprimer le statut "Indisponible"
+      await this.statusRepository.remove(indisponibleStatus);
     }
   }
 

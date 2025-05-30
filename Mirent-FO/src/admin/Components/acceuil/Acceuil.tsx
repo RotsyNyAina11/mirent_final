@@ -37,11 +37,14 @@ import {
 } from "@mui/icons-material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import { AppDispatch, RootState } from "../../../redux/store";
-import { fetchVehicles, Vehicle } from "../../../redux/features/vehicle/vehiclesSlice";
-
+import {
+  fetchVehicles,
+  Vehicle,
+} from "../../../redux/features/vehicle/vehiclesSlice";
 
 // Thème personnalisé (identique à LocationList.tsx et VehiclesList.tsx)
 const theme = createTheme({
@@ -196,6 +199,9 @@ const Accueil: React.FC = () => {
   const [availableClientsCount, setAvailableClientsCount] = useState<
     number | null
   >(null);
+  const [availablePrixCount, setAvailablePrixCount] = useState<number | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
@@ -257,6 +263,20 @@ const Accueil: React.FC = () => {
       }
     };
     fetchAvailableClients();
+  }, []);
+
+  //recuperer le prix total
+  useEffect(() => {
+    const fetchPrixCount = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/prixs/count");
+        setAvailablePrixCount(response.data);
+      } catch (error) {
+        console.error("Erreur lors du chargement du nombre de prix", error);
+      }
+    };
+
+    fetchPrixCount();
   }, []);
 
   // Fonctions pour les actions du tableau
@@ -426,7 +446,9 @@ const Accueil: React.FC = () => {
                 fontSize={isMobile ? "1.2rem" : "1.5rem"}
                 color="#1f2937"
               >
-                2 000 000 Ar
+                {typeof availablePrixCount === "number"
+                  ? `${availablePrixCount.toLocaleString("fr-FR")} Ar`
+                  : "Chargement..."}
               </Typography>
             </DashboardCard>
           </Grid>

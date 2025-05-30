@@ -187,14 +187,14 @@ export class ProformaService {
           dateDepart: new Date(item.dateDepart),
           dateRetour: new Date(item.dateRetour),
           nombreJours: dureeLocation,
-          subTotal: subTotalCalculated, // Utilisation de la valeur numérique
+          subTotal: subTotalCalculated,
         });
 
         const statusIndisponible = await this.statusRepository.findOne({
-          where: { status: 'Indisponible' },
+          where: { status: 'Réservé' },
         });
         if (!statusIndisponible) {
-          throw new NotFoundException(`Statut "Indisponible" non trouvé`);
+          throw new NotFoundException(`Statut "Réservé" non trouvé`);
         }
 
         vehiculeChoisi.status = statusIndisponible;
@@ -248,7 +248,9 @@ export class ProformaService {
   }
 
   async updateStatus(id: number, newStatus: ProformaStatus): Promise<Proforma> {
-    const proforma = await this.proformaRepository.findOne({ where: { id } });
+    const proforma = await this.proformaRepository.findOne({
+      where: { id: Number(id) },
+    });
     if (!proforma) {
       throw new NotFoundException(`Proforma with ID ${id} not found`);
     }
@@ -374,65 +376,98 @@ export class ProformaService {
     await this.proformaRepository.delete(id);
   }
 
+  // mettre à jour un proforma
+
   async update(
     id: number,
     updateDto: UpdateProformaItemDto,
   ): Promise<ProformaItem> {
-    const item = await this.proformaItemRepository.findOne({ where: { id } });
+    const item = await this.proformaItemRepository.findOne({
+      where: { id },
+      relations: ['region', 'vehicle', 'prix', 'vehicle.type'],
+    });
 
     if (!item) {
-      throw new NotFoundException(`ProformaItem avec l'id ${id} non trouvé`);
+      throw new NotFoundException(`Proforma item avec l'id ${id} non trouvé.`);
     }
 
-    // Mise à jour de la Proforma si elle est incluse dans le DTO
-    if (updateDto.proformaId) {
-      const proforma = await this.proformaRepository.findOne({
-        where: { id: updateDto.proformaId },
-      });
-      if (!proforma) throw new NotFoundException('Proforma non trouvée');
-      item.proforma = proforma;
-    }
-
-    // Mise à jour du Véhicule si l'ID est inclus
-    if (updateDto.vehicleId) {
-      const vehicule = await this.vehiculeRepository.findOne({
-        where: { id: updateDto.vehicleId },
-      });
-      if (!vehicule) throw new NotFoundException('Véhicule non trouvé');
-      item.vehicle = vehicule;
-    }
-
-    // Mise à jour de la Région si l'ID est inclus
-    if (updateDto.regionId) {
+    // Mise à jour de la région
+    if (updateDto.regionName) {
       const region = await this.regionRepository.findOne({
-        where: { id: updateDto.regionId },
+        where: { nom_region: updateDto.regionName },
       });
-      if (!region) throw new NotFoundException('Région non trouvée');
+      if (!region) {
+        throw new NotFoundException(
+          `Région avec le nom "${updateDto.regionName}" non trouvée.`,
+        );
+      }
       item.region = region;
     }
 
-    // Mise à jour du Prix si l'ID est inclus
+    // Mise à jour du véhicule
+    if (updateDto.vehicleCriteria) {
+      // Prepare criteria for vehicle lookup
+      const vehicleCriteria: any = { ...updateDto.vehicleCriteria };
+      if (vehicleCriteria.type) {
+        const typeEntity = await this.typeRepository.findOne({
+          where: { type: vehicleCriteria.type },
+        });
+        if (!typeEntity) {
+          throw new NotFoundException(
+            `Type de véhicule "${vehicleCriteria.type}" non trouvé.`,
+          );
+        }
+        vehicleCriteria.type = typeEntity;
+      }
+      const vehicle = await this.vehiculeRepository.findOne({
+        where: vehicleCriteria,
+      });
+      if (!vehicle) {
+        throw new NotFoundException(
+          `Véhicule avec les critères fournis non trouvé.`,
+        );
+      }
+      if (updateDto.vehicleCriteria.marque)
+        vehicle.marque = updateDto.vehicleCriteria.marque;
+      if (updateDto.vehicleCriteria.modele)
+        vehicle.modele = updateDto.vehicleCriteria.modele;
+      if (updateDto.vehicleCriteria.type) {
+      }
+      await this.vehiculeRepository.save(vehicle);
+      item.vehicle = vehicle;
+    }
+
+    // Mise à jour des dates
+    if (updateDto.dateDepart) item.dateDepart = updateDto.dateDepart;
+    if (updateDto.dateRetour) item.dateRetour = updateDto.dateRetour;
+
+    // Mise à jour du prix
     if (updateDto.prixId) {
       const prix = await this.prixRepository.findOne({
         where: { id: updateDto.prixId },
       });
-      if (!prix) throw new NotFoundException('Prix non trouvé');
+      if (!prix) {
+        throw new BadRequestException(
+          `Prix avec l'id ${updateDto.prixId} non trouvé.`,
+        );
+      }
       item.prix = prix;
     }
 
-    // Mise à jour des champs simples
-    if (updateDto.dateDepart) item.dateDepart = new Date(updateDto.dateDepart);
-    if (updateDto.dateRetour) item.dateRetour = new Date(updateDto.dateRetour);
-    // ✅ Mettre ici avec une vérification correcte même si la valeur est 0
+    // Mise à jour du nombre de jours
     if (updateDto.nombreJours !== undefined) {
       item.nombreJours = updateDto.nombreJours;
     }
 
-    if (updateDto.subTotal !== undefined) {
-      item.subTotal = updateDto.subTotal;
+    // Recalcul du subTotal si prix et nombreJours sont présents
+    if (item.prix && item.nombreJours !== undefined) {
+      const prixValue =
+        typeof item.prix.prix === 'number'
+          ? item.prix.prix
+          : Number(item.prix.prix);
+      item.subTotal = prixValue * item.nombreJours;
     }
 
-    // Enregistrement de l'élément mis à jour
     return this.proformaItemRepository.save(item);
   }
 
@@ -468,5 +503,16 @@ export class ProformaService {
 
     // Envoyer le buffer du PDF en réponse
     res.send(pdfBuffer);
+  }
+
+  async getProformaItemsByClientId(clientId: number): Promise<ProformaItem[]> {
+    return this.proformaItemRepository.find({
+      where: {
+        proforma: {
+          client: { id: clientId }, // Assurez-vous que Proforma et Client sont correctement liés
+        },
+      },
+      relations: ['proforma', 'proforma.client', 'vehicle', 'region', 'prix'],
+    });
   }
 }

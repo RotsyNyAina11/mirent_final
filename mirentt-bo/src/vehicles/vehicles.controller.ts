@@ -168,6 +168,7 @@ export class VehiclesController {
     }
     return vehicule;
   }
+
   @Put('update-status')
   async initStatuses() {
     const vehicules = await this.vehiculesService.findAll();
@@ -180,12 +181,6 @@ export class VehiclesController {
           'Disponible',
         );
         updated.push({ id: vehicule.id, status: 'Disponible' });
-      } else if (vehicule.status.status === 'Indisponible') {
-        await this.vehiculesService.updateStatusByName(
-          vehicule.id,
-          'Indisponible',
-        );
-        updated.push({ id: vehicule.id, status: 'Indisponible' });
       } else if (vehicule.status.status === 'Maintenance') {
         await this.vehiculesService.updateStatusByName(
           vehicule.id,
@@ -207,5 +202,13 @@ export class VehiclesController {
   async createInitialStatuses() {
     await this.vehiculesService.initStatuses();
     return { message: 'Statuts initialisés avec succès ✅' };
+  }
+
+  @Delete('status/remove-indisponible')
+  async removeIndisponible() {
+    await this.vehiculesService.removeIndisponibleStatus();
+    return {
+      message: 'Le statut "Indisponible" a été supprimé avec succès ✅',
+    };
   }
 }

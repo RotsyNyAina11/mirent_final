@@ -25,20 +25,16 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  FormHelperText,
 } from "@mui/material";
 
 import SendIcon from "@mui/icons-material/Send";
 
 import { AppDispatch, RootState } from "../../../redux/store";
-import {
-  createProforma,
-  fetchAvailableVehicles,
-} from "../../../redux/features/commande/commandeSlice";
-import { Link } from "react-router-dom";
-import jsPDF from "jspdf";
+import { createProforma } from "../../../redux/features/commande/commandeSlice";
 import "jspdf-autotable";
+import { Region } from "../../../types/region";
 
-// Interface pour définir le type de données d'un client
 interface Client {
   id: number;
   lastName: string;
@@ -46,7 +42,6 @@ interface Client {
   phone?: number;
   logo?: string;
 }
-//Interface pour definir le type de données d'une commande
 interface ProformaForm {
   clientId: number | "";
   vehicleId: number | "";
@@ -56,6 +51,7 @@ interface ProformaForm {
   contractReference: string;
   notes: string;
   status: "Brouillon" | "Envoyée" | "Confirmée" | "Annulée" | "";
+  totalAmount?: number; // Added for preview
 }
 interface FormErrors {
   clientId?: string;
@@ -102,7 +98,6 @@ const ButtonActions = {
   BON_COMMANDE: "BON_COMMANDE",
 };
 
-// Styles personnalisés
 const DashboardCard = styled("div")(({ theme }) => ({
   padding: theme.spacing(2),
   borderRadius: "12px",
@@ -148,13 +143,13 @@ const CancelButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-// Composant principal de la page de commande
 const OrderPage: React.FC = () => {
-  // États locaux
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.proformas);
   const [clients, setClients] = useState<Client[]>([]);
   const [vehicules, setVehicle] = useState<Vehicle[]>([]);
+  const [availableVehicles, setAvailableVehicles] = useState<Vehicle[]>([]);
+  const [regions, setRegions] = useState<Region[]>([]);
   const [formData, setFormData] = useState<ProformaForm>({
     clientId: "",
     vehicleId: "",
@@ -167,7 +162,6 @@ const OrderPage: React.FC = () => {
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  // Removed unused snackbarMessage state
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
@@ -184,10 +178,10 @@ const OrderPage: React.FC = () => {
   const [previewProforma, setPreviewProforma] = useState<ProformaForm | null>(
     null
   );
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [creationDate, setCreationDate] = useState(new Date());
   const [formType, setFormType] = useState("proforma");
 
-  //  Charger les clients au montage
   useEffect(() => {
     const fetchClients = async () => {
       try {
@@ -196,12 +190,10 @@ const OrderPage: React.FC = () => {
         if (response.ok) {
           setClients(data);
         } else {
-          // Removed snackbarMessage usage
           setSnackbarSeverity("error");
           setOpenSnackbar(true);
         }
       } catch (error) {
-        // Removed snackbarMessage usage
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -209,39 +201,60 @@ const OrderPage: React.FC = () => {
     fetchClients();
   }, []);
 
+  // Fetch Available Vehicles
   useEffect(() => {
-    const fetchAvailableVehicles = async () => {
+    const fetchVehicles = async () => {
       try {
         const response = await fetch("http://localhost:3000/vehicles");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        // Filter available vehicles directly here
+        const available = data.filter(
+          (vehicle: Vehicle) => vehicle.status.status === "Disponible"
+        );
+        setAvailableVehicles(available);
+      } catch (error: any) {
+        setSnackbarSeverity("error");
+        setSnackbarMessage(
+          `Erreur lors du chargement des véhicules: ${error.message}`
+        );
+        setOpenSnackbar(true);
+      }
+    };
+    fetchVehicles();
+  }, []);
+
+  //Api pour récuperér les regions avec son district
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/regions");
         const data = await response.json();
         if (response.ok) {
-          setVehicle(data);
+          // Assuming the API returns regions in the expected format
+          setRegions(data);
         } else {
-          // Removed snackbarMessage usage
           setSnackbarSeverity("error");
           setOpenSnackbar(true);
         }
       } catch (error) {
-        // Removed snackbarMessage usage
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
     };
-
-    fetchAvailableVehicles();
+    fetchRegions();
   }, []);
 
-  // Gestion des changements dans le formulaire
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<string | number>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name as string]: value }));
-    // Réinitialiser l'erreur pour ce champ
     setFormErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
-  // Validation du formulaire
   const validateForm = (): boolean => {
     const errors: FormErrors = {};
 
@@ -292,7 +305,6 @@ const OrderPage: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
-  // Soumission du formulaire
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -301,12 +313,10 @@ const OrderPage: React.FC = () => {
       setSubmitting(false);
       return;
     }
-    // Préparer les données pour l'API
     const selectedClient = clients.find(
       (client) => client.id === formData.clientId
     );
     if (!selectedClient) {
-      // Removed snackbarMessage usage
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
       setSubmitting(false);
@@ -330,7 +340,6 @@ const OrderPage: React.FC = () => {
       ],
     };
 
-    // Envoyer les données à l'API
     try {
       const result = await dispatch(createProforma(proformaData)).unwrap();
       const pdfBase64 = result.pdfBase64;
@@ -340,11 +349,6 @@ const OrderPage: React.FC = () => {
       const pdfUrl = URL.createObjectURL(pdfBlob);
       setPdfUrl(pdfUrl);
 
-      // Télécharger automatiquement le PDF
-      const link = document.createElement("a");
-      link.href = pdfUrl;
-
-      // Réinitialiser le formulaire
       setFormData({
         clientId: "",
         vehicleId: "",
@@ -356,10 +360,8 @@ const OrderPage: React.FC = () => {
         status: "",
       });
       setFormErrors({});
-      // Removed snackbarMessage usage
       setSnackbarSeverity("success");
     } catch (error: any) {
-      // Removed snackbarMessage usage
       setSnackbarSeverity("error");
     }
     setOpenSnackbar(true);
@@ -372,30 +374,37 @@ const OrderPage: React.FC = () => {
     }
     switch (action) {
       case ButtonActions.SEND_EMAIL:
-        console.log("Envoyer par email");
+        // Implement email sending logic here
         break;
       case ButtonActions.CONFIRM:
-        console.log("Confirmer la commande");
         setConfirmationMessage("Commande confirmée !");
         setTimeout(() => {
           setConfirmationMessage("");
         }, 3000);
         break;
       case ButtonActions.PREVIEW:
-        console.log("Prévisualiser");
+        handlePreview();
         break;
       case ButtonActions.CANCEL:
-        console.log("Annuler");
+        setFormData({
+          clientId: "",
+          vehicleId: "",
+          startDate: "",
+          endDate: "",
+          regionName: "",
+          contractReference: "",
+          notes: "",
+          status: "",
+        });
         break;
       case ButtonActions.DEVIS:
-        console.log("Devis");
         setFormType("devis");
         break;
       case ButtonActions.SENT:
-        console.log("Envoyé");
+        // Implement sent logic here
         break;
       case ButtonActions.BON_COMMANDE:
-        console.log("Bon de commande");
+        // Implement bon de commande logic here
         break;
       default:
         break;
@@ -409,17 +418,14 @@ const OrderPage: React.FC = () => {
     creationDate.getMonth() + 1
   }/${creationDate.getFullYear()}`;
 
-  //Fonction pour prévisualiser d'un proforma
+  // Preview logic: show modal with current form data
   const handlePreview = () => {
-    const selectedProforma = previewProforma;
-    setPreviewProforma(selectedProforma);
+    setPreviewProforma(formData);
     setOpenPreviewModal(true);
   };
 
-  // Rendu du composant
   return (
     <div>
-      {/* Barre d'outils avec des boutons */}
       <Toolbar>
         <Box sx={{ flexGrow: 1 }}>
           <ButtonGroup
@@ -437,22 +443,18 @@ const OrderPage: React.FC = () => {
               variant={activeButtonIndex === 1 ? "contained" : "outlined"}
               onClick={() => {
                 handleButtonClick(ButtonActions.CONFIRM, 1);
-                setConfirmationMessage("Commande confirmée !");
               }}
             >
               Confirmer
             </Button>
-
             <Button
               variant={activeButtonIndex === 2 ? "contained" : "outlined"}
               onClick={() => {
                 handleButtonClick(ButtonActions.PREVIEW, 2);
-                handlePreview;
               }}
             >
               Preview
             </Button>
-
             <Button
               variant={activeButtonIndex === 3 ? "contained" : "outlined"}
               onClick={() => handleButtonClick(ButtonActions.CANCEL, 3)}
@@ -506,7 +508,6 @@ const OrderPage: React.FC = () => {
       <Typography variant="body1" paragraph sx={{ fontSize: "0.9rem" }}>
         Ici, vous pouvez gérer les commandes de location de votre agence.
       </Typography>
-      {/* Message de chargement ou d'erreur */}
       {loading && (
         <>
           <Typography sx={{ mb: 2, fontSize: isMobile ? "0.9rem" : "1rem" }}>
@@ -545,12 +546,9 @@ const OrderPage: React.FC = () => {
         </Typography>
       )}
 
-      {/* Contenu principal de la page */}
-
       <Container maxWidth="lg" sx={{ marginTop: 4 }}>
         <Grid container spacing={2} sx={{ marginTop: 2 }}>
           <Grid item xs={12}>
-            {/* Carte pour les détails de la commande */}
             <Card
               sx={{
                 width: "100%",
@@ -616,11 +614,10 @@ const OrderPage: React.FC = () => {
                             readOnly: true,
                           }}
                         />
-                        {/*Vehicule*/}
                         <FormControl
                           fullWidth
                           error={!!formErrors.vehicleId}
-                          sx={{ mb: 2, mx: "auto" }}
+                          sx={{ mb: 2 }}
                         >
                           <InputLabel
                             id="vehicle-label"
@@ -639,40 +636,61 @@ const OrderPage: React.FC = () => {
                             label="Véhicule"
                             aria-label="Sélectionner un véhicule"
                           >
-                            {vehicules && vehicules.length > 0 ? (
-                              vehicules.map((vehicle) => (
-                                <MenuItem key={vehicle.id} value={vehicle.id}>
-                                  {vehicle.nom}
+                            {availableVehicles.length > 0
+                              ? availableVehicles.map((vehicle) => (
+                                  <MenuItem key={vehicle.id} value={vehicle.id}>
+                                    {vehicle.nom} ({vehicle.marque} -{" "}
+                                    {vehicle.immatriculation})
+                                  </MenuItem>
+                                ))
+                              : null}
+                          </Select>
+                          {formErrors.vehicleId && (
+                            <FormHelperText sx={{ color: "error.main" }}>
+                              {formErrors.vehicleId}
+                            </FormHelperText>
+                          )}
+                        </FormControl>
+
+                        <FormControl
+                          fullWidth
+                          sx={{ mb: 2 }}
+                          error={!!formErrors.regionName}
+                        >
+                          <InputLabel id="region-select-label">
+                            Région
+                          </InputLabel>
+                          <Select
+                            labelId="region-select-label"
+                            id="region-select"
+                            name="regionName"
+                            value={formData.regionName}
+                            onChange={handleChange}
+                            label="Région"
+                            variant="standard"
+                            aria-label="Sélectionner une région"
+                          >
+                            {regions.length > 0 ? (
+                              regions.map((region) => (
+                                <MenuItem
+                                  key={region.id}
+                                  value={region.nom_region}
+                                >
+                                  {region.nom_region} ({region.nom_district})
                                 </MenuItem>
                               ))
                             ) : (
                               <MenuItem disabled>
-                                Aucun véhicule disponible
+                                Aucune région disponible
                               </MenuItem>
                             )}
                           </Select>
-                          {formErrors.vehicleId && (
-                            <Typography color="error" variant="body2">
-                              {formErrors.vehicleId}
-                            </Typography>
+                          {formErrors.regionName && (
+                            <FormHelperText sx={{ color: "error.main" }}>
+                              {formErrors.regionName}
+                            </FormHelperText>
                           )}
                         </FormControl>
-
-                        <TextField
-                          sx={{ mb: 2, mx: "auto" }}
-                          label="Région"
-                          name="regionName"
-                          value={formData.regionName}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            handleChange(e)
-                          }
-                          fullWidth
-                          placeholder="Antananarivo"
-                          variant="standard"
-                          error={!!formErrors.regionName}
-                          helperText={formErrors.regionName}
-                          aria-label="Entrer la région"
-                        />
                         <Box sx={{ display: "flex", gap: 2 }}>
                           <TextField
                             label="Date de début"
@@ -773,7 +791,6 @@ const OrderPage: React.FC = () => {
                       </Grid>
                     </Grid>
 
-                    {/* Boutons d'action */}
                     <Box
                       sx={{
                         mt: isMobile ? 2 : 3,
@@ -808,18 +825,16 @@ const OrderPage: React.FC = () => {
                       </PrimaryButton>
                     </Box>
                   </form>
-                  {/* Lien pour télécharger le PDF */}
-
                   {pdfUrl && (
                     <Box sx={{ mt: 2 }}>
-                      <Link
+                      <a
                         href={pdfUrl}
                         download="proforma.pdf"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
                         Télécharger le Proforma (PDF)
-                      </Link>
+                      </a>
                     </Box>
                   )}
                 </DashboardCard>
@@ -847,9 +862,8 @@ const OrderPage: React.FC = () => {
                       Date retour : {previewProforma?.endDate}
                     </Typography>
                     <Typography>
-                      Prix total : {previewProforma?.totalAmount} Ar
+                      Prix total : {previewProforma?.totalAmount ?? "-"} Ar
                     </Typography>
-                    {/* Ajoute les autres champs que tu veux afficher */}
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={() => setOpenPreviewModal(false)}>
@@ -858,7 +872,6 @@ const OrderPage: React.FC = () => {
                   </DialogActions>
                 </Dialog>
 
-                {/* Snackbar de succès ou d'erreur */}
                 <Snackbar
                   open={openSnackbar}
                   autoHideDuration={3000}
@@ -866,11 +879,13 @@ const OrderPage: React.FC = () => {
                   anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 >
                   <Alert
-                    severity="success"
+                    severity={snackbarSeverity}
                     sx={{ width: "100%" }}
                     onClose={() => setOpenSnackbar(false)}
                   >
-                    Le proforma a été créé avec succès !
+                    {snackbarSeverity === "success"
+                      ? "Le proforma a été créé avec succès !"
+                      : "Erreur lors de la création du proforma."}
                   </Alert>
                 </Snackbar>
               </CardContent>

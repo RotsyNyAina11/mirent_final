@@ -666,6 +666,38 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
+          {/* Détail du contrat d'un client*/}
+          <Tooltip title="Détail du contrat" placement="right">
+            <NavLinkButton
+              to="/admin/client_detail"
+              selected={window.location.pathname === "/client_detail"}
+              sx={{
+                padding: "12px 16px",
+                "& .MuiListItemIcon-root": {
+                  minWidth: "40px",
+                  color: iconColor,
+                  fontSize: "1.4rem",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <ReceiptLong />
+              </ListItemIcon>
+              <ListItemText
+                primary="Détail du contrat"
+                primaryTypographyProps={{
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  color: textColor,
+                }}
+                sx={{
+                  opacity: isCollapsed ? 0 : 1,
+                  transition: "opacity 0.3s ease-in-out",
+                }}
+              />
+            </NavLinkButton>
+          </Tooltip>
+
           {/* Contact */}
           <Tooltip title="Contact" placement="right">
             <NavLinkButton
@@ -697,6 +729,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
+
           {/*
           commande
 
@@ -732,6 +765,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           </Tooltip>
            */}
         </List>
+        {/* Liste de détail d'un client*/}
 
         <List>
           <Divider sx={{ my: 8, borderColor: "#e0e0e0" }} />

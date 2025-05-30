@@ -48,14 +48,8 @@ const mockVehicles: Vehicle[] = [
     status: "Disponible",
     type: "Berline",
     image: "/src/assets/1.jpg",
-    description:
-      "La Toyota Corolla est une berline fiable et économique, parfaite pour les trajets urbains et les longues distances.",
-    features: [
-      "Climatisation",
-      "Système hybride",
-      "Caméra de recul",
-      "Bluetooth",
-    ],
+    description: "La Toyota Corolla est une berline fiable et économique, parfaite pour les trajets urbains et les longues distances.",
+    features: ["Climatisation", "Système hybride", "Caméra de recul", "Bluetooth"],
   },
   {
     id: 2,
@@ -64,14 +58,8 @@ const mockVehicles: Vehicle[] = [
     status: "Réservé",
     type: "Berline",
     image: "/src/assets/1.jpg",
-    description:
-      "La Honda Civic combine style et performance avec une conduite dynamique.",
-    features: [
-      "Écran tactile",
-      "Régulateur de vitesse",
-      "Sièges chauffants",
-      "Aide au stationnement",
-    ],
+    description: "La Honda Civic combine style et performance avec une conduite dynamique.",
+    features: ["Écran tactile", "Régulateur de vitesse", "Sièges chauffants", "Aide au stationnement"],
   },
   {
     id: 3,
@@ -80,14 +68,8 @@ const mockVehicles: Vehicle[] = [
     status: "Disponible",
     type: "Berline",
     image: "/src/assets/1.jpg",
-    description:
-      "La BMW Série 3 offre une expérience de conduite premium avec des finitions haut de gamme.",
-    features: [
-      "Suspension adaptative",
-      "Toit ouvrant",
-      "Système de navigation",
-      "Intérieur cuir",
-    ],
+    description: "La BMW Série 3 offre une expérience de conduite premium avec des finitions haut de gamme.",
+    features: ["Suspension adaptative", "Toit ouvrant", "Système de navigation", "Intérieur cuir"],
   },
   {
     id: 4,
@@ -97,12 +79,7 @@ const mockVehicles: Vehicle[] = [
     type: "Berline",
     image: "/src/assets/1.jpg",
     description: "La Mercedes Classe C est synonyme de luxe et de confort.",
-    features: [
-      "Sièges électriques",
-      "Éclairage d'ambiance",
-      "Assistance à la conduite",
-      "Son premium",
-    ],
+    features: ["Sièges électriques", "Éclairage d'ambiance", "Assistance à la conduite", "Son premium"],
   },
   {
     id: 5,
@@ -111,14 +88,8 @@ const mockVehicles: Vehicle[] = [
     status: "Disponible",
     type: "SUV",
     image: "/src/assets/1.jpg",
-    description:
-      "Le Volkswagen Tiguan est un SUV polyvalent, idéal pour les familles.",
-    features: [
-      "4x4",
-      "Coffre spacieux",
-      "Écran multifonction",
-      "Démarrage sans clé",
-    ],
+    description: "Le Volkswagen Tiguan est un SUV polyvalent, idéal pour les familles.",
+    features: ["4x4", "Coffre spacieux", "Écran multifonction", "Démarrage sans clé"],
   },
   {
     id: 6,
@@ -127,14 +98,8 @@ const mockVehicles: Vehicle[] = [
     status: "Réservé",
     type: "SUV",
     image: "/src/assets/1.jpg",
-    description:
-      "L'Audi Q5 allie élégance et robustesse avec des performances tout-terrain.",
-    features: [
-      "Quattro 4x4",
-      "Toit panoramique",
-      "Volant multifonction",
-      "Écran tête haute",
-    ],
+    description: "L'Audi Q5 allie élégance et robustesse avec des performances tout-terrain.",
+    features: ["Quattro 4x4", "Toit panoramique", "Volant multifonction", "Écran tête haute"],
   },
 ];
 
@@ -152,10 +117,7 @@ const VehicleSummary: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => (
     <CardContent sx={{ p: 3, display: "flex", alignItems: "center", gap: 3 }}>
       <Box
         component="img"
-        src={
-          vehicle.image ||
-          "https://via.placeholder.com/150x100?text=Image+Indisponible"
-        }
+        src={vehicle.image || "https://via.placeholder.com/150x100?text=Image+Indisponible"}
         alt={`${vehicle.brand} ${vehicle.model}`}
         sx={{ width: 150, height: 100, objectFit: "cover", borderRadius: 4 }}
       />
@@ -171,12 +133,7 @@ const VehicleSummary: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => (
           <Chip
             icon={<DirectionsCarIcon />}
             label={vehicle.type}
-            sx={{
-              bgcolor: "#e3f2fd",
-              color: "#1976d2",
-              fontWeight: 600,
-              fontFamily: "'Inter', sans-serif",
-            }}
+            sx={{ bgcolor: "#e3f2fd", color: "#1976d2", fontWeight: 600, fontFamily: "'Inter', sans-serif" }}
           />
           <Chip
             icon={
@@ -190,18 +147,8 @@ const VehicleSummary: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => (
             }
             label={vehicle.status}
             sx={{
-              bgcolor:
-                vehicle.status === "Disponible"
-                  ? "#e8f5e9"
-                  : vehicle.status === "Réservé"
-                  ? "#fff3e0"
-                  : "#ffebee",
-              color:
-                vehicle.status === "Disponible"
-                  ? "#2e7d32"
-                  : vehicle.status === "Réservé"
-                  ? "#ff9800"
-                  : "#d32f2f",
+              bgcolor: vehicle.status === "Disponible" ? "#e8f5e9" : vehicle.status === "Réservé" ? "#fff3e0" : "#ffebee",
+              color: vehicle.status === "Disponible" ? "#2e7d32" : vehicle.status === "Réservé" ? "#ff9800" : "#d32f2f",
               fontWeight: 600,
               fontFamily: "'Inter', sans-serif",
             }}
@@ -236,11 +183,9 @@ const ReservationForm: React.FC<{
     }
     if (!fullName.trim()) newErrors.fullName = "Nom complet requis";
     if (!phone.trim()) newErrors.phone = "Numéro de téléphone requis";
-    else if (!/^\+?\d{10,15}$/.test(phone))
-      newErrors.phone = "Numéro de téléphone invalide";
+    else if (!/^\+?\d{10,15}$/.test(phone)) newErrors.phone = "Numéro de téléphone invalide";
     if (!email.trim()) newErrors.email = "Email requis";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      newErrors.email = "Email invalide";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Email invalide";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -288,14 +233,8 @@ const ReservationForm: React.FC<{
                     fullWidth: true,
                     error: !!errors.startDate,
                     helperText: errors.startDate,
-                    sx: {
-                      "& .MuiInputBase-root": {
-                        fontFamily: "'Inter', sans-serif",
-                      },
-                    },
-                    InputLabelProps: {
-                      sx: { fontFamily: "'Inter', sans-serif" },
-                    },
+                    sx: { "& .MuiInputBase-root": { fontFamily: "'Inter', sans-serif" } },
+                    InputLabelProps: { sx: { fontFamily: "'Inter', sans-serif" } },
                   },
                 }}
                 aria-label="Sélectionner la date de début de la réservation"
@@ -314,14 +253,8 @@ const ReservationForm: React.FC<{
                     fullWidth: true,
                     error: !!errors.endDate,
                     helperText: errors.endDate,
-                    sx: {
-                      "& .MuiInputBase-root": {
-                        fontFamily: "'Inter', sans-serif",
-                      },
-                    },
-                    InputLabelProps: {
-                      sx: { fontFamily: "'Inter', sans-serif" },
-                    },
+                    sx: { "& .MuiInputBase-root": { fontFamily: "'Inter', sans-serif" } },
+                    InputLabelProps: { sx: { fontFamily: "'Inter', sans-serif" } },
                   },
                 }}
                 aria-label="Sélectionner la date de fin de la réservation"
@@ -336,9 +269,7 @@ const ReservationForm: React.FC<{
               fullWidth
               error={!!errors.fullName}
               helperText={errors.fullName}
-              sx={{
-                "& .MuiInputBase-root": { fontFamily: "'Inter', sans-serif" },
-              }}
+              sx={{ "& .MuiInputBase-root": { fontFamily: "'Inter', sans-serif" } }}
               InputLabelProps={{ sx: { fontFamily: "'Inter', sans-serif" } }}
               aria-label="Entrer votre nom complet"
             />
@@ -351,9 +282,7 @@ const ReservationForm: React.FC<{
               fullWidth
               error={!!errors.phone}
               helperText={errors.phone}
-              sx={{
-                "& .MuiInputBase-root": { fontFamily: "'Inter', sans-serif" },
-              }}
+              sx={{ "& .MuiInputBase-root": { fontFamily: "'Inter', sans-serif" } }}
               InputLabelProps={{ sx: { fontFamily: "'Inter', sans-serif" } }}
               aria-label="Entrer votre numéro de téléphone"
             />
@@ -366,9 +295,7 @@ const ReservationForm: React.FC<{
               fullWidth
               error={!!errors.email}
               helperText={errors.email}
-              sx={{
-                "& .MuiInputBase-root": { fontFamily: "'Inter', sans-serif" },
-              }}
+              sx={{ "& .MuiInputBase-root": { fontFamily: "'Inter', sans-serif" } }}
               InputLabelProps={{ sx: { fontFamily: "'Inter', sans-serif" } }}
               aria-label="Entrer votre adresse email"
             />
@@ -377,10 +304,7 @@ const ReservationForm: React.FC<{
       </CardContent>
       <Box sx={{ p: 3, display: "flex", justifyContent: "center" }}>
         <motion.div
-          whileHover={{
-            scale: 1.05,
-            boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)",
-          }}
+          whileHover={{ scale: 1.05, boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)" }}
           whileTap={{ scale: 0.95 }}
         >
           <Button
@@ -473,14 +397,7 @@ const ReservationPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
         <CircularProgress size={60} sx={{ color: "#ff6f61" }} />
       </Box>
     );
@@ -497,17 +414,10 @@ const ReservationPage: React.FC = () => {
           bgcolor: "rgba(0,0,0,0.7)",
         }}
       >
-        <SentimentDissatisfiedIcon
-          sx={{ fontSize: 60, color: "#fff", opacity: 0.7 }}
-        />
+        <SentimentDissatisfiedIcon sx={{ fontSize: 60, color: "#fff", opacity: 0.7 }} />
         <Typography
           variant="h5"
-          sx={{
-            color: "#fff",
-            mt: 2,
-            opacity: 0.9,
-            fontFamily: "'Inter', sans-serif",
-          }}
+          sx={{ color: "#fff", mt: 2, opacity: 0.9, fontFamily: "'Inter', sans-serif" }}
         >
           {error || "Véhicule non trouvé"}
         </Typography>
@@ -614,10 +524,7 @@ const ReservationPage: React.FC = () => {
               Réservation confirmée ! Vous serez redirigé vers la flotte.
             </Alert>
           ) : (
-            <ReservationForm
-              vehicle={vehicle}
-              onSubmit={handleReservationSubmit}
-            />
+            <ReservationForm vehicle={vehicle} onSubmit={handleReservationSubmit} />
           )}
         </motion.div>
       </Container>

@@ -1,4 +1,4 @@
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsDateString,
   IsNotEmpty,
@@ -7,6 +7,9 @@ import {
   IsArray,
   IsString,
   IsDate,
+  ArrayNotEmpty,
+  ValidateNested,
+  IsInt,
 } from 'class-validator';
 
 export class CreateDevisItemDto {
@@ -14,38 +17,27 @@ export class CreateDevisItemDto {
   @IsString()
   clientName: string;
 
+  @IsInt()
+  @IsNotEmpty()
+  regionId: number;
+
   @IsNotEmpty()
   @Transform(({ value }) => new Date(value))
   @IsDate()
   dateCreation: Date;
 
-  @IsOptional()
-  @IsString()
-  numeroDevis: string;
-
-  @IsOptional()
-  @IsNumber()
   @IsNotEmpty()
+  @IsNumber()
+  @Transform(({ value }) => Number(value))
   prixCarburant: number;
 
-  @IsOptional()
-  @IsNumber()
-  prixTotal: number;
-
-  @IsOptional()
-  @IsString()
-  totalEnLettre: string;
-
-  @IsOptional()
-  @IsString()
-  signatureClient: string;
-}
-
-export class CreateDevisDto {
   @IsNotEmpty()
-  clientId: number;
+  @IsString()
+  remarque?: string;
 
-  @IsArray()
+  @ArrayNotEmpty()
   @IsNotEmpty({ each: true })
+  @ValidateNested({ each: true })
+  @Type(() => CreateDevisItemDto)
   items: CreateDevisItemDto[];
 }

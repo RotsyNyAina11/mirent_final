@@ -1,59 +1,54 @@
 import {
+  IsDate,
   IsDateString,
   IsInt,
   IsNumber,
   IsOptional,
   IsPositive,
+  IsString,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { VehicleCriteria } from './create-proformaItem.dto'; // Assurez-vous que c'est le bon chemin
 
 export class UpdateProformaItemDto {
   @IsOptional()
   @IsInt()
-  @IsPositive()
-  proformaId?: number;
+  clientId?: number;
 
   @IsOptional()
-  @IsInt()
-  @IsPositive()
-  vehicleId?: number;
+  // @Type(() => VehicleCriteria) // Décommentez si VehicleCriteria est un objet complexe et doit être transformé
+  vehicleCriteria?: VehicleCriteria; // La structure exacte de VehicleCriteria doit être définie
 
   @IsOptional()
-  @IsInt()
-  @IsPositive()
-  regionId?: number;
+  @IsString()
+  regionName?: string; // Doit être le nom de la région, pas son ID
 
   @IsOptional()
-  @IsInt()
-  @IsPositive()
-  prixId?: number;
-
-  @IsOptional()
-  @IsDateString()
-  @Type(() => Date) // Ajoutez Type pour la transformation correcte de la chaîne en Date
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
   dateDepart?: Date;
 
   @IsOptional()
-  @IsDateString()
-  @Type(() => Date) // Ajoutez Type pour la transformation correcte de la chaîne en Date
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
   dateRetour?: Date;
+
+  // --- NOUVEAUX CHAMPS (si vous voulez les mettre à jour) ---
+  @IsOptional()
+  @IsInt()
+  prixId?: number; // Ajoutez si nécessaire
 
   @IsOptional()
   @IsInt()
-  nombreJours?: number;
+  proformaId?: number; // Ajoutez si nécessaire, mais souvent l'ID de la proforma parente n'est pas modifié via l'item
 
   @IsOptional()
-  @Type(() => Number)
-  @IsNumber({ maxDecimalPlaces: 2 })
-  subTotal?: number;
+  @IsInt()
+  @IsPositive()
+  nombreJours?: number; // Ajoutez si nécessaire
 
   @IsOptional()
-  @Type(() => Number)
-  @IsNumber({ maxDecimalPlaces: 2 })
-  totalAmount?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber({ maxDecimalPlaces: 2 })
-  carburant?: number; // Ajout du champ carburant
+  @IsNumber()
+  @IsPositive()
+  subTotal?: number; // Ajoutez si nécessaire
 }

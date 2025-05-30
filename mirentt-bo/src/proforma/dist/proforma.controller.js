@@ -119,25 +119,24 @@ var ProformaController = /** @class */ (function () {
             });
         });
     };
-    ProformaController.prototype.updateProformaItem = function (id, dto) {
+    // proforma.controller.ts
+    ProformaController.prototype.updateProformaItem = function (
+    // Renommez la méthode pour clarifier ce qu'elle fait
+    id, // L'ID vient de l'URL, c'est une string
+    updateProformaItemDto) {
         return __awaiter(this, void 0, void 0, function () {
-            var updatedItem, error_2;
+            var updatedItem;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.proformaService.update(id, dto)];
+                        console.log("Tentative de mise \u00E0 jour de l'item de proforma ID: " + id);
+                        console.log('DTO reçu:', updateProformaItemDto);
+                        return [4 /*yield*/, this.proformaService.update(Number(id), // Conversion ici
+                            updateProformaItemDto)];
                     case 1:
                         updatedItem = _a.sent();
-                        return [2 /*return*/, {
-                                message: 'ProformaItem mis à jour avec succès',
-                                data: updatedItem
-                            }];
-                    case 2:
-                        error_2 = _a.sent();
-                        console.error('Erreur lors de la mise à jour du ProformaItem :', error_2);
-                        throw error_2; // Renvoyer l'erreur pour qu'elle soit traitée par le filtre global
-                    case 3: return [2 /*return*/];
+                        console.log('Item de proforma mis à jour:', updatedItem);
+                        return [2 /*return*/, updatedItem];
                 }
             });
         });
@@ -176,8 +175,10 @@ var ProformaController = /** @class */ (function () {
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], ProformaController.prototype, "delete");
     __decorate([
-        common_1.Put(':id'),
-        __param(0, common_1.Param('id', common_1.ParseIntPipe)),
+        common_1.Put(':id') // C'est la SEULE route PUT avec ce chemin
+        ,
+        common_1.HttpCode(common_1.HttpStatus.OK),
+        __param(0, common_1.Param('id')),
         __param(1, common_1.Body())
     ], ProformaController.prototype, "updateProformaItem");
     __decorate([

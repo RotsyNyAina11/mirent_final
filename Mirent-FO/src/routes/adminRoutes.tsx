@@ -7,7 +7,6 @@ import {
 import "react-toastify/dist/ReactToastify.css";
 
 import MainLayout from "../layouts/MainLayouts";
-import Performat from "../admin/pages/proforma/ProformaList";
 import Devis from "../admin/pages/Devis/DevisPage";
 import ProformaPage from "../admin/pages/proforma/proformaPage";
 import Commande from "../admin/pages/commande/CommandePage";
@@ -16,6 +15,7 @@ import ContratPage from "../admin/pages/contrat/contratPage";
 import Vehicule from "../admin/pages/vehicules/vehiculePage";
 import Types from "../admin/pages/Types/type";
 import ClientPage from "../admin/pages/clients/ClientPage";
+import ClientDetailPage from "../admin/pages/ClientDetailPage/clientdetailPage";
 import Home from "../admin/pages/acceuil/HomePage";
 import ContactPage from "../admin/pages/Contact/ContactPage";
 import ProformaList from "../admin/pages/proforma/ProformaList";
@@ -65,6 +65,16 @@ const AdminRoutes = () => {
           </MainLayout>
         }
       />
+      {/* Route pour la page de la détail d'un client */}
+
+      <Route
+        path="client_detail"
+        element={
+          <MainLayout>
+            <ClientDetailPage />
+          </MainLayout>
+        }
+      />
 
       {/* Route pour la page de Performat sur la commande */}
       <Route
@@ -90,16 +100,6 @@ const AdminRoutes = () => {
         element={
           <MainLayout>
             <ProformaPage />
-          </MainLayout>
-        }
-      />
-
-      {/* Route pour la page Table proforma */}
-      <Route
-        path="tableau_proforma"
-        element={
-          <MainLayout>
-            <Performat />
           </MainLayout>
         }
       />

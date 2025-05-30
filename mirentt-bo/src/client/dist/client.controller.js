@@ -51,8 +51,9 @@ var platform_express_1 = require("@nestjs/platform-express");
 var multer_1 = require("multer");
 var path_1 = require("path");
 var ClientController = /** @class */ (function () {
-    function ClientController(clientService) {
+    function ClientController(clientService, proformaService) {
         this.clientService = clientService;
+        this.proformaService = proformaService;
     }
     ClientController.prototype.getClientCount = function () {
         return __awaiter(this, void 0, Promise, function () {
@@ -126,6 +127,30 @@ var ClientController = /** @class */ (function () {
             });
         });
     };
+    ClientController.prototype.getClientProformaItems = function (clientId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var items, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("Backend: Requ\u00EAte re\u00E7ue pour les items de proforma du client ID: " + clientId);
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.proformaService.getProformaItemsByClientId(clientId)];
+                    case 2:
+                        items = _a.sent();
+                        console.log("Backend: " + items.length + " items de proforma trouv\u00E9s pour le client ID: " + clientId);
+                        return [2 /*return*/, items];
+                    case 3:
+                        error_2 = _a.sent();
+                        console.error("Backend: Erreur lors de la r\u00E9cup\u00E9ration des items de proforma pour le client " + clientId + ":", error_2);
+                        throw new common_1.InternalServerErrorException('Erreur lors du chargement des items de proforma.');
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
     __decorate([
         common_1.Get('client-count')
     ], ClientController.prototype, "getClientCount");
@@ -170,6 +195,10 @@ var ClientController = /** @class */ (function () {
         common_1.Delete(':id'),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], ClientController.prototype, "remove");
+    __decorate([
+        common_1.Get(':clientId/proforma-items'),
+        __param(0, common_1.Param('clientId', common_1.ParseIntPipe))
+    ], ClientController.prototype, "getClientProformaItems");
     ClientController = __decorate([
         common_1.Controller('clients')
     ], ClientController);

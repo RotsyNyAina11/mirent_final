@@ -178,39 +178,32 @@ var VehiclesController = /** @class */ (function () {
                         _i = 0, vehicules_1 = vehicules;
                         _a.label = 2;
                     case 2:
-                        if (!(_i < vehicules_1.length)) return [3 /*break*/, 11];
+                        if (!(_i < vehicules_1.length)) return [3 /*break*/, 9];
                         vehicule = vehicules_1[_i];
                         if (!(vehicule.status.status === 'Disponible')) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.vehiculesService.updateStatusByName(vehicule.id, 'Disponible')];
                     case 3:
                         _a.sent();
                         updated.push({ id: vehicule.id, status: 'Disponible' });
-                        return [3 /*break*/, 10];
+                        return [3 /*break*/, 8];
                     case 4:
-                        if (!(vehicule.status.status === 'Indisponible')) return [3 /*break*/, 6];
-                        return [4 /*yield*/, this.vehiculesService.updateStatusByName(vehicule.id, 'Indisponible')];
+                        if (!(vehicule.status.status === 'Maintenance')) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this.vehiculesService.updateStatusByName(vehicule.id, 'Maintenance')];
                     case 5:
                         _a.sent();
-                        updated.push({ id: vehicule.id, status: 'Indisponible' });
-                        return [3 /*break*/, 10];
+                        updated.push({ id: vehicule.id, status: 'Maintenance' });
+                        return [3 /*break*/, 8];
                     case 6:
-                        if (!(vehicule.status.status === 'Maintenance')) return [3 /*break*/, 8];
-                        return [4 /*yield*/, this.vehiculesService.updateStatusByName(vehicule.id, 'Maintenance')];
+                        if (!(vehicule.status.status === 'Reserve')) return [3 /*break*/, 8];
+                        return [4 /*yield*/, this.vehiculesService.updateStatusByName(vehicule.id, 'Réservé')];
                     case 7:
                         _a.sent();
-                        updated.push({ id: vehicule.id, status: 'Maintenance' });
-                        return [3 /*break*/, 10];
-                    case 8:
-                        if (!(vehicule.status.status === 'Reserve')) return [3 /*break*/, 10];
-                        return [4 /*yield*/, this.vehiculesService.updateStatusByName(vehicule.id, 'Réservé')];
-                    case 9:
-                        _a.sent();
                         updated.push({ id: vehicule.id, status: 'Reserve' });
-                        _a.label = 10;
-                    case 10:
+                        _a.label = 8;
+                    case 8:
                         _i++;
                         return [3 /*break*/, 2];
-                    case 11: return [2 /*return*/, {
+                    case 9: return [2 /*return*/, {
                             message: 'Statuts mis à jour',
                             updated: updated
                         }];
@@ -226,6 +219,20 @@ var VehiclesController = /** @class */ (function () {
                     case 1:
                         _a.sent();
                         return [2 /*return*/, { message: 'Statuts initialisés avec succès ✅' }];
+                }
+            });
+        });
+    };
+    VehiclesController.prototype.removeIndisponible = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.vehiculesService.removeIndisponibleStatus()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, {
+                                message: 'Le statut "Indisponible" a été supprimé avec succès ✅'
+                            }];
                 }
             });
         });
@@ -299,6 +306,9 @@ var VehiclesController = /** @class */ (function () {
     __decorate([
         common_1.Post('init-statuses')
     ], VehiclesController.prototype, "createInitialStatuses");
+    __decorate([
+        common_1.Delete('status/remove-indisponible')
+    ], VehiclesController.prototype, "removeIndisponible");
     VehiclesController = VehiclesController_1 = __decorate([
         common_1.Controller('vehicles')
     ], VehiclesController);

@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -21,6 +23,7 @@ import { CreateProformaByCriteriaDto } from './create-proforma.dto';
 import { FindAvailableVehiclesDto } from 'src/dto/find-available-vehicles.dto';
 import { UpdateProformaStatusDto } from 'src/dto/update-proforma-status.dto';
 import { UpdateProformaItemDto } from './uptade-proforma.dto';
+import { CreateProformaItemByCriteriaDto } from './create-proformaItem.dto';
 
 @Controller('proforma')
 export class ProformaController {
@@ -77,21 +80,26 @@ export class ProformaController {
     return this.proformaService.delete(id);
   }
 
-  @Put(':id')
+  // proforma.controller.ts
+
+  @Put(':id') // C'est la SEULE route PUT avec ce chemin
+  @HttpCode(HttpStatus.OK)
   async updateProformaItem(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateProformaItemDto,
+    // Renommez la méthode pour clarifier ce qu'elle fait
+    @Param('id') id: string, // L'ID vient de l'URL, c'est une string
+    @Body() updateProformaItemDto: UpdateProformaItemDto, // Le corps de la requête est le DTO de l'item
   ) {
-    try {
-      const updatedItem = await this.proformaService.update(id, dto);
-      return {
-        message: 'ProformaItem mis à jour avec succès',
-        data: updatedItem,
-      };
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du ProformaItem :', error);
-      throw error; // Renvoyer l'erreur pour qu'elle soit traitée par le filtre global
-    }
+    console.log(`Tentative de mise à jour de l'item de proforma ID: ${id}`);
+    console.log('DTO reçu:', updateProformaItemDto);
+
+    // Appelle la méthode 'update' de ProformaItemService
+    // Convertit l'ID de string en number car le service l'attend comme number
+    const updatedItem = await this.proformaService.update(
+      Number(id), // Conversion ici
+      updateProformaItemDto,
+    );
+    console.log('Item de proforma mis à jour:', updatedItem);
+    return updatedItem;
   }
 
   @Get(':id/pdf')

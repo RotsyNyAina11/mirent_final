@@ -28,8 +28,5 @@ export class UpdateDevisDto {
   items?: UpdateDevisItemDto[];
 
   @IsOptional()
-  commentaire?: string;
-
-  @IsOptional()
-  valide?: boolean;
+  remarque?: string;
 }

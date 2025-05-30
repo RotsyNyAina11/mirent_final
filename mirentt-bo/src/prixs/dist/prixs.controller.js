@@ -5,6 +5,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 exports.__esModule = true;
 exports.PrixsController = void 0;
 var common_1 = require("@nestjs/common");
@@ -12,6 +15,26 @@ var PrixsController = /** @class */ (function () {
     function PrixsController(prixsService) {
         this.prixsService = prixsService;
     }
+    PrixsController.prototype.getCount = function () {
+        return this.prixsService.getAvailableCountPrixs();
+    };
+    // prix.controller.ts
+    PrixsController.prototype.findAll = function () {
+        return this.prixsService.findAll(); // Assure-toi que ce service existe
+    };
+    PrixsController.prototype.findByRegion = function (id) {
+        return this.prixsService.findByRegion(id);
+    };
+    __decorate([
+        common_1.Get('count')
+    ], PrixsController.prototype, "getCount");
+    __decorate([
+        common_1.Get()
+    ], PrixsController.prototype, "findAll");
+    __decorate([
+        common_1.Get('region/:id'),
+        __param(0, common_1.Param('id'))
+    ], PrixsController.prototype, "findByRegion");
     PrixsController = __decorate([
         common_1.Controller('prixs')
     ], PrixsController);

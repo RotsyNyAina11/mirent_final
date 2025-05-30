@@ -1,47 +1,44 @@
+import { Transform } from 'class-transformer';
 import {
+  IsDate,
   IsDateString,
   IsInt,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsPositive,
+  IsString,
 } from 'class-validator';
 
+export class VehicleCriteria {
+  @IsOptional()
+  @IsString()
+  marque?: string;
+
+  @IsOptional()
+  @IsString()
+  modele?: string;
+
+  @IsOptional()
+  @IsString()
+  type?: string;
+}
+
 export class CreateDevisItemDto {
-  @IsInt()
-  devisId: number;
+  @IsNotEmpty()
+  vehicleCriteria: VehicleCriteria;
 
-  @IsInt()
-  @IsPositive()
-  @IsNumber()
-  vehicleId: number;
+  @IsNotEmpty()
+  @IsString()
+  regionNom: string;
 
-  @IsInt()
-  @IsPositive()
-  @IsNumber()
-  regionId: number;
-
-  @IsInt()
-  prixId: number;
-
-  @IsDateString()
+  @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
   dateDebut: Date;
 
-  @IsDateString()
+  @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
+  @IsDate()
   dateFin: Date;
-
-  @IsInt()
-  @IsPositive()
-  nombreJours: number;
-
-  @IsNumber()
-  @IsPositive()
-  prixUnitaire: number;
-
-  @IsNumber()
-  @IsPositive()
-  sousTotal: number;
-}
-export class CreateDevisDto {
-  clientId: number;
-  items: CreateDevisItemDto[];
 }

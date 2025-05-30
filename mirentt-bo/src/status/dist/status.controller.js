@@ -5,9 +5,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -45,50 +42,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.PrixsService = void 0;
+exports.StatusController = void 0;
 var common_1 = require("@nestjs/common");
-var typeorm_1 = require("@nestjs/typeorm");
-var prix_entity_1 = require("../entities/prix.entity");
-var PrixsService = /** @class */ (function () {
-    function PrixsService(prixsRepository) {
-        this.prixsRepository = prixsRepository;
+var StatusController = /** @class */ (function () {
+    function StatusController(statusService) {
+        this.statusService = statusService;
     }
-    PrixsService.prototype.getAvailableCountPrixs = function () {
+    StatusController.prototype.findAll = function () {
         return __awaiter(this, void 0, Promise, function () {
-            var total;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.prixsRepository.count({
-                            relations: ['region']
-                        })];
-                    case 1:
-                        total = _a.sent();
-                        return [2 /*return*/, total];
-                }
+                return [2 /*return*/, this.statusService.findAll()];
             });
         });
     };
-    PrixsService.prototype.findAll = function () {
-        return __awaiter(this, void 0, Promise, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.prixsRepository.find({ relations: ['region'] })];
-            });
-        });
-    };
-    PrixsService.prototype.findByRegion = function (regionId) {
-        return __awaiter(this, void 0, Promise, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.prixsRepository.find({
-                        where: { region: { id: regionId } },
-                        relations: ['region']
-                    })];
-            });
-        });
-    };
-    PrixsService = __decorate([
-        common_1.Injectable(),
-        __param(0, typeorm_1.InjectRepository(prix_entity_1.Prix))
-    ], PrixsService);
-    return PrixsService;
+    __decorate([
+        common_1.Get()
+    ], StatusController.prototype, "findAll");
+    StatusController = __decorate([
+        common_1.Controller('status')
+    ], StatusController);
+    return StatusController;
 }());
-exports.PrixsService = PrixsService;
+exports.StatusController = StatusController;

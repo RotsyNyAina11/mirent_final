@@ -85,7 +85,7 @@ var RegionService = /** @class */ (function () {
                     case 2:
                         error_1 = _a.sent();
                         console.error('Error creating region:', error_1);
-                        throw error_1; // Re-throw the error to be handled by the controller
+                        throw error_1;
                     case 3: return [2 /*return*/];
                 }
             });

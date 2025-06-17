@@ -37,68 +37,34 @@ import {
 } from "@mui/icons-material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useDispatch, useSelector } from "react-redux";
-
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { fetchVehicles, Vehicle } from "../../../redux/features/vehicle/vehiclesSlice";
+import { Devis, fetchDevis } from "../../../redux/features/devis/devisSlice";
+import { useNavigate } from "react-router-dom";
 
-
-// Thème personnalisé (identique à LocationList.tsx et VehiclesList.tsx)
+// Thème personnalisé (inchangé)
 const theme = createTheme({
   palette: {
-    primary: {
-      main: "#3b82f6",
-    },
-    secondary: {
-      main: "#ef4444",
-    },
-    background: {
-      default: "#f9fafb",
-    },
-    text: {
-      primary: "#1f2937",
-      secondary: "#6b7280",
-    },
+    primary: { main: "#3b82f6" },
+    secondary: { main: "#ef4444" },
+    background: { default: "#f9fafb" },
+    text: { primary: "#1f2937", secondary: "#6b7280" },
   },
   typography: {
     fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
-    h4: {
-      fontWeight: 600,
-      color: "#1f2937",
-    },
-    h6: {
-      fontWeight: 600,
-      color: "#1f2937",
-    },
-    body1: {
-      fontSize: "0.9rem",
-      color: "#1f2937",
-    },
-    body2: {
-      fontSize: "0.85rem",
-      color: "#6b7280",
-    },
+    h4: { fontWeight: 600, color: "#1f2937" },
+    h6: { fontWeight: 600, color: "#1f2937" },
+    body1: { fontSize: "0.9rem", color: "#1f2937" },
+    body2: { fontSize: "0.85rem", color: "#6b7280" },
   },
   components: {
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          padding: "12px 16px",
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: "none",
-          borderRadius: "8px",
-        },
-      },
-    },
+    MuiTableCell: { styleOverrides: { root: { padding: "12px 16px" } } },
+    MuiButton: { styleOverrides: { root: { textTransform: "none", borderRadius: "8px" } } },
   },
 });
 
-// Styles personnalisés (alignés avec LocationList.tsx et VehiclesList.tsx)
+// Styles personnalisés (inchangés)
 const DashboardCard = styled("div")(({ theme }) => ({
   padding: theme.spacing(2),
   borderRadius: "12px",
@@ -144,104 +110,40 @@ const CancelButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-// Interfaces pour les données
-interface Booking {
-  id: number;
-  quoteNumber: string;
-  client: string;
-  car: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  expirationDate: string;
-  status: "En attente" | "En cours" | "Confirmé";
-  totalPrice: number;
-}
-
-const recentBookings: Booking[] = [
-  {
-    id: 1,
-    quoteNumber: "DEV-123456",
-    client: "Antoine Dupont",
-    car: "Peugeot 3008",
-    destination: "Tour de ville",
-    startDate: "24/03/2025",
-    endDate: "26/03/2025",
-    expirationDate: "23/04/2025",
-    status: "En cours",
-    totalPrice: 600000,
-  },
-  {
-    id: 2,
-    quoteNumber: "DEV-123457",
-    client: "Marie Leclerc",
-    car: "Renault Captur",
-    destination: "Évasion en montagne",
-    startDate: "25/03/2025",
-    endDate: "28/03/2025",
-    expirationDate: "24/04/2025",
-    status: "Confirmé",
-    totalPrice: 900000,
-  },
-  {
-    id: 3,
-    quoteNumber: "DEV-123458",
-    client: "Pierre Bernard",
-    car: "Citroën C4",
-    destination: "Conduite côtière",
-    startDate: "26/03/2025",
-    endDate: "29/03/2025",
-    expirationDate: "25/04/2025",
-    status: "En attente",
-    totalPrice: 720000,
-  },
-];
-
 const Accueil: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { vehicles, vehiclesError } = useSelector(
-    (state: RootState) => state.vehicles
-  );
+  const navigate = useNavigate();
+  const { vehicles, error: vehiclesError } = useSelector((state: RootState) => state.vehicles as { vehicles: Vehicle[]; error?: string });
+  const { devis, loading: devisLoading, error: devisError } = useSelector((state: RootState) => state.devis); // Récupérer les devis
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Jusqu'à 600px
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md")); // 600px à 960px
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
-  const [availableVehiclesCount, setAvailableVehiclesCount] = useState<
-    number | null
-  >(null);
-  const [availableClientsCount, setAvailableClientsCount] = useState<
-    number | null
-  >(null);
+  const [availableVehiclesCount, setAvailableVehiclesCount] = useState<number | null>(null);
+  const [availableClientsCount, setAvailableClientsCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
+  const [devisToDelete, setDevisToDelete] = useState<Devis | null>(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [bookings, setBookings] = useState<Booking[]>(recentBookings);
 
-  // Récupérer les véhicules via Redux
+  // Récupérer les véhicules et les devis via Redux
   useEffect(() => {
     dispatch(fetchVehicles());
+    dispatch(fetchDevis()); 
   }, [dispatch]);
 
   // Filtrer les véhicules disponibles
-  const availableCars = vehicles.filter(
-    (vehicle: Vehicle) => vehicle.status.status === "Disponible"
-  );
+  const availableCars = vehicles.filter((vehicle: Vehicle) => vehicle.status.status === "Disponible");
 
   // Récupérer le nombre de véhicules disponibles
   useEffect(() => {
     const fetchAvailableVehicles = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/vehicles/available-count"
-        );
+        const response = await fetch("http://localhost:3000/vehicles/available-count");
         const data = await response.json();
         setAvailableVehiclesCount(data);
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des véhicules disponibles",
-          error
-        );
+        console.error("Erreur lors de la récupération des véhicules disponibles", error);
         setError("Erreur lors du chargement des véhicules disponibles");
       }
     };
@@ -252,9 +154,7 @@ const Accueil: React.FC = () => {
   useEffect(() => {
     const fetchAvailableClients = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/clients/client-count"
-        );
+        const response = await fetch("http://localhost:3000/clients/client-count");
         const data = await response.json();
         if (response.ok) {
           setAvailableClientsCount(data);
@@ -264,10 +164,7 @@ const Accueil: React.FC = () => {
           setError("Erreur lors du chargement des clients");
         }
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des nombres de clients",
-          error
-        );
+        console.error("Erreur lors de la récupération des nombres de clients", error);
         setAvailableClientsCount(null);
         setError("Erreur lors du chargement des clients");
       }
@@ -276,27 +173,25 @@ const Accueil: React.FC = () => {
   }, []);
 
   // Fonctions pour les actions du tableau
-  const handleViewBooking = (id: number) => {
-    console.log(`Voir la réservation ${id}`);
+  const handleViewDevis = (id: string) => {
+    navigate(`devis/${id}`);
   };
 
-  const handleEditBooking = (id: number) => {
-    console.log(`Modifier la réservation ${id}`);
+  const handleEditDevis = (id: string) => {
+    console.log(`Modifier le devis ${id}`);
   };
 
-  const handleDeleteBooking = () => {
-    if (bookingToDelete) {
-      setBookings(
-        bookings.filter((booking) => booking.id !== bookingToDelete.id)
-      );
+  const handleDeleteDevis = () => {
+    if (devisToDelete) {
+      console.log(`Supprimer le devis ${devisToDelete.id}`);
       setOpenSnackbar(true);
     }
     setOpenDeleteDialog(false);
-    setBookingToDelete(null);
+    setDevisToDelete(null);
   };
 
-  const openDeleteDialogForBooking = (booking: Booking) => {
-    setBookingToDelete(booking);
+  const openDeleteDialogForDevis = (devis: Devis) => {
+    setDevisToDelete(devis);
     setOpenDeleteDialog(true);
   };
 
@@ -311,224 +206,75 @@ const Accueil: React.FC = () => {
         }}
       >
         {/* Afficher les erreurs s'il y en a */}
-        {(error || vehiclesError) && (
+        {(error || vehiclesError || devisError) && (
           <Typography
             color="error"
             sx={{ mb: 2, fontSize: isMobile ? "0.9rem" : "1rem" }}
           >
-            {error || vehiclesError}
+            {error || vehiclesError || devisError}
           </Typography>
         )}
 
         {/* Titre de la page */}
         <Grid container spacing={3} mb={isMobile ? 2 : 4}>
           <Grid item xs={12}>
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: 600, color: "#1f2937", marginBottom: 1 }}
-            >
+            <Typography variant="h4" sx={{ fontWeight: 600, color: "#1f2937", marginBottom: 1 }}>
               Tableau de Bord
             </Typography>
-            <Typography
-              variant="body1"
-              sx={{ fontSize: "0.9rem", color: "#6b7280" }}
-            >
-              Aperçu des performances, véhicules disponibles et réservations
-              récentes.
+            <Typography variant="body1" sx={{ fontSize: "0.9rem", color: "#6b7280" }}>
+              Aperçu des performances, véhicules disponibles et devis récents.
             </Typography>
           </Grid>
         </Grid>
 
-        {/* Widgets statistiques */}
+        {/* Widgets statistiques (inchangés) */}
         <Grid container spacing={isMobile ? 2 : 4} mb={isMobile ? 2 : 4}>
           <Grid item xs={12} sm={6} md={3}>
-            <DashboardCard
-              sx={{
-                p: isMobile ? 2 : 3,
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <CarIcon
-                sx={{
-                  fontSize: isMobile ? 30 : 40,
-                  color: "#3b82f6",
-                  mb: 1,
-                  transition: "all 0.3s ease",
-                }}
-                aria-label="Icône de véhicules disponibles"
-              />
-              <Typography
-                variant="body2"
-                color="#6b7280"
-                fontSize={isMobile ? "0.8rem" : "0.875rem"}
-              >
-                Véhicules disponibles
-              </Typography>
-              <Typography
-                variant="h5"
-                fontSize={isMobile ? "1.2rem" : "1.5rem"}
-                color="#1f2937"
-              >
-                {availableVehiclesCount ?? "Chargement..."}
-              </Typography>
+            <DashboardCard sx={{ p: isMobile ? 2 : 3, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <CarIcon sx={{ fontSize: isMobile ? 30 : 40, color: "#3b82f6", mb: 1 }} aria-label="Icône de véhicules disponibles" />
+              <Typography variant="body2" color="#6b7280" fontSize={isMobile ? "0.8rem" : "0.875rem"}>Véhicules disponibles</Typography>
+              <Typography variant="h5" fontSize={isMobile ? "1.2rem" : "1.5rem"} color="#1f2937">{availableVehiclesCount ?? "Chargement..."}</Typography>
             </DashboardCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <DashboardCard
-              sx={{
-                p: isMobile ? 2 : 3,
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <PeopleIcon
-                sx={{
-                  fontSize: isMobile ? 30 : 40,
-                  color: "#3b82f6",
-                  mb: 1,
-                  transition: "all 0.3s ease",
-                }}
-                aria-label="Icône de total clients"
-              />
-              <Typography
-                variant="body2"
-                color="#6b7280"
-                fontSize={isMobile ? "0.8rem" : "0.875rem"}
-              >
-                Total Clients
-              </Typography>
-              <Typography
-                variant="h5"
-                fontSize={isMobile ? "1.2rem" : "1.5rem"}
-                color="#1f2937"
-              >
-                {availableClientsCount ?? "Chargement..."}
-              </Typography>
+            <DashboardCard sx={{ p: isMobile ? 2 : 3, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <PeopleIcon sx={{ fontSize: isMobile ? 30 : 40, color: "#3b82f6", mb: 1 }} aria-label="Icône de total clients" />
+              <Typography variant="body2" color="#6b7280" fontSize={isMobile ? "0.8rem" : "0.875rem"}>Total Clients</Typography>
+              <Typography variant="h5" fontSize={isMobile ? "1.2rem" : "1.5rem"} color="#1f2937">{availableClientsCount ?? "Chargement..."}</Typography>
             </DashboardCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <DashboardCard
-              sx={{
-                p: isMobile ? 2 : 3,
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <MoneyIcon
-                sx={{
-                  fontSize: isMobile ? 30 : 40,
-                  color: "#3b82f6",
-                  mb: 1,
-                  transition: "all 0.3s ease",
-                }}
-                aria-label="Icône de revenus totaux"
-              />
-              <Typography
-                variant="body2"
-                color="#6b7280"
-                fontSize={isMobile ? "0.8rem" : "0.875rem"}
-              >
-                Revenus totaux
-              </Typography>
-              <Typography
-                variant="h5"
-                fontSize={isMobile ? "1.2rem" : "1.5rem"}
-                color="#1f2937"
-              >
-                2 000 000 Ar
-              </Typography>
+            <DashboardCard sx={{ p: isMobile ? 2 : 3, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <MoneyIcon sx={{ fontSize: isMobile ? 30 : 40, color: "#3b82f6", mb: 1 }} aria-label="Icône de revenus totaux" />
+              <Typography variant="body2" color="#6b7280" fontSize={isMobile ? "0.8rem" : "0.875rem"}>Revenus totaux</Typography>
+              <Typography variant="h5" fontSize={isMobile ? "1.2rem" : "1.5rem"} color="#1f2937">2 000 000 Ar</Typography>
             </DashboardCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <DashboardCard
-              sx={{
-                p: isMobile ? 2 : 3,
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <PercentIcon
-                sx={{
-                  fontSize: isMobile ? 30 : 40,
-                  color: "#3b82f6",
-                  mb: 1,
-                  transition: "all 0.3s ease",
-                }}
-                aria-label="Icône de taux d'occupation"
-              />
-              <Typography
-                variant="body2"
-                color="#6b7280"
-                fontSize={isMobile ? "0.8rem" : "0.875rem"}
-              >
-                Taux d'occupation
-              </Typography>
-              <Typography
-                variant="h5"
-                fontSize={isMobile ? "1.2rem" : "1.5rem"}
-                color="#1f2937"
-              >
-                75%
-              </Typography>
+            <DashboardCard sx={{ p: isMobile ? 2 : 3, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <PercentIcon sx={{ fontSize: isMobile ? 30 : 40, color: "#3b82f6", mb: 1 }} aria-label="Icône de taux d'occupation" />
+              <Typography variant="body2" color="#6b7280" fontSize={isMobile ? "0.8rem" : "0.875rem"}>Taux d'occupation</Typography>
+              <Typography variant="h5" fontSize={isMobile ? "1.2rem" : "1.5rem"} color="#1f2937">75%</Typography>
             </DashboardCard>
           </Grid>
         </Grid>
 
-        {/* Graphique et véhicules disponibles */}
+        {/* Graphique et véhicules disponibles (inchangés) */}
         <Grid container spacing={isMobile ? 2 : 4}>
           <Grid item xs={12} md={8}>
             <DashboardCard sx={{ p: isMobile ? 2 : 3 }}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                fontSize={isMobile ? "1rem" : "1.25rem"}
-                color="#1f2937"
-              >
-                Performance{" "}
-                <TrendingUpIcon
-                  sx={{
-                    verticalAlign: "middle",
-                    ml: 1,
-                    fontSize: isMobile ? "1rem" : "1.25rem",
-                    color: "#3b82f6",
-                  }}
-                />
+              <Typography variant="h6" gutterBottom fontSize={isMobile ? "1rem" : "1.25rem"} color="#1f2937">
+                Performance <TrendingUpIcon sx={{ verticalAlign: "middle", ml: 1, fontSize: isMobile ? "1rem" : "1.25rem", color: "#3b82f6" }} />
               </Typography>
               <Box sx={{ height: isMobile ? 200 : 300 }}>
                 <LineChart
-                  xAxis={[
-                    {
-                      data: [1, 2, 3, 4, 5],
-                      label: "Mois",
-                      scaleType: "point",
-                      tickFontSize: isMobile ? 10 : 12,
-                    },
-                  ]}
-                  series={[
-                    {
-                      data: [200000, 300000, 250000, 400000, 350000],
-                      label: "Revenus (Ar)",
-                      color: "#3b82f6",
-                    },
-                  ]}
+                  xAxis={[{ data: [1, 2, 3, 4, 5], label: "Mois", scaleType: "point", tickFontSize: isMobile ? 10 : 12 }]}
+                  series={[{ data: [200000, 300000, 250000, 400000, 350000], label: "Revenus (Ar)", color: "#3b82f6" }]}
                   height={isMobile ? 200 : 300}
                   margin={{ top: 20, bottom: 40, left: 50, right: 20 }}
                   sx={{
-                    "& .MuiChartsAxis-tickLabel": {
-                      fontSize: isMobile ? "0.7rem" : "0.8rem",
-                    },
-                    "& .MuiChartsAxis-label": {
-                      fontSize: isMobile ? "0.8rem" : "0.9rem",
-                    },
+                    "& .MuiChartsAxis-tickLabel": { fontSize: isMobile ? "0.7rem" : "0.8rem" },
+                    "& .MuiChartsAxis-label": { fontSize: isMobile ? "0.8rem" : "0.9rem" },
                   }}
                 />
               </Box>
@@ -536,160 +282,46 @@ const Accueil: React.FC = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <DashboardCard sx={{ p: isMobile ? 2 : 3 }}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                fontSize={isMobile ? "1rem" : "1.25rem"}
-                color="#1f2937"
-              >
-                Véhicules disponibles
-              </Typography>
-              <Box
-                sx={{
-                  maxHeight: isMobile ? 200 : 300,
-                  overflowY: "auto",
-                  overflowX: "hidden",
-                  pr: 1,
-                  "&::-webkit-scrollbar": {
-                    width: "8px",
-                  },
-                  "&::-webkit-scrollbar-track": {
-                    background: "#f3f4f6",
-                    borderRadius: "4px",
-                  },
-                  "&::-webkit-scrollbar-thumb": {
-                    background: "#3b82f6",
-                    borderRadius: "4px",
-                  },
-                  "&::-webkit-scrollbar-thumb:hover": {
-                    background: "#2563eb",
-                  },
-                  scrollbarWidth: "thin",
-                  scrollbarColor: "#3b82f6 #f3f4f6",
-                }}
-              >
+              <Typography variant="h6" gutterBottom fontSize={isMobile ? "1rem" : "1.25rem"} color="#1f2937">Véhicules disponibles</Typography>
+              <Box sx={{ maxHeight: isMobile ? 200 : 300, overflowY: "auto", overflowX: "hidden", pr: 1, /* styles de scrollbar inchangés */ }}>
                 {availableCars.length > 0 ? (
                   availableCars.map((car: Vehicle) => (
-                    <Box
-                      key={car.id}
-                      display="flex"
-                      alignItems="center"
-                      gap={2}
-                      my={isMobile ? 1 : 2}
-                      sx={{
-                        p: 1,
-                        borderRadius: "8px",
-                        transition: "background-color 0.3s ease",
-                        "&:hover": {
-                          backgroundColor: "#f3f4f6",
-                        },
-                      }}
-                      aria-label={`Véhicule disponible: ${car.nom}`}
-                    >
-                      <Avatar
-                        variant="rounded"
-                        src={car.imageUrl}
-                        sx={{
-                          width: isMobile ? 40 : 56,
-                          height: isMobile ? 40 : 56,
-                        }}
-                      />
+                    <Box key={car.id} display="flex" alignItems="center" gap={2} my={isMobile ? 1 : 2} sx={{ p: 1, borderRadius: "8px", "&:hover": { backgroundColor: "#f3f4f6" } }} aria-label={`Véhicule disponible: ${car.nom}`}>
+                      <Avatar variant="rounded" src={car.imageUrl} sx={{ width: isMobile ? 40 : 56, height: isMobile ? 40 : 56 }} />
                       <Box>
-                        <Typography
-                          variant="subtitle1"
-                          fontSize={isMobile ? "0.9rem" : "1rem"}
-                          color="#1f2937"
-                        >
-                          {car.nom}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="success.main"
-                          fontSize={isMobile ? "0.8rem" : "0.875rem"}
-                        >
-                          {car.status.status}
-                        </Typography>
+                        <Typography variant="subtitle1" fontSize={isMobile ? "0.9rem" : "1rem"} color="#1f2937">{car.nom}</Typography>
+                        <Typography variant="body2" color="success.main" fontSize={isMobile ? "0.8rem" : "0.875rem"}>{car.status.status}</Typography>
                       </Box>
                     </Box>
                   ))
                 ) : (
-                  <Typography
-                    variant="body2"
-                    color="#6b7280"
-                    fontSize={isMobile ? "0.8rem" : "0.875rem"}
-                  >
-                    Aucun véhicule disponible pour le moment.
-                  </Typography>
+                  <Typography variant="body2" color="#6b7280" fontSize={isMobile ? "0.8rem" : "0.875rem"}>Aucun véhicule disponible pour le moment.</Typography>
                 )}
               </Box>
             </DashboardCard>
           </Grid>
         </Grid>
 
-        {/* Réservations récentes */}
+        {/* Réservations récentes (mise à jour avec les devis) */}
         <DashboardCard sx={{ mt: isMobile ? 2 : 4, p: isMobile ? 2 : 3 }}>
-          <Typography
-            variant="h6"
-            gutterBottom
-            fontSize={isMobile ? "1rem" : "1.25rem"}
-            color="#1f2937"
-          >
-            Réservations récentes
+          <Typography variant="h6" gutterBottom fontSize={isMobile ? "1rem" : "1.25rem"} color="#1f2937">
+             Réservations récentes
           </Typography>
-          {isMobile ? (
+          {devisLoading ? (
+            <Typography variant="body2" color="#6b7280">Chargement des devis...</Typography>
+          ) : devis.length === 0 ? (
+            <Typography variant="body2" color="#6b7280">Aucun devis disponible pour le moment.</Typography>
+          ) : isMobile ? (
             // Affichage sous forme de cartes sur mobile
             <Box>
-              {bookings.map((booking) => (
-                <Card
-                  key={booking.id}
-                  sx={{
-                    mb: 2,
-                    borderRadius: "12px",
-                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                    backgroundColor: "#fff",
-                    transition:
-                      "box-shadow 0.3s ease, transform 0.2s ease-in-out",
-                    "&:hover": {
-                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-                      transform: "scale(1.02)",
-                    },
-                  }}
-                >
+              {devis.map((devisItem) => (
+                <Card key={devisItem.id} sx={{ mb: 2, borderRadius: "12px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#fff", "&:hover": { boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", transform: "scale(1.02)" } }}>
                   <CardContent sx={{ p: 2 }}>
-                    <Typography
-                      variant="body2"
-                      fontWeight="bold"
-                      color="#1f2937"
-                      fontSize={isMobile ? "0.85rem" : "0.9rem"}
-                    >
-                      Client: {booking.client}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="#1f2937"
-                      fontSize={isMobile ? "0.85rem" : "0.9rem"}
-                    >
-                      Véhicule: {booking.car}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="#1f2937"
-                      fontSize={isMobile ? "0.85rem" : "0.9rem"}
-                    >
-                      Début: {booking.startDate}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="#1f2937"
-                      fontSize={isMobile ? "0.85rem" : "0.9rem"}
-                    >
-                      Fin: {booking.endDate}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="#1f2937"
-                      fontSize={isMobile ? "0.85rem" : "0.9rem"}
-                    >
+                    <Typography variant="body2" fontWeight="bold" color="#1f2937" fontSize={isMobile ? "0.85rem" : "0.9rem"}>Client: {devisItem.client?.lastName || `${devisItem.clientId}`}</Typography>
+                    <Typography variant="body2" color="#1f2937" fontSize={isMobile ? "0.85rem" : "0.9rem"}>Description: {devisItem.items?.[0]?.description || "Aucune description"}</Typography>
+                    <Typography variant="body2" color="#1f2937" fontSize={isMobile ? "0.85rem" : "0.9rem"}>Début: {new Date(devisItem.startDate).toLocaleDateString("fr-FR")}</Typography>
+                    <Typography variant="body2" color="#1f2937" fontSize={isMobile ? "0.85rem" : "0.9rem"}>Fin: {new Date(devisItem.endDate).toLocaleDateString("fr-FR")}</Typography>
+                    <Typography variant="body2" color="#1f2937" fontSize={isMobile ? "0.85rem" : "0.9rem"}>
                       Statut:
                       <Box
                         component="span"
@@ -699,77 +331,29 @@ const Accueil: React.FC = () => {
                           py: 0.5,
                           borderRadius: "4px",
                           fontSize: isMobile ? "0.75rem" : "0.8rem",
-                          backgroundColor:
-                            booking.status === "En cours"
-                              ? "#C8E6C9"
-                              : booking.status === "Confirmé"
-                              ? "#BBDEFB"
-                              : "#FFECB3",
-                          color:
-                            booking.status === "En cours"
-                              ? "#fff"
-                              : booking.status === "Confirmé"
-                              ? "#fff"
-                              : "#fff",
-                          background:
-                            booking.status === "En cours"
-                              ? "linear-gradient(90deg, #2E7D32 0%, #4CAF50 100%)"
-                              : booking.status === "Confirmé"
-                              ? "linear-gradient(90deg, #1976D2 0%, #42A5F5 100%)"
-                              : "linear-gradient(90deg, #FBC02D 0%, #FFD54F 100%)",
+                          backgroundColor: devisItem.status === "En cours" ? "#C8E6C9" : devisItem.status === "Confirmé" ? "#BBDEFB" : "#FFECB3",
+                          color: "#fff",
+                          background: devisItem.status === "En cours" ? "linear-gradient(90deg, #2E7D32 0%, #4CAF50 100%)" : devisItem.status === "Confirmé" ? "linear-gradient(90deg, #1976D2 0%, #42A5F5 100%)" : "linear-gradient(90deg, #FBC02D 0%, #FFD54F 100%)",
                         }}
-                        aria-label={`Statut de la réservation: ${booking.status}`}
+                        aria-label={`Statut du devis: ${devisItem.status}`}
                       >
-                        {booking.status}
+                        {devisItem.status}
                       </Box>
                     </Typography>
                   </CardContent>
                   <CardActions sx={{ justifyContent: "flex-end", p: 1 }}>
                     <Tooltip title="Voir">
-                      <IconButton
-                        onClick={() => handleViewBooking(booking.id)}
-                        aria-label={`Voir la réservation ${booking.id}`}
-                        size="small"
-                        sx={{
-                          color: "#3b82f6",
-                          "&:hover": {
-                            backgroundColor: "#dbeafe",
-                            transition: "background-color 0.3s ease",
-                          },
-                        }}
-                      >
+                      <IconButton onClick={() => handleViewDevis(devisItem.id)} aria-label={`Voir le devis ${devisItem.id}`} size="small" sx={{ color: "#3b82f6", "&:hover": { backgroundColor: "#dbeafe" } }}>
                         <VisibilityIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Modifier">
-                      <IconButton
-                        onClick={() => handleEditBooking(booking.id)}
-                        aria-label={`Modifier la réservation ${booking.id}`}
-                        size="small"
-                        sx={{
-                          color: "#3b82f6",
-                          "&:hover": {
-                            backgroundColor: "#dbeafe",
-                            transition: "background-color 0.3s ease",
-                          },
-                        }}
-                      >
+                      <IconButton onClick={() => handleEditDevis(devisItem.id)} aria-label={`Modifier le devis ${devisItem.id}`} size="small" sx={{ color: "#3b82f6", "&:hover": { backgroundColor: "#dbeafe" } }}>
                         <EditIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Supprimer">
-                      <IconButton
-                        onClick={() => openDeleteDialogForBooking(booking)}
-                        aria-label={`Supprimer la réservation ${booking.id}`}
-                        size="small"
-                        sx={{
-                          color: "#ef4444",
-                          "&:hover": {
-                            backgroundColor: "#fee2e2",
-                            transition: "background-color 0.3s ease",
-                          },
-                        }}
-                      >
+                      <IconButton onClick={() => openDeleteDialogForDevis(devisItem)} aria-label={`Supprimer le devis ${devisItem.id}`} size="small" sx={{ color: "#ef4444", "&:hover": { backgroundColor: "#fee2e2" } }}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
@@ -779,124 +363,25 @@ const Accueil: React.FC = () => {
             </Box>
           ) : (
             // Affichage sous forme de tableau sur tablette et desktop
-            <TableContainer
-              sx={{
-                borderRadius: "12px",
-                backgroundColor: "#fff",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-              }}
-            >
+            <TableContainer sx={{ borderRadius: "12px", backgroundColor: "#fff", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)" }}>
               <Table>
-                <TableHead
-                  sx={{
-                    backgroundColor: "#f3f4f6",
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 1,
-                  }}
-                >
+                <TableHead sx={{ backgroundColor: "#f3f4f6", position: "sticky", top: 0, zIndex: 1 }}>
                   <TableRow>
-                    <TableCell
-                      sx={{
-                        fontWeight: 500,
-                        color: "#6b7280",
-                        fontSize: isTablet ? "0.9rem" : "0.85rem",
-                      }}
-                    >
-                      Client
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontWeight: 500,
-                        color: "#6b7280",
-                        fontSize: isTablet ? "0.9rem" : "0.85rem",
-                      }}
-                    >
-                      Véhicule
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontWeight: 500,
-                        color: "#6b7280",
-                        fontSize: isTablet ? "0.9rem" : "0.85rem",
-                      }}
-                    >
-                      Date début
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontWeight: 500,
-                        color: "#6b7280",
-                        fontSize: isTablet ? "0.9rem" : "0.85rem",
-                      }}
-                    >
-                      Date fin
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontWeight: 500,
-                        color: "#6b7280",
-                        fontSize: isTablet ? "0.9rem" : "0.85rem",
-                      }}
-                    >
-                      Statut
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontWeight: 500,
-                        color: "#6b7280",
-                        fontSize: isTablet ? "0.9rem" : "0.85rem",
-                      }}
-                    >
-                      Actions
-                    </TableCell>
+                    <TableCell sx={{ fontWeight: 500, color: "#6b7280", fontSize: isTablet ? "0.9rem" : "0.85rem" }}>Client</TableCell>
+                    <TableCell sx={{ fontWeight: 500, color: "#6b7280", fontSize: isTablet ? "0.9rem" : "0.85rem" }}>Description</TableCell>
+                    <TableCell sx={{ fontWeight: 500, color: "#6b7280", fontSize: isTablet ? "0.9rem" : "0.85rem" }}>Date début</TableCell>
+                    <TableCell sx={{ fontWeight: 500, color: "#6b7280", fontSize: isTablet ? "0.9rem" : "0.85rem" }}>Date fin</TableCell>
+                    <TableCell sx={{ fontWeight: 500, color: "#6b7280", fontSize: isTablet ? "0.9rem" : "0.85rem" }}>Statut</TableCell>
+                    <TableCell sx={{ fontWeight: 500, color: "#6b7280", fontSize: isTablet ? "0.9rem" : "0.85rem" }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {bookings.map((booking, index) => (
-                    <TableRow
-                      key={booking.id}
-                      sx={{
-                        backgroundColor: index % 2 === 0 ? "#fff" : "#f9fafb",
-                        "&:hover": {
-                          backgroundColor: "#f3f4f6",
-                          transition: "background-color 0.3s ease",
-                        },
-                        "& td": { borderBottom: "none" },
-                      }}
-                    >
-                      <TableCell
-                        sx={{
-                          fontSize: isTablet ? "0.9rem" : "1rem",
-                          color: "#1f2937",
-                        }}
-                      >
-                        {booking.client}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontSize: isTablet ? "0.9rem" : "1rem",
-                          color: "#1f2937",
-                        }}
-                      >
-                        {booking.car}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontSize: isTablet ? "0.9rem" : "1rem",
-                          color: "#1f2937",
-                        }}
-                      >
-                        {booking.startDate}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontSize: isTablet ? "0.9rem" : "1rem",
-                          color: "#1f2937",
-                        }}
-                      >
-                        {booking.endDate}
-                      </TableCell>
+                  {devis.map((devisItem, index) => (
+                    <TableRow key={devisItem.id} sx={{ backgroundColor: index % 2 === 0 ? "#fff" : "#f9fafb", "&:hover": { backgroundColor: "#f3f4f6" }, "& td": { borderBottom: "none" } }}>
+                      <TableCell sx={{ fontSize: isTablet ? "0.9rem" : "1rem", color: "#1f2937" }}>{devisItem.client?.lastName || `Client ${devisItem.clientId}`}</TableCell>
+                      <TableCell sx={{ fontSize: isTablet ? "0.9rem" : "1rem", color: "#1f2937" }}>{devisItem.items?.[0]?.description || "Aucune description"}</TableCell>
+                      <TableCell sx={{ fontSize: isTablet ? "0.9rem" : "1rem", color: "#1f2937" }}>{new Date(devisItem.startDate).toLocaleDateString("fr-FR")}</TableCell>
+                      <TableCell sx={{ fontSize: isTablet ? "0.9rem" : "1rem", color: "#1f2937" }}>{new Date(devisItem.endDate).toLocaleDateString("fr-FR")}</TableCell>
                       <TableCell>
                         <Box
                           component="span"
@@ -905,83 +390,29 @@ const Accueil: React.FC = () => {
                             py: 0.5,
                             borderRadius: "4px",
                             fontSize: isTablet ? "0.75rem" : "0.8rem",
-                            backgroundColor:
-                              booking.status === "En cours"
-                                ? "#C8E6C9"
-                                : booking.status === "Confirmé"
-                                ? "#BBDEFB"
-                                : "#FFECB3",
-                            color:
-                              booking.status === "En cours"
-                                ? "#fff"
-                                : booking.status === "Confirmé"
-                                ? "#fff"
-                                : "#fff",
-                            background:
-                              booking.status === "En cours"
-                                ? "linear-gradient(90deg, #2E7D32 0%, #4CAF50 100%)"
-                                : booking.status === "Confirmé"
-                                ? "linear-gradient(90deg, #1976D2 0%, #42A5F5 100%)"
-                                : "linear-gradient(90deg, #FBC02D 0%, #FFD54F 100%)",
+                            backgroundColor: devisItem.status === "En cours" ? "#C8E6C9" : devisItem.status === "Confirmé" ? "#BBDEFB" : "#FFECB3",
+                            color: "#fff",
+                            background: devisItem.status === "En cours" ? "linear-gradient(90deg, #2E7D32 0%, #4CAF50 100%)" : devisItem.status === "Confirmé" ? "linear-gradient(90deg, #1976D2 0%, #42A5F5 100%)" : "linear-gradient(90deg, #FBC02D 0%, #FFD54F 100%)",
                           }}
-                          aria-label={`Statut de la réservation: ${booking.status}`}
+                          aria-label={`Statut du devis: ${devisItem.status}`}
                         >
-                          {booking.status}
+                          {devisItem.status}
                         </Box>
                       </TableCell>
                       <TableCell>
                         <Tooltip title="Voir">
-                          <IconButton
-                            onClick={() => handleViewBooking(booking.id)}
-                            aria-label={`Voir la réservation ${booking.id}`}
-                            size={isTablet ? "small" : "medium"}
-                            sx={{
-                              color: "#3b82f6",
-                              "&:hover": {
-                                backgroundColor: "#dbeafe",
-                                transition: "background-color 0.3s ease",
-                              },
-                            }}
-                          >
-                            <VisibilityIcon
-                              fontSize={isTablet ? "small" : "medium"}
-                            />
+                          <IconButton onClick={() => handleViewDevis(devisItem.id)} aria-label={`Voir le devis ${devisItem.id}`} size={isTablet ? "small" : "medium"} sx={{ color: "#3b82f6", "&:hover": { backgroundColor: "#dbeafe" } }}>
+                            <VisibilityIcon fontSize={isTablet ? "small" : "medium"} />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Modifier">
-                          <IconButton
-                            onClick={() => handleEditBooking(booking.id)}
-                            aria-label={`Modifier la réservation ${booking.id}`}
-                            size={isTablet ? "small" : "medium"}
-                            sx={{
-                              color: "#3b82f6",
-                              "&:hover": {
-                                backgroundColor: "#dbeafe",
-                                transition: "background-color 0.3s ease",
-                              },
-                            }}
-                          >
-                            <EditIcon
-                              fontSize={isTablet ? "small" : "medium"}
-                            />
+                          <IconButton onClick={() => handleEditDevis(devisItem.id)} aria-label={`Modifier le devis ${devisItem.id}`} size={isTablet ? "small" : "medium"} sx={{ color: "#3b82f6", "&:hover": { backgroundColor: "#dbeafe" } }}>
+                            <EditIcon fontSize={isTablet ? "small" : "medium"} />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Supprimer">
-                          <IconButton
-                            onClick={() => openDeleteDialogForBooking(booking)}
-                            aria-label={`Supprimer la réservation ${booking.id}`}
-                            size={isTablet ? "small" : "medium"}
-                            sx={{
-                              color: "#ef4444",
-                              "&:hover": {
-                                backgroundColor: "#fee2e2",
-                                transition: "background-color 0.3s ease",
-                              },
-                            }}
-                          >
-                            <DeleteIcon
-                              fontSize={isTablet ? "small" : "medium"}
-                            />
+                          <IconButton onClick={() => openDeleteDialogForDevis(devisItem)} aria-label={`Supprimer le devis ${devisItem.id}`} size={isTablet ? "small" : "medium"} sx={{ color: "#ef4444", "&:hover": { backgroundColor: "#fee2e2" } }}>
+                            <DeleteIcon fontSize={isTablet ? "small" : "medium"} />
                           </IconButton>
                         </Tooltip>
                       </TableCell>
@@ -994,73 +425,23 @@ const Accueil: React.FC = () => {
         </DashboardCard>
 
         {/* Dialogue de confirmation de suppression */}
-        <Dialog
-          open={openDeleteDialog}
-          onClose={() => setOpenDeleteDialog(false)}
-          sx={{
-            "& .MuiDialog-paper": {
-              borderRadius: "12px",
-              boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
-              backgroundColor: "#fff",
-            },
-          }}
-        >
-          <DialogTitle
-            sx={{
-              fontWeight: 600,
-              color: "#1f2937",
-              textAlign: "center",
-              py: 3,
-            }}
-          >
-            Confirmer la suppression
-          </DialogTitle>
+        <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)} sx={{ "& .MuiDialog-paper": { borderRadius: "12px", boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)", backgroundColor: "#fff" } }}>
+          <DialogTitle sx={{ fontWeight: 600, color: "#1f2937", textAlign: "center", py: 3 }}>Confirmer la suppression</DialogTitle>
           <DialogContent sx={{ p: 4 }}>
-            <DialogContentText
-              sx={{ color: "#1f2937", fontSize: "1rem", textAlign: "center" }}
-            >
-              Êtes-vous sûr de vouloir supprimer la réservation de{" "}
-              {bookingToDelete?.client} ?
+            <DialogContentText sx={{ color: "#1f2937", fontSize: "1rem", textAlign: "center" }}>
+              Êtes-vous sûr de vouloir supprimer le devis de {devisToDelete?.client?.name || `Client ${devisToDelete?.clientId}`} ?
             </DialogContentText>
           </DialogContent>
-          <DialogActions
-            sx={{ p: 3, display: "flex", justifyContent: "space-between" }}
-          >
-            <CancelButton
-              onClick={() => setOpenDeleteDialog(false)}
-              aria-label="Annuler la suppression"
-            >
-              Annuler
-            </CancelButton>
-            <SecondaryButton
-              onClick={handleDeleteBooking}
-              aria-label="Confirmer la suppression"
-            >
-              Supprimer
-            </SecondaryButton>
+          <DialogActions sx={{ p: 3, display: "flex", justifyContent: "space-between" }}>
+            <CancelButton onClick={() => setOpenDeleteDialog(false)} aria-label="Annuler la suppression">Annuler</CancelButton>
+            <SecondaryButton onClick={handleDeleteDevis} aria-label="Confirmer la suppression">Supprimer</SecondaryButton>
           </DialogActions>
         </Dialog>
 
         {/* Snackbar de succès */}
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={3000}
-          onClose={() => setOpenSnackbar(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <Alert
-            onClose={() => setOpenSnackbar(false)}
-            severity="success"
-            sx={{
-              width: "100%",
-              backgroundColor: "#10b981",
-              color: "#fff",
-              "& .MuiAlert-icon": {
-                color: "#fff",
-              },
-            }}
-          >
-            Réservation supprimée avec succès !
+        <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={() => setOpenSnackbar(false)} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+          <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: "100%", backgroundColor: "#10b981", color: "#fff", "& .MuiAlert-icon": { color: "#fff" } }}>
+            Devis supprimé avec succès !
           </Alert>
         </Snackbar>
       </Box>

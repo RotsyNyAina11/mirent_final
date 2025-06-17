@@ -1,12 +1,8 @@
-// src/devis/dto/create-devis.dto.ts
 import { IsString, IsArray, ArrayMinSize, ValidateNested, IsNumber, IsPositive, IsInt, IsOptional, IsDateString, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateDevisItemDto {
-
-  @IsNumber()
-  @IsPositive()
-  quantity: number;
+  quantity: 1;
 
 
   @IsNumber()

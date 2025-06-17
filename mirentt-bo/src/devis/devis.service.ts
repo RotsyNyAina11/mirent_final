@@ -62,23 +62,12 @@ export class DevisService {
       throw new BadRequestException(`Le véhicule "${vehicule.nom} - ${vehicule.immatriculation}" n'est pas disponible pour la location (statut: ${vehicule.status.status}).`);
     }
 
-    return {
-      quantity: item.quantity,
-      regionId: item.regionId,
-      vehiculeId: item.vehiculeId,
-      unitPrice: region.prix.prix,
-      regionName: region.nom_region + (region.nom_district ? ` - ${region.nom_district}` : ''),
-      vehiculeDetails: {
-        nom: vehicule.nom,
-        marque: vehicule.marque,
-        modele: vehicule.modele,
-        immatriculation: vehicule.immatriculation,
-        nombrePlace: vehicule.nombrePlace,
-        type: vehicule.type.type,
-        imageUrl: vehicule.imageUrl,
-      },
-    };
-  }
+  return {
+    description: `${vehicule.nom} (${vehicule.marque} ${vehicule.modele})`,
+    quantity: 1,
+    unitPrice: region.prix.prix,
+  };
+}
 
   async create(createDevisDto: CreateDevisDto): Promise<Devis> {
     const { clientId, items, startDate, endDate, includesFuel, fuelCostPerDay, ...rest } = createDevisDto;
@@ -98,14 +87,12 @@ export class DevisService {
       throw new BadRequestException('Le nombre de jours de location doit être supérieur à zéro.');
     }
 
-    // Validation spécifique au carburant
     if (includesFuel && (fuelCostPerDay === undefined || fuelCostPerDay <= 0)) {
-        throw new BadRequestException('Si le carburant est inclus, "fuelCostPerDay" doit être fourni et être un nombre positif.');
+      throw new BadRequestException('Si le carburant est inclus, "fuelCostPerDay" doit être fourni et être un nombre positif.');
     }
     if (!includesFuel && fuelCostPerDay !== undefined && fuelCostPerDay > 0) {
-        throw new BadRequestException('Si le carburant n\'est pas inclus, "fuelCostPerDay" ne doit pas être fourni ou doit être zéro.');
+      throw new BadRequestException('Si le carburant n\'est pas inclus, "fuelCostPerDay" ne doit pas être fourni ou doit être zéro.');
     }
-
 
     const client = await this.clientService.findOne(clientId);
     if (!client) {
@@ -113,7 +100,7 @@ export class DevisService {
     }
 
     let totalAmount = 0;
-    const processedItems: any[] = [];
+    const processedItems: { description: string; quantity: number; unitPrice: number }[] = [];
     const selectedVehicleIds = new Set<number>();
 
     for (const item of items) {
@@ -127,19 +114,18 @@ export class DevisService {
       totalAmount += processedItem.unitPrice * processedItem.quantity * numberOfDays;
     }
 
-    // Ajout du coût du carburant au total si inclus
     if (includesFuel && fuelCostPerDay !== undefined) {
-        totalAmount += fuelCostPerDay * numberOfDays;
+      totalAmount += fuelCostPerDay * numberOfDays;
     }
 
     const devis = this.devisRepository.create({
       ...rest,
-      ...(typeof processedItems !== 'undefined' && { items: processedItems }), // Only include if items is a valid property
+      items: processedItems,
       totalAmount,
       startDate: parsedStartDate,
       endDate: parsedEndDate,
-      includesFuel, // Enregistrement de l'option carburant
-      fuelCostPerDay: includesFuel ? fuelCostPerDay : undefined, // Use undefined instead of null
+      includesFuel,
+      fuelCostPerDay: includesFuel ? fuelCostPerDay : undefined,
       client,
       clientId: client.id,
     });
@@ -148,11 +134,11 @@ export class DevisService {
   }
 
   findAll(): Promise<Devis[]> {
-    return this.devisRepository.find({ relations: ['client'] });
+    return this.devisRepository.find({ relations: ['client'], });
   }
 
   async findOne(id: string): Promise<Devis> {
-    const devis = await this.devisRepository.findOne({ where: { id }, relations: ['client'] });
+    const devis = await this.devisRepository.findOne({ where: { id }, relations: ['client'], });
     if (!devis) {
       throw new NotFoundException(`Devis avec l'ID "${id}" introuvable`);
     }
@@ -252,9 +238,9 @@ export class DevisService {
     if (devis.includesFuel && devis.fuelCostPerDay !== null && devis.fuelCostPerDay !== undefined) {
         newTotalAmount += devis.fuelCostPerDay * numberOfDays;
     }
-    devis.totalAmount = newTotalAmount; // Assign the final calculated total
+    devis.totalAmount = newTotalAmount; 
 
-    Object.assign(devis, updateDevisDto); // Apply other updates like status
+    Object.assign(devis, updateDevisDto); 
 
     return this.devisRepository.save(devis);
   }

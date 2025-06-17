@@ -1,5 +1,4 @@
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -7,8 +6,6 @@ import {
 import "react-toastify/dist/ReactToastify.css";
 
 import MainLayout from "../layouts/MainLayouts";
-import Performat from "../admin/pages/proforma/ProformaList";
-import Devis from "../admin/pages/Devis/DevisPage";
 import ProformaPage from "../admin/pages/proforma/proformaPage";
 import Commande from "../admin/pages/commande/CommandePage";
 import LocationsPage from "../admin/pages/lieux/locationPage";
@@ -21,6 +18,9 @@ import UserProfile from "../components/profile/userProfile";
 import ContratPage from "../admin/pages/contrat/contratPage";
 import ContactPage from "../admin/pages/Contact/ContactPage";
 import QuoteForm from "../admin/pages/Quote/quoteForm";
+import DevisListPage from "../admin/pages/Quote/quoteListPage";
+import DevisDetailsPage from "../admin/pages/Quote/quoteDetailsPage";
+
 
 
 const AdminRoutes = () => {
@@ -157,6 +157,24 @@ const AdminRoutes = () => {
             <ContactPage />
           </MainLayout>
         }
+      />
+
+      // Route pour la page de devis
+      <Route
+        path="devis"
+        element={
+          <MainLayout>
+            <DevisListPage />
+          </MainLayout>
+        }
+      />
+      <Route 
+        path="/devis/:id" 
+        element={
+          <MainLayout>
+            <DevisDetailsPage />
+          </MainLayout>
+        } 
       />
     </Routes>
   );

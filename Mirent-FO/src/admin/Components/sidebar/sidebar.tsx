@@ -30,7 +30,8 @@ import {
   Add as AddIcon,
   List as ListIcon, // Icône pour le sous-menu List
   Category as CategoryIcon, // Icône pour le sous-menu Type
-  Search as SearchIcon, // Icône pour la barre de recherche
+  Search as SearchIcon,
+  RequestQuote, // Icône pour la barre de recherche
 } from "@mui/icons-material";
 import PlaceIcon from "@mui/icons-material/Place";
 import { NavLink, Link as RouterLink } from "react-router-dom";
@@ -48,7 +49,6 @@ const secondaryColor = "#e3f2fd";
 const textColor = "#555";
 const iconColor = primaryColor;
 
-// Style personnalisé pour les boutons de navigation
 const NavLinkButton = styled(
   ({
     to,
@@ -358,6 +358,41 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                 />
               </NavLinkButton>
             </Tooltip>
+
+            {/* Liste des Commandes */}
+            <Tooltip title="Commandes" placement="right">
+              <NavLinkButton
+                to="/admin/devis"
+                selected={window.location.pathname === "/admin/devis"}
+                  sx={{
+                    pl: 6,
+                    pr: 4,
+                    py: 1,
+                    "& .MuiListItemIcon-root": {
+                      minWidth: "40px",
+                      color: iconColor,
+                      fontSize: "1.4rem",
+                    },
+                  }}
+              >
+                <ListItemIcon>
+                  <RequestQuote fontSize="small"  />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Commandes"
+                  primaryTypographyProps={{
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: textColor,
+                  }}
+                  sx={{
+                    opacity: isCollapsed ? 0 : 1,
+                    transition: "opacity 0.3s ease-in-out",
+                  }}
+                />
+              </NavLinkButton>
+            </Tooltip>
+
               {/* Proformat */}
               <Tooltip title="Proformat" placement="right">
                 <ListItemButton

@@ -3,19 +3,20 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus
 import { DevisService } from './devis.service';
 import { CreateDevisDto } from './dto/create-devis.dto';
 import { UpdateDevisDto } from './dto/update-devis.dto';
+import { Devis } from 'src/entities/devis.entity';
 
-@Controller('devis') // Route de base pour cette API
+@Controller('devis') 
 export class DevisController {
   constructor(private readonly devisService: DevisService) {}
 
   @Post()
-  @HttpCode(HttpStatus.CREATED) // Retourne un statut 201 Created
+  @HttpCode(HttpStatus.CREATED) 
   create(@Body() createDevisDto: CreateDevisDto) {
     return this.devisService.create(createDevisDto);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Devis[]> {
     return this.devisService.findAll();
   }
 
@@ -30,7 +31,7 @@ export class DevisController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT) // Retourne un statut 204 No Content pour une suppression réussie
+  @HttpCode(HttpStatus.NO_CONTENT) 
   remove(@Param('id') id: string) {
     return this.devisService.remove(id);
   }

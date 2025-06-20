@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -21,15 +32,45 @@ var prixs_module_1 = require("./prixs/prixs.module");
 var client_module_1 = require("./client/client.module");
 var proforma_module_1 = require("./proforma/proforma.module");
 var mailer_module_1 = require("./mailer/mailer.module");
-var devis_controller_1 = require("./devis/devis.controller");
 var devis_module_1 = require("./devis/devis.module");
+var reservation_module_1 = require("./reservation/reservation.module");
+var reservation_entity_1 = require("./entities/reservation.entity");
+var vehicle_entity_1 = require("./entities/vehicle.entity");
+var region_entity_1 = require("./entities/region.entity");
+var status_entity_1 = require("./entities/status.entity");
+var type_entity_1 = require("./entities/type.entity");
+var prix_entity_1 = require("./entities/prix.entity");
+var client_entity_1 = require("./entities/client.entity");
+var proforma_entity_1 = require("./entities/proforma.entity");
+var devis_entity_1 = require("./entities/devis.entity");
+var proformat_item_entity_1 = require("./entities/proformat-item.entity");
+var utilisateur_controller_1 = require("./utilisateur/utilisateur.controller");
+var utilisateur_module_1 = require("./utilisateur/utilisateur.module");
+var utilisateur_entity_1 = require("./entities/utilisateur.entity");
+var notifications_module_1 = require("./notifications/notifications.module");
+var schedule_1 = require("@nestjs/schedule");
+var notifications_entity_1 = require("./entities/notifications.entity");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
     AppModule = __decorate([
         common_1.Module({
             imports: [
-                typeorm_1.TypeOrmModule.forRoot(database_config_1.typeOrmConfig),
+                schedule_1.ScheduleModule.forRoot(),
+                typeorm_1.TypeOrmModule.forRoot(__assign(__assign({}, database_config_1.typeOrmConfig), { entities: [
+                        reservation_entity_1.Reservation,
+                        vehicle_entity_1.Vehicule,
+                        region_entity_1.Region,
+                        status_entity_1.Status,
+                        type_entity_1.Type,
+                        prix_entity_1.Prix,
+                        client_entity_1.Client,
+                        proforma_entity_1.Proforma,
+                        proformat_item_entity_1.ProformaItem,
+                        devis_entity_1.Devis,
+                        utilisateur_entity_1.Utilisateur,
+                        notifications_entity_1.Notification,
+                    ] })),
                 auth_module_1.AuthModule,
                 vehicles_module_1.VehiclesModule,
                 type_module_1.TypeModule,
@@ -45,8 +86,11 @@ var AppModule = /** @class */ (function () {
                 proforma_module_1.ProformaModule,
                 mailer_module_1.MailerModule,
                 devis_module_1.DevisModule,
+                reservation_module_1.ReservationModule,
+                utilisateur_module_1.UtilisateurModule,
+                notifications_module_1.NotificationsModule,
             ],
-            controllers: [devis_controller_1.DevisController]
+            controllers: [utilisateur_controller_1.UtilisateurController]
         })
     ], AppModule);
     return AppModule;

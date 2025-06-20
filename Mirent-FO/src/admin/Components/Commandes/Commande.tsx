@@ -31,7 +31,10 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 
 import { AppDispatch, RootState } from "../../../redux/store";
-import { createProforma } from "../../../redux/features/commande/commandeSlice";
+import {
+  createProforma,
+  fetchAvailableVehicles,
+} from "../../../redux/features/commande/commandeSlice";
 import "jspdf-autotable";
 import { Region } from "../../../types/region";
 
@@ -51,7 +54,7 @@ interface ProformaForm {
   contractReference: string;
   notes: string;
   status: "Brouillon" | "Envoyée" | "Confirmée" | "Annulée" | "";
-  totalAmount?: number; // Added for preview
+  totalAmount: number; // Added for preview
 }
 interface FormErrors {
   clientId?: string;
@@ -159,6 +162,7 @@ const OrderPage: React.FC = () => {
     contractReference: "",
     notes: "",
     status: "",
+    totalAmount: 0,
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -224,7 +228,16 @@ const OrderPage: React.FC = () => {
       }
     };
     fetchVehicles();
-  }, []);
+    // Optionally, fetch available vehicles from redux if needed
+    if (formData.startDate && formData.endDate) {
+      dispatch(
+        fetchAvailableVehicles({
+          dateDepart: formData.startDate,
+          dateRetour: formData.endDate,
+        })
+      );
+    }
+  }, [formData.startDate, formData.endDate, dispatch]);
 
   //Api pour récuperér les regions avec son district
   useEffect(() => {
@@ -308,16 +321,23 @@ const OrderPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setSnackbarMessage("");
+    setOpenSnackbar(false);
 
     if (!validateForm()) {
       setSubmitting(false);
+      setSnackbarMessage("Veuillez corriger les erreurs dans le formulaire.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
       return;
     }
+
     const selectedClient = clients.find(
       (client) => client.id === formData.clientId
     );
     if (!selectedClient) {
       setSnackbarSeverity("error");
+      setSnackbarMessage("Client sélectionné introuvable.");
       setOpenSnackbar(true);
       setSubmitting(false);
       return;
@@ -326,7 +346,7 @@ const OrderPage: React.FC = () => {
     const proformaData = {
       clientLastName: selectedClient.lastName,
       clientEmail: selectedClient.email,
-      clientPhone: selectedClient.phone,
+      clientPhone: selectedClient.phone?.toString(),
       date: new Date().toISOString(),
       contractReference: formData.contractReference,
       notes: formData.notes,
@@ -340,14 +360,41 @@ const OrderPage: React.FC = () => {
       ],
     };
 
+    // Find the selected vehicle to pass its criteria if needed by the backend for item creation
+    const selectedVehicle = availableVehicles.find(
+      (v) => v.id === formData.vehicleId
+    );
+    if (selectedVehicle) {
+      proformaData.items[0].vehicleCriteria = {
+        marque: selectedVehicle.marque,
+        modele: selectedVehicle.modele,
+        type: selectedVehicle.type.type,
+        immatriculation: selectedVehicle.immatriculation,
+        nombrePlace: selectedVehicle.nombrePlace,
+        imageUrl: selectedVehicle.imageUrl,
+      };
+    } else {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Véhicule sélectionné introuvable.");
+      setOpenSnackbar(true);
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const result = await dispatch(createProforma(proformaData)).unwrap();
-      const pdfBase64 = result.pdfBase64;
-      const pdfBlob = new Blob([Buffer.from(pdfBase64, "base64")], {
-        type: "application/pdf",
-      });
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      setPdfUrl(pdfUrl);
+      if (result && result.pdfBase64) {
+        const pdfBase64 = result.pdfBase64;
+        const pdfBlob = new Blob([Buffer.from(pdfBase64, "base64")], {
+          type: "application/pdf",
+        });
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        setPdfUrl(pdfUrl);
+      } else {
+        console.warn("PDF Base64 not received in proforma creation response.");
+        setSnackbarMessage("Proforma créé, mais le PDF n'a pas été généré.");
+        setSnackbarSeverity("warning");
+      }
 
       setFormData({
         clientId: "",
@@ -358,14 +405,20 @@ const OrderPage: React.FC = () => {
         contractReference: "",
         notes: "",
         status: "",
+        totalAmount: 0,
       });
       setFormErrors({});
       setSnackbarSeverity("success");
+      setSnackbarMessage("Proforma créé avec succès !");
     } catch (error: any) {
       setSnackbarSeverity("error");
+      setSnackbarMessage(
+        error || "Erreur lors de la création du proforma. Veuillez réessayer."
+      );
+    } finally {
+      setOpenSnackbar(true);
+      setSubmitting(false);
     }
-    setOpenSnackbar(true);
-    setSubmitting(false);
   };
 
   const handleButtonClick = (action: string, index?: number) => {
@@ -374,7 +427,6 @@ const OrderPage: React.FC = () => {
     }
     switch (action) {
       case ButtonActions.SEND_EMAIL:
-        // Implement email sending logic here
         break;
       case ButtonActions.CONFIRM:
         setConfirmationMessage("Commande confirmée !");
@@ -395,16 +447,15 @@ const OrderPage: React.FC = () => {
           contractReference: "",
           notes: "",
           status: "",
+          totalAmount: 0,
         });
         break;
       case ButtonActions.DEVIS:
         setFormType("devis");
         break;
       case ButtonActions.SENT:
-        // Implement sent logic here
         break;
       case ButtonActions.BON_COMMANDE:
-        // Implement bon de commande logic here
         break;
       default:
         break;
@@ -417,8 +468,6 @@ const OrderPage: React.FC = () => {
   const formattedDate = `${creationDate.getDate()}/${
     creationDate.getMonth() + 1
   }/${creationDate.getFullYear()}`;
-
-  // Preview logic: show modal with current form data
   const handlePreview = () => {
     setPreviewProforma(formData);
     setOpenPreviewModal(true);
@@ -658,7 +707,7 @@ const OrderPage: React.FC = () => {
                           error={!!formErrors.regionName}
                         >
                           <InputLabel id="region-select-label">
-                            Région
+                            Destination
                           </InputLabel>
                           <Select
                             labelId="region-select-label"
@@ -810,6 +859,7 @@ const OrderPage: React.FC = () => {
                             contractReference: "",
                             notes: "",
                             status: "",
+                            totalAmount: 0,
                           })
                         }
                         aria-label="Annuler la création du proforma"
@@ -862,7 +912,7 @@ const OrderPage: React.FC = () => {
                       Date retour : {previewProforma?.endDate}
                     </Typography>
                     <Typography>
-                      Prix total : {previewProforma?.totalAmount ?? "-"} Ar
+                      Prix total : {previewProforma?.totalAmount} Ar
                     </Typography>
                   </DialogContent>
                   <DialogActions>

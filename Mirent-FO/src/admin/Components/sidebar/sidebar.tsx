@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Drawer,
   List,
@@ -14,6 +14,10 @@ import {
   useMediaQuery,
   Typography,
   Avatar,
+  Badge,
+  Popover,
+  Card, // Card et CardContent sont importés mais non utilisés dans ce composant direct.
+  CardContent, // Ils sont utiles pour des affichages de détail de notification plus riches.
 } from "@mui/material";
 import {
   Home,
@@ -25,18 +29,20 @@ import {
   AccountCircle,
   ExpandLess,
   ExpandMore,
-  AddShoppingCart,
-  Notifications as NotificationsIcon,
   Add as AddIcon,
-  List as ListIcon, // Icône pour le sous-menu List
-  Category as CategoryIcon, // Icône pour le sous-menu Type
-  Search as SearchIcon, // Icône pour la barre de recherche
+  List as ListIcon,
+  Category as CategoryIcon,
+  Search as SearchIcon,
+  Notifications as NotificationsIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon,
+  HighlightOff as HighlightOffIcon,
 } from "@mui/icons-material";
 import PlaceIcon from "@mui/icons-material/Place";
-import { NavLink, Link as RouterLink } from "react-router-dom";
+import { NavLink, Link as RouterLink, useNavigate } from "react-router-dom";
 import logo from "../../../assets/horizontal.png";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import axios from "axios";
 
 interface SidebarProps {
   onCollapseChange: (collapsed: boolean) => void;
@@ -76,22 +82,134 @@ const NavLinkButton = styled(
   }),
 }));
 
+// Interface pour la notification (doit correspondre à l'entité backend)
+interface Notification {
+  id: number;
+  type: string;
+  message: string;
+  payload: any;
+  createdAt: string; // La date vient du backend en string ISO 8601
+  isRead: boolean;
+}
+
+// URL de base de votre API NestJS
+const API_BASE_URL = "http://localhost:3000"; // <<--- TRÈS IMPORTANT : Assurez-vous que cette URL est correcte pour votre backend !
+
 const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
   const [openCommande, setOpenCommande] = useState(false);
-  const [openVehicules, setOpenVehicules] = useState(false); // Nouvel état pour le sous-menu Véhicules
+  const [openVehicules, setOpenVehicules] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  const notificationButtonRef = useRef<HTMLButtonElement>(null);
+
   const isSmallScreen = useMediaQuery("(max-width: 900px)");
 
-  // Ajustement automatique pour petits écrans
+  // Calcul du nombre de notifications non lues
+  const unreadNotificationsCount = notifications.filter(
+    (notif) => !notif.isRead
+  ).length;
+
+  // --- Fonctions d'appel API pour les notifications ---
+
+  /**
+   * Récupère les notifications depuis le backend.
+   */
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications`); // Utilise la route GET /notifications
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP! statut: ${response.status}`);
+      }
+      const data: Notification[] = await response.json();
+      // Tri des notifications par date de création, les plus récentes d'abord
+      const sortedData = data.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setNotifications(sortedData);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des notifications:", error);
+      // Gérer l'erreur (ex: afficher un message d'erreur à l'utilisateur)
+    }
+  };
+
+  /**
+   * Marque une notification spécifique comme lue sur le backend.
+   * Met à jour l'état local après succès.
+   * @param id L'ID de la notification à marquer comme lue.
+   */
+  const markNotificationAsRead = async (id: number) => {
+    try {
+      // Note: Le backend devrait retourner un 204 No Content pour cette opération
+      const response = await fetch(`${API_BASE_URL}/notifications/${id}/read`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // Pas besoin d'envoyer un corps si le backend n'en attend pas, ou si `isRead: true` est géré côté serveur.
+        // Si votre backend attend un corps, vous pouvez décommenter : body: JSON.stringify({ isRead: true }),
+      });
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP! statut: ${response.status}`);
+      }
+      // Met à jour l'état local pour refléter le changement sans refetch complet
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notif) =>
+          notif.id === id ? { ...notif, isRead: true } : notif
+        )
+      );
+    } catch (error) {
+      console.error(
+        `Erreur lors du marquage de la notification ${id} comme lue:`,
+        error
+      );
+    }
+  };
+
+  /**
+   * Marque toutes les notifications non lues comme lues sur le backend.
+   * Met à jour l'état local après succès.
+   */
+  const markAllNotificationsAsRead = async () => {
+    try {
+      // Note: Le backend devrait retourner un 204 No Content pour cette opération
+      const response = await fetch(
+        `${API_BASE_URL}/notifications/mark-all-read`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP! statut: ${response.status}`);
+      }
+      // Met à jour toutes les notifications locales comme lues
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notif) => ({ ...notif, isRead: true }))
+      );
+    } catch (error) {
+      console.error(
+        "Erreur lors du marquage de toutes les notifications comme lues:",
+        error
+      );
+    }
+  };
+
+  // --- Effets de côté ---
+
+  // Effet pour gérer l'effondrement de la barre latérale sur les petits écrans
   useEffect(() => {
     setIsCollapsed(isSmallScreen);
     onCollapseChange(isSmallScreen);
   }, [isSmallScreen, onCollapseChange]);
 
-  // Mise à jour de l'heure
+  // Effet pour mettre à jour l'heure actuelle
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -99,12 +217,24 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
     return () => clearInterval(timer);
   }, []);
 
+  // Effet pour récupérer les notifications au chargement et les rafraîchir périodiquement
+  useEffect(() => {
+    fetchNotifications(); // Récupère les notifications au montage initial
+
+    // Intervalle de polling (ex: toutes les 30 secondes)
+    const intervalId = setInterval(fetchNotifications, 30000); // Poll toutes les 30 secondes
+
+    return () => clearInterval(intervalId); // Nettoie l'intervalle au démontage du composant
+  }, []); // Dépendances vides pour n'exécuter qu'une fois au montage
+
+  // --- Gestionnaires d'événements UI ---
+
   const handleCommandeClick = () => {
     setOpenCommande(!openCommande);
   };
 
   const handleVehiculesClick = () => {
-    setOpenVehicules(!openVehicules); // Gestion du clic pour ouvrir/fermer le sous-menu
+    setOpenVehicules(!openVehicules);
   };
 
   const toggleCollapse = () => {
@@ -112,10 +242,71 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
     onCollapseChange(!isCollapsed);
   };
 
-  const [open, setOpen] = useState(false);
+  // Renommé pour éviter la confusion avec l'état 'open' du Popover
+  const [openProformatSubmenu, setOpenProformatSubmenu] = useState(false);
+  const handleProformatClick = () => {
+    setOpenProformatSubmenu(!openProformatSubmenu);
+  };
 
-  const handleClick = () => {
-    setOpen(!open);
+  const handleNotificationsClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseNotifications = () => {
+    setAnchorEl(null);
+  };
+
+  // Les fonctions de gestion des actions sur les notifications sont maintenant des wrappers
+  // autour des fonctions asynchrones d'appel API.
+  const handleMarkAllAsReadClick = () => {
+    markAllNotificationsAsRead();
+  };
+
+  const handleMarkAsReadClick = (id: number) => {
+    markNotificationAsRead(id);
+  };
+
+  const openNotificationsPopover = Boolean(anchorEl);
+  const id = openNotificationsPopover ? "notifications-popover" : undefined;
+
+  //appel des API pour la deconnexion
+  const navigate = useNavigate(); // Hook pour la navigation
+  const handleLogout = async () => {
+    const token = localStorage.getItem("access_token"); // Récupère le token stocké
+
+    if (!token) {
+      // Si aucun token n'est trouvé, l'utilisateur n'était pas vraiment connecté,
+      // ou le token a déjà été supprimé. On redirige simplement.
+      navigate("/login");
+      return;
+    }
+
+    try {
+      // Envoyer une requête POST à votre endpoint de déconnexion NestJS
+      await axios.post(
+        "http://localhost:3000/utilisateur/logout", // Assurez-vous que c'est l'URL correcte de votre API
+        {}, // Corps de la requête vide (ou { token } si votre backend s'attendait à un corps)
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Inclut le token dans l'en-tête Authorization
+          },
+        }
+      );
+
+      // Si la déconnexion côté serveur est réussie :
+      localStorage.removeItem("access_token"); // Supprime le token du Local Storage
+      navigate("/login"); // Redirige l'utilisateur vers la page de connexion
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error);
+      // Gérer les erreurs (par exemple, afficher un message à l'utilisateur)
+      alert("Échec de la déconnexion. Veuillez réessayer."); // Utilisez une modale ou un toaster pour un meilleur UX
+      // Même en cas d'erreur côté serveur, si le token est potentiellement invalide
+      // ou expiré, il est souvent préférable de le supprimer côté client quand même.
+      localStorage.removeItem("access_token");
+      navigate("/login");
+    }
   };
 
   return (
@@ -189,9 +380,112 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               minute: "2-digit",
             })}
           </Typography>
-          <IconButton onClick={() => setShowNotifications(!showNotifications)}>
-            <NotificationsIcon fontSize="small" />
+          <IconButton
+            aria-describedby={id}
+            onClick={handleNotificationsClick}
+            ref={notificationButtonRef}
+          >
+            <Badge badgeContent={unreadNotificationsCount} color="error">
+              <NotificationsIcon fontSize="small" />
+            </Badge>
           </IconButton>
+          {/* Popover pour afficher les notifications */}
+          <Popover
+            id={id}
+            open={openNotificationsPopover}
+            anchorEl={anchorEl}
+            onClose={handleCloseNotifications}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            PaperProps={{
+              sx: {
+                mt: 1, // Marge supérieure pour séparer de l'icône
+                minWidth: "300px",
+                maxWidth: "400px",
+                borderRadius: "8px",
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+              },
+            }}
+          >
+            <Box p={2}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={1}
+              >
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  Notifications
+                </Typography>
+                <IconButton
+                  onClick={handleMarkAllAsReadClick} // Appel de la fonction de gestion
+                  disabled={unreadNotificationsCount === 0}
+                >
+                  <CheckCircleOutlineIcon fontSize="small" />
+                  <Typography variant="caption" ml={0.5}>
+                    Tout lire
+                  </Typography>
+                </IconButton>
+              </Box>
+              <Divider sx={{ mb: 2 }} />
+              {notifications.length === 0 ? (
+                <Typography variant="body2" color="text.secondary">
+                  Aucune nouvelle notification.
+                </Typography>
+              ) : (
+                <List dense sx={{ maxHeight: "300px", overflowY: "auto" }}>
+                  {notifications.map((notif) => (
+                    <ListItemButton
+                      key={notif.id}
+                      onClick={() => handleMarkAsReadClick(notif.id)} // Appel de la fonction de gestion
+                      sx={{
+                        backgroundColor: notif.isRead ? "#fff" : "#e3f2fd",
+                        borderRadius: "4px",
+                        mb: 1,
+                        "&:hover": {
+                          backgroundColor: notif.isRead ? "#f5f5f5" : "#d0e7fc",
+                        },
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: "30px" }}>
+                        {notif.isRead ? (
+                          <CheckCircleOutlineIcon
+                            fontSize="small"
+                            color="success"
+                          />
+                        ) : (
+                          <HighlightOffIcon fontSize="small" color="warning" />
+                        )}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={notif.message}
+                        secondary={new Date(notif.createdAt).toLocaleString(
+                          "fr-FR",
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
+                        primaryTypographyProps={{
+                          fontWeight: notif.isRead ? "normal" : "bold",
+                        }}
+                        sx={{ wordBreak: "break-word" }}
+                      />
+                    </ListItemButton>
+                  ))}
+                </List>
+              )}
+            </Box>
+          </Popover>
           <Avatar
             src="https://public.readdy.ai/ai/img_res/4e32fe8260bae0a4f879d9618e1c1763.jpg"
             sx={{ width: 32, height: 32 }}
@@ -203,16 +497,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
       <Drawer
         variant="permanent"
         sx={{
-          width: isCollapsed ? "60px" : "250px",
+          width: isCollapsed ? 70 : 240,
           flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: isCollapsed ? "60px" : "250px",
+          [`& .MuiDrawer-paper`]: {
+            width: isCollapsed ? 70 : 240,
             boxSizing: "border-box",
-            background: "linear-gradient(180deg, #f8f9fa 0%, #e8ecef 100%)",
-            borderRight: "none",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.05)",
+            top: "56px",
+            height: "calc(100% - 56px)",
             transition: "width 0.3s ease-in-out",
-            top: "75px",
+            overflowX: "hidden",
+            boxShadow: "2px 0px 4px rgba(0, 0, 0, 0.1)",
+            borderRight: "none",
+            backgroundColor: "#ffffff",
           },
         }}
       >
@@ -239,12 +535,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
             )}
           </IconButton>
         </Box>
-
         {/* Liste des éléments du menu */}
         <List sx={{ overflowY: "auto", flexGrow: 1 }}>
           {/* Accueil */}
           <Tooltip
-            title="Acceuil"
+            title="Accueil"
             placement="right"
             componentsProps={{
               tooltip: {
@@ -260,7 +555,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           >
             <NavLinkButton
               to="/admin/home"
-              selected={window.location.pathname === "/acceuil"}
+              selected={window.location.pathname === "/admin/home"}
               sx={{
                 padding: "12px 16px",
                 "& .MuiListItemIcon-root": {
@@ -274,7 +569,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                 <Home />
               </ListItemIcon>
               <ListItemText
-                primary="Acceuil"
+                primary="Accueil"
                 primaryTypographyProps={{
                   fontSize: "14px",
                   fontWeight: "500",
@@ -325,10 +620,45 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               disablePadding
               sx={{ backgroundColor: "#f0f4f8" }}
             >
+              {/* Nouveau Commande */}
+              <Tooltip title="Nouveau" placement="right">
+                <NavLinkButton
+                  to="/admin/createCommande"
+                  selected={
+                    window.location.pathname === "/admin/createCommande"
+                  }
+                  sx={{
+                    pl: 6,
+                    pr: 4,
+                    py: 1,
+                    "& .MuiListItemIcon-root": {
+                      minWidth: "40px",
+                      color: iconColor,
+                      fontSize: "1.4rem",
+                    },
+                  }}
+                >
+                  <ListItemIcon>
+                    <AddCircleOutlineIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Nouveau"
+                    primaryTypographyProps={{
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: textColor,
+                    }}
+                    sx={{
+                      opacity: isCollapsed ? 0 : 1,
+                      transition: "opacity 0.3s ease-in-out",
+                    }}
+                  />
+                </NavLinkButton>
+              </Tooltip>
               {/* Proformat */}
               <Tooltip title="Proformat" placement="right">
                 <ListItemButton
-                  onClick={handleClick}
+                  onClick={handleProformatClick}
                   sx={{
                     pl: 6,
                     pr: 4,
@@ -355,11 +685,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                       transition: "opacity 0.3s ease-in-out",
                     }}
                   />
-                  {open ? <ExpandLess /> : <ExpandMore />}
+                  {openProformatSubmenu ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
               </Tooltip>
 
-              <Collapse in={open} timeout="auto" unmountOnExit>
+              <Collapse in={openProformatSubmenu} timeout="auto" unmountOnExit>
                 <NavLink
                   to="/admin/proformat/nouveau"
                   style={{ textDecoration: "none" }}
@@ -395,44 +725,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                   </ListItemButton>
                 </NavLink>
               </Collapse>
-              {/* Devis */}
-              <Tooltip title="Devis" placement="right">
-                <NavLinkButton
-                  to="/admin/devis"
-                  selected={window.location.pathname === "/devis"}
-                  sx={{
-                    pl: 6,
-                    pr: 4,
-                    py: 1,
-                    "& .MuiListItemIcon-root": {
-                      minWidth: "40px",
-                      color: iconColor,
-                      fontSize: "1.4rem",
-                    },
-                  }}
-                >
-                  <ListItemIcon>
-                    <AddShoppingCart />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Devis"
-                    primaryTypographyProps={{
-                      fontSize: "13px",
-                      fontWeight: "500",
-                      color: textColor,
-                    }}
-                    sx={{
-                      opacity: isCollapsed ? 0 : 1,
-                      transition: "opacity 0.3s ease-in-out",
-                    }}
-                  />
-                </NavLinkButton>
-              </Tooltip>
+
               {/* Facture */}
               <Tooltip title="Facture" placement="right">
                 <NavLinkButton
                   to="/admin/facture"
-                  selected={window.location.pathname === "/facture"}
+                  selected={window.location.pathname === "/admin/facture"}
                   sx={{
                     pl: 6,
                     pr: 4,
@@ -504,7 +802,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               <Tooltip title="Liste des Véhicules" placement="right">
                 <NavLinkButton
                   to="/admin/vehicules"
-                  selected={window.location.pathname === "/vehicules/liste"}
+                  selected={window.location.pathname === "/admin/vehicules"}
                   sx={{
                     pl: 6,
                     pr: 4,
@@ -537,7 +835,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               <Tooltip title="Types de Véhicules" placement="right">
                 <NavLinkButton
                   to="/admin/types"
-                  selected={window.location.pathname === "/vehicules/types"}
+                  selected={window.location.pathname === "/admin/types"}
                   sx={{
                     pl: 6,
                     pr: 4,
@@ -573,7 +871,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           <Tooltip title="Liste des Clients" placement="right">
             <NavLinkButton
               to="/admin/clients"
-              selected={window.location.pathname === "/clients"}
+              selected={window.location.pathname === "/admin/clients"}
               sx={{
                 padding: "12px 16px",
                 "& .MuiListItemIcon-root": {
@@ -600,13 +898,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-          {/* Créer Proformas 
-          
-          */}
+          {/* Créer Proformas */}
           <Tooltip title="Créer Proformas" placement="right">
             <NavLinkButton
               to="/admin/proformas"
-              selected={window.location.pathname === "/proformas"}
+              selected={window.location.pathname === "/admin/proformas"}
               sx={{
                 padding: "12px 16px",
                 "& .MuiListItemIcon-root": {
@@ -635,11 +931,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           </Tooltip>
 
           {/* Lieux de Location */}
-
           <Tooltip title="Lieux de Location" placement="right">
             <NavLinkButton
               to="/admin/lieux"
-              selected={window.location.pathname === "/lieux"}
+              selected={window.location.pathname === "/admin/lieux"}
               sx={{
                 padding: "12px 16px",
                 "& .MuiListItemIcon-root": {
@@ -670,7 +965,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           <Tooltip title="Détail du contrat" placement="right">
             <NavLinkButton
               to="/admin/client_detail"
-              selected={window.location.pathname === "/client_detail"}
+              selected={window.location.pathname === "/admin/client_detail"}
               sx={{
                 padding: "12px 16px",
                 "& .MuiListItemIcon-root": {
@@ -702,7 +997,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
           <Tooltip title="Contact" placement="right">
             <NavLinkButton
               to="/admin/contact"
-              selected={window.location.pathname === "/contact"}
+              selected={window.location.pathname === "/admin/contact"}
               sx={{
                 padding: "12px 16px",
                 "& .MuiListItemIcon-root": {
@@ -729,52 +1024,17 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
               />
             </NavLinkButton>
           </Tooltip>
-
-          {/*
-          commande
-
-            <Tooltip title="Commande" placement="right">
-            <NavLinkButton
-              to="/commande"
-              selected={window.location.pathname === "/commande"}
-              sx={{
-                padding: "12px 16px",
-                "& .MuiListItemIcon-root": {
-                  minWidth: "40px",
-                  color: iconColor,
-                  fontSize: "1.4rem",
-                },
-              }}
-            >
-              <ListItemIcon>
-                <ContactMail />
-              </ListItemIcon>
-              <ListItemText
-                primary="Commande"
-                primaryTypographyProps={{
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  color: textColor,
-                }}
-                sx={{
-                  opacity: isCollapsed ? 0 : 1,
-                  transition: "opacity 0.3s ease-in-out",
-                }}
-              />
-            </NavLinkButton>
-          </Tooltip>
-           */}
         </List>
         {/* Liste de détail d'un client*/}
-
         <List>
           <Divider sx={{ my: 8, borderColor: "#e0e0e0" }} />
 
           {/* Se Déconnecter */}
           <Box sx={{ mt: "auto", pb: 2 }}>
             <Tooltip title="Se Déconnecter" placement="right">
-              <NavLinkButton
-                to="/admin/logout"
+              {/* Utilisation de ListItemButton pour la sémantique Material-UI */}
+              <ListItemButton
+                onClick={handleLogout} // Appelle notre fonction handleLogout
                 sx={{
                   mx: 1,
                   padding: "10px 16px",
@@ -809,7 +1069,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapseChange }) => {
                     transition: "opacity 0.3s ease-in-out",
                   }}
                 />
-              </NavLinkButton>
+              </ListItemButton>
             </Tooltip>
           </Box>
         </List>

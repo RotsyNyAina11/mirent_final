@@ -26,7 +26,7 @@ const Reservations: React.FC = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/reservations")
+    fetch("http://localhost:3000/reservations")
       .then((res) => res.json())
       .then((data) => setReservations(data));
   }, []);

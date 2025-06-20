@@ -1,6 +1,13 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Type } from './type.entity';
 import { Status } from './status.entity';
+import { Reservation } from './reservation.entity';
 
 @Entity()
 export class Vehicule {
@@ -30,4 +37,7 @@ export class Vehicule {
 
   @Column({ type: 'varchar', nullable: true })
   imageUrl: string | null;
+
+  @OneToMany(() => Reservation, (reservation) => reservation.vehicle)
+  reservations: Reservation[];
 }

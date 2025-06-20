@@ -3,45 +3,44 @@ import {
   Get,
   Post,
   Body,
+  Patch,
   Param,
   Delete,
-  Put,
-  ParseIntPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { DevisService } from './devis.service';
-import { CreateDevisItemDto } from './create-devis.dto';
-import { UpdateDevisDto } from './update-devis.dto';
-import { Devis } from 'src/entities/devis.entity';
+import { CreateDevisDto } from './dto/create-devis.dto';
+import { UpdateDevisDto } from './dto/update-devis.dto';
 
-@Controller('devis')
+@Controller('devis') // Route de base pour cette API
 export class DevisController {
   constructor(private readonly devisService: DevisService) {}
 
   @Post()
-  async create(@Body() createDevisDto: CreateDevisItemDto): Promise<Devis> {
+  @HttpCode(HttpStatus.CREATED) // Retourne un statut 201 Created
+  create(@Body() createDevisDto: CreateDevisDto) {
     return this.devisService.create(createDevisDto);
   }
 
   @Get()
-  async findAll(): Promise<Devis[]> {
+  findAll() {
     return this.devisService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Devis> {
+  findOne(@Param('id') id: string) {
     return this.devisService.findOne(id);
   }
 
-  @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateDevisDto: UpdateDevisDto,
-  ): Promise<Devis> {
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateDevisDto: UpdateDevisDto) {
     return this.devisService.update(id, updateDevisDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  @HttpCode(HttpStatus.NO_CONTENT) // Retourne un statut 204 No Content pour une suppression réussie
+  remove(@Param('id') id: string) {
     return this.devisService.remove(id);
   }
 }

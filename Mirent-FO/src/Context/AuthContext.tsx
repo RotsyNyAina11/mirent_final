@@ -14,7 +14,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const login = (email: string, password: string) => {
-    // Ici, vous pouvez appeler une API pour vérifier les identifiants
     if (email === "user@example.com" && password === "password123") {
       setIsAuthenticated(true);
     } else {

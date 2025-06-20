@@ -9,6 +9,7 @@ exports.__esModule = true;
 exports.Status = void 0;
 var typeorm_1 = require("typeorm");
 var vehicle_entity_1 = require("./vehicle.entity");
+var reservation_entity_1 = require("./reservation.entity");
 var Status = /** @class */ (function () {
     function Status() {
     }
@@ -24,6 +25,9 @@ var Status = /** @class */ (function () {
     __decorate([
         typeorm_1.OneToMany(function () { return vehicle_entity_1.Vehicule; }, function (vehicule) { return vehicule.status; })
     ], Status.prototype, "vehicules");
+    __decorate([
+        typeorm_1.ManyToOne(function () { return reservation_entity_1.Reservation; }, function (reservation) { return reservation.status; })
+    ], Status.prototype, "reservation");
     Status = __decorate([
         typeorm_1.Entity()
     ], Status);

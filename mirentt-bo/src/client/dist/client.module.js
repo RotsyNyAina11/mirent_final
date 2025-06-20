@@ -21,7 +21,7 @@ var ClientModule = /** @class */ (function () {
             imports: [typeorm_1.TypeOrmModule.forFeature([client_entity_1.Client]), proforma_module_1.ProformaModule],
             controllers: [client_controller_1.ClientController],
             providers: [client_service_1.ClientService],
-            exports: [typeorm_1.TypeOrmModule]
+            exports: [client_service_1.ClientService, typeorm_1.TypeOrmModule]
         })
     ], ClientModule);
     return ClientModule;

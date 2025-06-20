@@ -19,7 +19,7 @@ import { updateProforma } from "../../../redux/features/commande/commandeSlice";
 // Interfaces pour les données externes
 interface Prix {
   id: number;
-  montant: number;
+  prix: number;
 }
 
 interface Region {
@@ -29,9 +29,9 @@ interface Region {
 
 // Interface pour les props du composant
 interface EditProformaItemProps {
-  item: any; // L'item de proforma à éditer
-  onSave: (updatedItem: any) => void; // Callback appelé après sauvegarde réussie
-  onClose: () => void; // Callback appelé pour fermer le formulaire
+  item: any;
+  onSave: (updatedItem: any) => void;
+  onClose: () => void;
 }
 
 const EditProformaItem: React.FC<EditProformaItemProps> = ({
@@ -42,10 +42,12 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
   const dispatch = useDispatch<AppDispatch>();
 
   const [prixList, setPrixList] = useState<Prix[]>([]);
-  const [regionList, setRegionList] = useState<Region[]>([]); // Renommé pour éviter la confusion avec 'region'
+  const [regionList, setRegionList] = useState<Region[]>([]);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  ); // New state for snackbar severity
   const [loading, setLoading] = useState(false);
 
   // État du formulaire, adapté pour correspondre au DTO backend
@@ -77,9 +79,27 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
         console.log("Régions chargées :", response.data);
       } catch (error) {
         console.error("Erreur lors du chargement des régions :", error);
+        setSnackbarMessage("Erreur lors du chargement des régions.");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       }
     };
     fetchRegions();
+  }, []);
+  useEffect(() => {
+    const fetchPrix = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/prixs");
+        setPrixList(response.data);
+        console.log("Prix chargés :", response.data);
+      } catch (error) {
+        console.error("Erreur lors du chargement des prix :", error);
+        setSnackbarMessage("Erreur lors du chargement des prix.");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    };
+    fetchPrix();
   }, []);
 
   // Effet pour calculer le nombre de jours lorsque les dates changent
@@ -89,10 +109,11 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
         setSnackbarMessage(
           "La date de retour doit être postérieure à la date de départ."
         );
+        setSnackbarSeverity("error");
         setSnackbarOpen(true);
-        setLoading(false); // Réinitialise le chargement si erreur
-        setNombreJours(0); // Réinitialise le nombre de jours
-        setSubTotal(0); // Réinitialise le sous-total
+        setLoading(false);
+        setNombreJours(0);
+        setSubTotal(0);
         return;
       }
 
@@ -109,21 +130,18 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
   // Effet pour mettre à jour le sous-total lorsque le prix ou le nombre de jours changent
   useEffect(() => {
     if (formData.prixId && nombreJours > 0) {
-      // S'assurer que nombreJours est positif
-      const prix = prixList.find(
-        (p) => p.id === Number(formData.prixId)
-      )?.montant;
+      const prix = prixList.find((p) => p.id === Number(formData.prixId))?.prix;
 
       if (prix) {
         const total = nombreJours * prix;
         setSubTotal(total);
       } else {
-        setSubTotal(0); // Réinitialiser si le prix n'est pas trouvé
+        setSubTotal(0);
       }
     } else {
-      setSubTotal(0); // Réinitialiser si prixId ou nombreJours n'est pas valide
+      setSubTotal(0);
     }
-  }, [formData.prixId, nombreJours, prixList]); // Dépendance à prixList pour s'assurer que les prix sont chargés
+  }, [formData.prixId, nombreJours, prixList]);
 
   // Gestionnaire de changement pour les champs de texte
   const handleChange = (
@@ -131,10 +149,9 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
   ) => {
     const { name, value } = e.target;
     if (name === "vehicleId") {
-      // Gérer vehicleId qui fait partie de vehicleCriteria
       setFormData((prev) => ({
         ...prev,
-        vehicleCriteria: { id: value }, // Mettre à jour l'objet vehicleCriteria
+        vehicleCriteria: { id: value },
       }));
     } else {
       setFormData((prev) => ({
@@ -173,16 +190,20 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
       );
 
       onSave(response.data);
-      setOpenSnackbar(true);
+      setSnackbarMessage("Proforma modifié avec succès !");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
       onClose();
     } catch (error: any) {
       console.error("Erreur lors de l’enregistrement :", error);
       setSnackbarMessage(
-        error?.response?.data?.message || "Erreur lors de la mise à jour."
+        error?.response?.data?.message ||
+          "Une erreur est survenue lors de la modification du proforma."
       );
-      setSnackbarOpen(true); // Afficher le snackbar d'erreur
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     } finally {
-      setLoading(false); // Désactiver l'état de chargement
+      setLoading(true);
     }
   };
 
@@ -214,7 +235,7 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
             name="clientId"
             type="number"
             fullWidth
-            value={formData.clientId.id}
+            value={formData.clientId}
             onChange={handleChange}
             variant="outlined"
             size="small"
@@ -236,7 +257,6 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          {/* Champ pour le nom de la région, car le DTO attend 'regionName' */}
           <TextField
             label="Nom de la Région"
             name="regionName"
@@ -246,11 +266,30 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
             variant="outlined"
             size="small"
             className="rounded-md"
-            select // Utiliser un select pour les régions existantes
+            select
           >
             {regionList.map((region) => (
               <MenuItem key={region.id} value={region.nom_region}>
-                {region.nom_region}
+                {region.nom_region} {region.prix.prix}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Prix"
+            name="prixId"
+            fullWidth
+            select
+            value={formData.prixId}
+            onChange={handleChange}
+            variant="outlined"
+            size="small"
+            className="rounded-md"
+          >
+            {prixList.map((prix) => (
+              <MenuItem key={prix.id} value={prix.id}>
+                {prix.prix}
               </MenuItem>
             ))}
           </TextField>
@@ -259,8 +298,16 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
           <DatePicker
             label="Date de départ"
             value={dateDepart}
-            onChange={(value) => setDateDepart(value ? value.toDate() : null)}
-            className="w-full" // Tailwind class for full width
+            onChange={(value) =>
+              setDateDepart(
+                value
+                  ? typeof value === "object" && "toDate" in value
+                    ? (value as any).toDate()
+                    : (value as Date)
+                  : null
+              )
+            }
+            className="w-full"
             slotProps={{
               textField: {
                 size: "small",
@@ -274,8 +321,16 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
           <DatePicker
             label="Date de retour"
             value={dateRetour}
-            onChange={(value) => setDateRetour(value ? value.toDate() : null)}
-            className="w-full" // Tailwind class for full width
+            onChange={(value) =>
+              setDateRetour(
+                value
+                  ? typeof value === "object" && "toDate" in value
+                    ? (value as any).toDate()
+                    : (value as Date)
+                  : null
+              )
+            }
+            className="w-full"
             slotProps={{
               textField: {
                 size: "small",
@@ -332,34 +387,15 @@ const EditProformaItem: React.FC<EditProformaItemProps> = ({
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
-        // Change this: if the user clicks outside or on the close icon, it should close
         onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          severity="error"
-          // Change this: if the user clicks the close icon on the alert itself
           onClose={() => setSnackbarOpen(false)}
-          className="rounded-md"
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
         >
           {snackbarMessage}
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        // Change this: if the user clicks outside or on the close icon, it should close
-        onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          severity="success"
-          // Change this: if the user clicks the close icon on the alert itself
-          onClose={() => setOpenSnackbar(false)}
-          className="rounded-md"
-        >
-          La modification a bien été enregistrée !
         </Alert>
       </Snackbar>
     </Paper>

@@ -85,6 +85,29 @@ var PrixsService = /** @class */ (function () {
             });
         });
     };
+    PrixsService.prototype.getTotalRevenueFromRegionPrices = function () {
+        return __awaiter(this, void 0, Promise, function () {
+            var result, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.prixsRepository
+                                .createQueryBuilder('prix')
+                                .select('SUM(prix.prix)', 'totalRevenue')
+                                .getRawOne()];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, parseFloat(result === null || result === void 0 ? void 0 : result.totalRevenue) || 0];
+                    case 2:
+                        error_1 = _a.sent();
+                        console.error('Erreur lors du calcul du revenu total par région :', error_1);
+                        throw error_1;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
     PrixsService = __decorate([
         common_1.Injectable(),
         __param(0, typeorm_1.InjectRepository(prix_entity_1.Prix))

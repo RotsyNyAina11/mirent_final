@@ -13,13 +13,45 @@ import { PrixsModule } from './prixs/prixs.module';
 import { ClientModule } from './client/client.module';
 import { ProformaModule } from './proforma/proforma.module';
 import { MailerModule } from './mailer/mailer.module';
-import { DevisController } from './devis/devis.controller';
 import { DevisModule } from './devis/devis.module';
-
+import { ReservationModule } from './reservation/reservation.module';
+import { Reservation } from './entities/reservation.entity';
+import { Vehicule } from './entities/vehicle.entity';
+import { Region } from './entities/region.entity';
+import { Status } from './entities/status.entity';
+import { Type } from './entities/type.entity';
+import { Prix } from './entities/prix.entity';
+import { Client } from './entities/client.entity';
+import { Proforma } from './entities/proforma.entity';
+import { Devis } from './entities/devis.entity';
+import { ProformaItem } from './entities/proformat-item.entity';
+import { UtilisateurController } from './utilisateur/utilisateur.controller';
+import { UtilisateurModule } from './utilisateur/utilisateur.module';
+import { Utilisateur } from './entities/utilisateur.entity';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { Notification } from './entities/notifications.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(typeOrmConfig),
+    ScheduleModule.forRoot(),
+    TypeOrmModule.forRoot({
+      ...typeOrmConfig,
+      entities: [
+        Reservation,
+        Vehicule,
+        Region,
+        Status,
+        Type,
+        Prix,
+        Client,
+        Proforma,
+        ProformaItem,
+        Devis,
+        Utilisateur,
+        Notification,
+      ],
+    }),
     AuthModule,
     VehiclesModule,
     TypeModule,
@@ -35,7 +67,10 @@ import { DevisModule } from './devis/devis.module';
     ProformaModule,
     MailerModule,
     DevisModule,
+    ReservationModule,
+    UtilisateurModule,
+    NotificationsModule,
   ],
-  controllers: [DevisController],
+  controllers: [UtilisateurController],
 })
 export class AppModule {}

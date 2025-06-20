@@ -29,9 +29,11 @@ import {
   useMediaQuery,
   Toolbar,
 } from "@mui/material";
-import { ThemeProvider } from "@mui/material/styles";
-import { styled } from "@mui/material/styles";
+
 import { Delete, SearchOutlined, Edit, Add, DirectionsCar, LocalShipping, TwoWheeler, FilterList } from "@mui/icons-material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
+
 import { useAppDispatch } from "../../../hooks";
 import {
   deleteVehicle,
@@ -45,7 +47,78 @@ import {
 import EditVehicle from "./EditVehicles";
 import AddVehicle from "./AddVehicles";
 
-// Styles personnalisés avec ajustements responsive
+
+// Thème personnalisé (identique à LocationList.tsx)
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#3b82f6",
+    },
+    secondary: {
+      main: "#ef4444",
+    },
+    background: {
+      default: "#f9fafb",
+    },
+    text: {
+      primary: "#1f2937",
+      secondary: "#6b7280",
+    },
+  },
+  typography: {
+    fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
+    h5: {
+      fontWeight: 600,
+      color: "#1f2937",
+    },
+    body1: {
+      fontSize: "0.9rem",
+      color: "#1f2937",
+    },
+    body2: {
+      fontSize: "0.85rem",
+      color: "#6b7280",
+    },
+  },
+  components: {
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          padding: "12px 16px",
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          borderRadius: "8px",
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-root": {
+            borderRadius: "8px",
+            "& fieldset": {
+              borderColor: "#d1d5db",
+            },
+            "&:hover fieldset": {
+              borderColor: "#9ca3af",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#3b82f6",
+            },
+          },
+        },
+      },
+    },
+  },
+});
+
+// Styles personnalisés (alignés avec LocationList.tsx)
+
 const PrimaryButton = styled(Button)(({ theme }) => ({
   backgroundColor: "#3b82f6",
   color: theme.palette.common.white,
@@ -206,6 +279,21 @@ const VehiclesList: React.FC = () => {
       return false;
     }
   };
+
+  // Gestion de la sélection des véhicules
+  const handleSelectAllVehicles = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.checked) {
+      const newSelected = paginatedVehicles.map(
+        (vehicle: Vehicle) => vehicle.id
+      );
+      setSelectedVehicles(newSelected);
+    } else {
+      setSelectedVehicles([]);
+    }
+  };
+
 
   const handleSelectVehicle = (id: number) => {
     setSelectedVehicles((prev) =>
@@ -780,10 +868,9 @@ const VehiclesList: React.FC = () => {
           {showAddVehicle && (
             <AddVehicle
               open={showAddVehicle}
-              onClose={() => setShowAddVehicle(false)}
-              vehicleId={0}
-              currentStatus=""
-            />
+
+              onClose={() => setShowAddVehicle(false)} vehicleId={0} currentStatus={""}            />
+
           )}
         </Grid>
       </Box>

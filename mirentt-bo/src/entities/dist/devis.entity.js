@@ -9,43 +9,47 @@ exports.__esModule = true;
 exports.Devis = void 0;
 var typeorm_1 = require("typeorm");
 var client_entity_1 = require("./client.entity");
-// import { User } from './user.entity';
-var devis_item_entity_1 = require("./devis-item.entity");
 var Devis = /** @class */ (function () {
     function Devis() {
     }
     __decorate([
-        typeorm_1.PrimaryGeneratedColumn()
+        typeorm_1.PrimaryGeneratedColumn('uuid')
     ], Devis.prototype, "id");
     __decorate([
-        typeorm_1.Column()
-    ], Devis.prototype, "dateCreation");
-    __decorate([
-        typeorm_1.Column({ unique: true })
-    ], Devis.prototype, "numeroDevis");
-    __decorate([
-        typeorm_1.ManyToOne(function () { return client_entity_1.Client; }, function (client) { return client.devis; }, { nullable: true })
-    ], Devis.prototype, "client");
-    __decorate([
-        typeorm_1.OneToMany(function () { return devis_item_entity_1.DevisItem; }, function (item) { return item.devis; }, { cascade: true })
+        typeorm_1.Column({ type: 'jsonb', nullable: true })
     ], Devis.prototype, "items");
     __decorate([
-        typeorm_1.Column('decimal', { precision: 10, scale: 2, nullable: true })
-    ], Devis.prototype, "prixCarburant");
+        typeorm_1.Column({ type: 'date' })
+    ], Devis.prototype, "startDate");
     __decorate([
-        typeorm_1.Column('decimal', { precision: 10, scale: 2 })
-    ], Devis.prototype, "prixTotal");
+        typeorm_1.Column({ type: 'date' })
+    ], Devis.prototype, "endDate");
     __decorate([
-        typeorm_1.Column({ nullable: true })
-    ], Devis.prototype, "remarque");
+        typeorm_1.Column({ "default": false })
+    ], Devis.prototype, "includesFuel");
+    __decorate([
+        typeorm_1.Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+    ], Devis.prototype, "fuelCostPerDay");
+    __decorate([
+        typeorm_1.Column({ type: 'decimal', precision: 10, scale: 2, "default": 0 })
+    ], Devis.prototype, "totalAmount");
+    __decorate([
+        typeorm_1.Column({ "default": 'pending' })
+    ], Devis.prototype, "status");
     __decorate([
         typeorm_1.CreateDateColumn()
     ], Devis.prototype, "createdAt");
     __decorate([
         typeorm_1.UpdateDateColumn()
     ], Devis.prototype, "updatedAt");
+    __decorate([
+        typeorm_1.ManyToOne(function () { return client_entity_1.Client; }, function (client) { return client.devis; })
+    ], Devis.prototype, "client");
+    __decorate([
+        typeorm_1.Column()
+    ], Devis.prototype, "clientId");
     Devis = __decorate([
-        typeorm_1.Entity()
+        typeorm_1.Entity('devis')
     ], Devis);
     return Devis;
 }());

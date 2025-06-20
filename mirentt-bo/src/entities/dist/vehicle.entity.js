@@ -10,6 +10,7 @@ exports.Vehicule = void 0;
 var typeorm_1 = require("typeorm");
 var type_entity_1 = require("./type.entity");
 var status_entity_1 = require("./status.entity");
+var reservation_entity_1 = require("./reservation.entity");
 var Vehicule = /** @class */ (function () {
     function Vehicule() {
     }
@@ -40,6 +41,9 @@ var Vehicule = /** @class */ (function () {
     __decorate([
         typeorm_1.Column({ type: 'varchar', nullable: true })
     ], Vehicule.prototype, "imageUrl");
+    __decorate([
+        typeorm_1.OneToMany(function () { return reservation_entity_1.Reservation; }, function (reservation) { return reservation.vehicle; })
+    ], Vehicule.prototype, "reservations");
     Vehicule = __decorate([
         typeorm_1.Entity()
     ], Vehicule);

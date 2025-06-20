@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Prix } from 'src/entities/prix.entity';
 import { Region } from 'src/entities/region.entity';
@@ -10,7 +10,7 @@ import { CreateRegionDto } from './create-region.dto';
 export class RegionService {
   constructor(
     @InjectRepository(Region)
-    private regionRepository: Repository<Region>,
+    public regionRepository: Repository<Region>,
     @InjectRepository(Prix)
     private prixRepository: Repository<Prix>,
   ) {}
@@ -111,5 +111,23 @@ export class RegionService {
       await this.prixRepository.remove(region.prix);
     }
     await this.regionRepository.remove(region);
+  }
+  /* async findByName(name: string): Promise<Region> {
+    const region = await this.regionRepository.findOneBy({ nom_region: name });
+    if (!region) {
+      throw new NotFoundException(`Region '${name}' not found.`);
+    }
+    return region;
+  }*/
+  async findByName(regionName: string): Promise<Region | undefined> {
+    const region = await this.regionRepository.findOne({
+      where: { nom_region: regionName },
+      relations: ['prix'], // <--- Cette ligne est CRUCIALE dans RegionService.findByName !!
+    });
+    console.log(
+      'Region loaded in findByName (should be in RegionService):',
+      JSON.stringify(region, null, 2),
+    );
+    return region ?? undefined;
   }
 }

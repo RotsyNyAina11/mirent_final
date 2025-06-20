@@ -186,6 +186,30 @@ var RegionService = /** @class */ (function () {
             });
         });
     };
+    /* async findByName(name: string): Promise<Region> {
+      const region = await this.regionRepository.findOneBy({ nom_region: name });
+      if (!region) {
+        throw new NotFoundException(`Region '${name}' not found.`);
+      }
+      return region;
+    }*/
+    RegionService.prototype.findByName = function (regionName) {
+        return __awaiter(this, void 0, Promise, function () {
+            var region;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.regionRepository.findOne({
+                            where: { nom_region: regionName },
+                            relations: ['prix']
+                        })];
+                    case 1:
+                        region = _a.sent();
+                        console.log('Region loaded in findByName (should be in RegionService):', JSON.stringify(region, null, 2));
+                        return [2 /*return*/, region !== null && region !== void 0 ? region : undefined];
+                }
+            });
+        });
+    };
     RegionService = __decorate([
         common_1.Injectable(),
         __param(0, typeorm_1.InjectRepository(region_entity_1.Region)),

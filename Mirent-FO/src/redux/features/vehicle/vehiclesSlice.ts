@@ -243,11 +243,11 @@ const vehiclesSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchVehicles.pending, (state) => {
-        state.vehiclesTypeLoading = true;
-        state.vehiclesTypeError = null;
+        state.vehiclesLoading = true; // Correction
+        state.vehiclesError = null; // Correction
       })
       .addCase(fetchVehicles.fulfilled, (state, action) => {
-        state.vehiclesTypeLoading = false;
+        state.vehiclesLoading = false; // Correction
         state.vehicles = action.payload;
       })
       .addCase(updateVehicleType.fulfilled, (state, action) => {
@@ -259,9 +259,9 @@ const vehiclesSlice = createSlice({
         }
       })
       .addCase(fetchVehicles.rejected, (state, action) => {
-        state.vehiclesTypeLoading = false;
-        state.vehiclesTypeError = action.payload as string;
-        console.error("Error fetching vehicle types:", action.payload);
+        state.vehiclesLoading = false; // Correction
+        state.vehiclesError = action.payload as string; // Correction
+        console.error("Error fetching vehicles:", action.payload); // Correction du message
       })
       .addCase(createVehicle.rejected, (state, action) => {
         console.error("Failed to create vehicle:", action.payload);
@@ -273,13 +273,9 @@ const vehiclesSlice = createSlice({
       .addCase(updateVehicle.fulfilled, (state, action) => {
         state.loading = false;
         console.log("API response:", action.payload);
-        state.vehicles = state.vehicles.map((vehicle) => {
-          if (vehicle.id === action.payload.id) {
-            console.log("Updated vehicle:", action.payload);
-            return action.payload;
-          }
-          return vehicle;
-        });
+        state.vehicles = state.vehicles.map((vehicle) =>
+          vehicle.id === action.payload.id ? action.payload : vehicle
+        );
         console.log("Updated state:", state.vehicles);
       })
       .addCase(updateVehicle.rejected, (state, action) => {
@@ -292,6 +288,10 @@ const vehiclesSlice = createSlice({
         state.vehicles = state.vehicles.filter(
           (vehicle) => vehicle.id !== action.payload
         );
+      })
+      .addCase(fetchVehicleTypes.pending, (state) => {
+        state.vehiclesTypeLoading = true;
+        state.vehiclesTypeError = null;
       })
       .addCase(fetchVehicleTypes.fulfilled, (state, action) => {
         state.vehiclesTypeLoading = false;

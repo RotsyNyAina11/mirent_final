@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  OneToMany,
+} from 'typeorm';
 import { Prix } from './prix.entity';
+import { Reservation } from './reservation.entity';
 
 @Entity()
 export class Region {
@@ -11,7 +18,9 @@ export class Region {
 
   @Column({ nullable: true })
   nom_district?: string;
-
-  @OneToOne(() => Prix, (prix) => prix.region)
+  @OneToOne(() => Prix, (prix) => prix.region, { eager: false })
   prix: Prix;
+
+  @OneToMany(() => Reservation, (reservation) => reservation.pickupRegion)
+  reservations: Reservation[];
 }

@@ -8,24 +8,31 @@ import "react-toastify/dist/ReactToastify.css";
 
 import MainLayout from "../layouts/MainLayouts";
 import Devis from "../admin/pages/Devis/DevisPage";
-import ProformaPage from "../admin/pages/proforma/proformaPage";
 import Commande from "../admin/pages/commande/CommandePage";
 import LocationsPage from "../admin/pages/lieux/locationPage";
-import ContratPage from "../admin/pages/contrat/contratPage";
+import Home from "../admin/pages/acceuil/HomePage";
 import Vehicule from "../admin/pages/vehicules/vehiculePage";
 import Types from "../admin/pages/Types/type";
 import ClientPage from "../admin/pages/clients/ClientPage";
 import ClientDetailPage from "../admin/pages/ClientDetailPage/clientdetailPage";
-import Home from "../admin/pages/acceuil/HomePage";
+import ProformaList from "../admin/pages/commande/ProformaList";
+import UserProfile from "../Components/profile/userProfile";
+import ContratPage from "../admin/pages/contrat/contratPage";
 import ContactPage from "../admin/pages/Contact/ContactPage";
-import ProformaList from "../admin/pages/proforma/ProformaList";
-//import ReservationPage from "./pages/proforma/proformaPage";
-//import ProformaPage from "./pages/proforma/proformaPage";
+import QuoteForm from "../admin/pages/Quote/quoteForm";
 
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/admin/home" />} />
+      <Route path="/" element={<Navigate to="home" />} />
+      <Route
+        path="home"
+        element={
+          <MainLayout>
+            <Home />
+          </MainLayout>
+        }
+      />
 
       {/* Route pour l'accueil avec Sidebar */}
       <Route
@@ -43,6 +50,15 @@ const AdminRoutes = () => {
         element={
           <MainLayout>
             <Vehicule />
+          </MainLayout>
+        }
+      />
+
+      <Route
+        path="createCommande"
+        element={
+          <MainLayout>
+            <QuoteForm />
           </MainLayout>
         }
       />
@@ -76,15 +92,6 @@ const AdminRoutes = () => {
         }
       />
 
-      {/* Route pour la page de Performat sur la commande */}
-      <Route
-        path="proformat"
-        element={
-          <MainLayout>
-            <ProformaPage />
-          </MainLayout>
-        }
-      />
       {/* Route pour la page de liste des proformas */}
       <Route
         path="/proformat/liste"
@@ -94,12 +101,12 @@ const AdminRoutes = () => {
           </MainLayout>
         }
       />
-
+      {/* Route pour la page sur la commande */}
       <Route
-        path="/proformas"
+        path="/proformat/nouveau"
         element={
           <MainLayout>
-            <ProformaPage />
+            <Commande />
           </MainLayout>
         }
       />
@@ -114,21 +121,21 @@ const AdminRoutes = () => {
         }
       />
 
+      <Route
+        path="profile"
+        element={
+          <MainLayout>
+            <UserProfile />
+          </MainLayout>
+        }
+      />
+
       {/* Route pour la page des lieux */}
       <Route
         path="lieux"
         element={
           <MainLayout>
             <LocationsPage />
-          </MainLayout>
-        }
-      />
-      {/* Route pour la page sur la commande */}
-      <Route
-        path="/proformat/nouveau"
-        element={
-          <MainLayout>
-            <Commande />
           </MainLayout>
         }
       />
@@ -151,6 +158,8 @@ const AdminRoutes = () => {
           </MainLayout>
         }
       />
+      {/* Route pour deconnecter*/}
+      <Route path="logout" />
     </Routes>
   );
 };

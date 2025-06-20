@@ -1,5 +1,5 @@
 import { Container, Grid } from "@mui/material";
-import VehicleTypes from "../../../admin/Components/Types/Types";
+import VehicleTypes from "../../Components/types/Types";
 
 const Types: React.FC = () => {
   return (

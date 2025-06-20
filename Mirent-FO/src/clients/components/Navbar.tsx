@@ -23,7 +23,36 @@ import logo from "../../assets/horizontal.png";
 import illustration from "../../assets/horizontal.png";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { motion } from "framer-motion";
+
+const popoverVariants = {
+  hidden: {
+    opacity: 0,
+    y: 30,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 15,
+    },
+  },
+};
+
+const buttonVariants = {
+  hover: {
+    scale: 1.05,
+    transition: {
+      duration: 0.3,
+    },
+  },
+  tap: {
+    scale: 0.95,
+  },
+};
 
 const navItems = [
   { label: "Accueil", path: "/acceuil" },
@@ -413,7 +442,7 @@ const Navbar: React.FC = () => {
             />
             <Stack spacing={1}>
               {[
-                { label: "Mes réservations", path: "/reservations" },
+                { label: "Mes réservations", path: "/reservations-list" },
                 { label: "Mon profil", path: "/profile" },
               ].map((item) => (
                 <motion.div
@@ -436,6 +465,7 @@ const Navbar: React.FC = () => {
                 </motion.div>
               ))}
               <Divider />
+
               <motion.div
                 variants={buttonVariants}
                 whileHover="hover"

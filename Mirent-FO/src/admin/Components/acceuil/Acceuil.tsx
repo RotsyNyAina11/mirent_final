@@ -150,37 +150,53 @@ const CancelButton = styled(IconButton)(({ theme }) => ({
 // Interfaces pour les données
 interface Booking {
   id: number;
+  quoteNumber: string;
   client: string;
   car: string;
+  destination: string;
   startDate: string;
   endDate: string;
-  status: "En cours" | "Confirmé" | "En attente";
+  expirationDate: string;
+  status: "En attente" | "En cours" | "Confirmé";
+  totalPrice: number;
 }
 
 const recentBookings: Booking[] = [
   {
     id: 1,
+    quoteNumber: "DEV-123456",
     client: "Antoine Dupont",
     car: "Peugeot 3008",
+    destination: "Tour de ville",
     startDate: "24/03/2025",
     endDate: "26/03/2025",
+    expirationDate: "23/04/2025",
     status: "En cours",
+    totalPrice: 600000,
   },
   {
     id: 2,
+    quoteNumber: "DEV-123457",
     client: "Marie Leclerc",
     car: "Renault Captur",
+    destination: "Évasion en montagne",
     startDate: "25/03/2025",
     endDate: "28/03/2025",
+    expirationDate: "24/04/2025",
     status: "Confirmé",
+    totalPrice: 900000,
   },
   {
     id: 3,
+    quoteNumber: "DEV-123458",
     client: "Pierre Bernard",
     car: "Citroën C4",
+    destination: "Conduite côtière",
     startDate: "26/03/2025",
     endDate: "29/03/2025",
+    expirationDate: "25/04/2025",
     status: "En attente",
+    totalPrice: 720000,
   },
 ];
 
@@ -207,6 +223,10 @@ const Accueil: React.FC = () => {
   const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>(recentBookings);
+
+  const [totalRevenue, setTotalRevenue] = useState<null | number>(null);
+  const [loadingRevenue, setLoadingRevenue] = useState(true);
+  const [errorRevenue, setErrorRevenue] = useState<string | null>(null);
 
   // Récupérer les véhicules via Redux
   useEffect(() => {
@@ -267,16 +287,25 @@ const Accueil: React.FC = () => {
 
   //recuperer le prix total
   useEffect(() => {
-    const fetchPrixCount = async () => {
+    const fetchTotalRevenue = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/prixs/count");
-        setAvailablePrixCount(response.data);
+        setLoadingRevenue(true);
+        const response = await axios.get(
+          "http://localhost:3000/prixs/total-revenue-from-regions"
+        );
+        setTotalRevenue(response.data);
       } catch (error) {
-        console.error("Erreur lors du chargement du nombre de prix", error);
+        console.error(
+          "Erreur lors du chargement du revenu total des régions :",
+          error
+        );
+        setErrorRevenue("Impossible de charger le revenu total.");
+      } finally {
+        setLoadingRevenue(false);
       }
     };
 
-    fetchPrixCount();
+    fetchTotalRevenue();
   }, []);
 
   // Fonctions pour les actions du tableau
@@ -446,9 +475,16 @@ const Accueil: React.FC = () => {
                 fontSize={isMobile ? "1.2rem" : "1.5rem"}
                 color="#1f2937"
               >
-                {typeof availablePrixCount === "number"
-                  ? `${availablePrixCount.toLocaleString("fr-FR")} Ar`
-                  : "Chargement..."}
+                {loadingRevenue
+                  ? "Chargement..."
+                  : errorRevenue
+                  ? "Erreur"
+                  : typeof totalRevenue === "number"
+                  ? `${totalRevenue.toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })} Ar`
+                  : "N/A"}
               </Typography>
             </DashboardCard>
           </Grid>

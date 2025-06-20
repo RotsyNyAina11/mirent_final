@@ -10,21 +10,20 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  CircularProgress,
-  Alert,
 } from "@mui/material";
-import moment from "moment"; // Pour formater les dates, assurez-vous de l'installer: npm install moment
-import { Prix } from "../../../types/region";
+import moment from "moment";
 
-// Interface pour un item de contrat (basée sur ProformaItem ou une entité de contrat)
+interface Prix {
+  valeur: number;
+}
+
 interface ContractItem {
   id: number; // N° Demande
   proforma?: {
-    // Assurez-vous que cette relation est chargée
-    id: number; // N° Proforma
+    id: number;
+    proformaNumber: number;
   };
   vehicle?: {
-    // Assurez-vous que cette relation est chargée
     marque: string;
     modele: string;
     immatriculation: string;
@@ -33,86 +32,86 @@ interface ContractItem {
     status: string;
   };
   region?: {
-    // Assurez-vous que cette relation est chargée
-    nom_region: string; // Destination
+    nom_region: string;
   };
   nombreJours: number;
-  dateDepart: string; // Ou Date, si vous traitez des objets Date directement
+  dateDepart: string;
   dateRetour: string;
-  dateVisite?: string; // Optionnel
-  kmEstimatif?: number; // Optionnel
+  dateVisite?: string;
+  kmEstimatif?: number;
   prix?: {
-    // Assurez-vous que cette relation est chargée
-    prix: Prix; // Prix unitaire
+    prix: number;
   };
-  prixCarburant?: number; // Optionnel
-  subTotal: number; // Total Net
+  prixCarburant?: number;
+  subTotal: number;
 }
 
 interface ContractDetailsProps {
   clientId: number;
+  onLoadingChange: (isLoading: boolean) => void;
+  onError: (errorMessage: string | null) => void;
+  onNoContracts: (hasNoContracts: boolean) => void;
 }
 
-const ContractDetails: React.FC<ContractDetailsProps> = ({ clientId }) => {
+const ContractDetails: React.FC<ContractDetailsProps> = ({
+  clientId,
+  onLoadingChange,
+  onError,
+  onNoContracts,
+}) => {
   const [contractItems, setContractItems] = useState<ContractItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchContractItems = async () => {
+      // Vérifier si les fonctions de rappel sont définies avant de les appeler
+      if (onLoadingChange) onLoadingChange(true);
+      if (onError) onError(null);
+      if (onNoContracts) onNoContracts(false);
       setLoading(true);
       setError(null);
+
       try {
-        // Cet endpoint doit être implémenté sur votre backend.
-        // Il devrait retourner tous les ProformaItems associés à un client.
         const response = await axios.get(
           `http://localhost:3000/clients/${clientId}/proforma-items`
         );
-        setContractItems(response.data);
+        const fetchedItems = response.data;
+        setContractItems(fetchedItems);
+
+        if (fetchedItems.length === 0) {
+          if (onNoContracts) onNoContracts(true);
+        }
       } catch (err) {
         console.error(
           `Erreur lors du chargement des items de contrat pour le client ${clientId}:`,
           err
         );
-        setError("Impossible de charger les détails des contrats.");
+        const errorMessage = "Impossible de charger les détails des contrats.";
+        setError(errorMessage);
+        if (onError) onError(errorMessage);
       } finally {
         setLoading(false);
+        if (onLoadingChange) onLoadingChange(false);
       }
     };
 
+    // Assurez-vous que clientId est valide avant de lancer la requête
     if (clientId) {
       fetchContractItems();
     } else {
-      setContractItems([]); // Réinitialiser si pas de client sélectionné
+      // Si clientId est null ou 0, réinitialisez l'état
+      setContractItems([]);
       setLoading(false);
+      if (onLoadingChange) onLoadingChange(false);
+      setError(null);
+      if (onError) onError(null);
+      if (onNoContracts) onNoContracts(true);
     }
-  }, [clientId]);
+  }, [clientId, onLoadingChange, onError, onNoContracts]);
 
-  if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
-        <CircularProgress />
-        <Typography sx={{ ml: 2 }}>Chargement des contrats...</Typography>
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert severity="error" sx={{ m: 3 }}>
-        {error}
-      </Alert>
-    );
-  }
-
-  if (contractItems.length === 0) {
-    return (
-      <Paper elevation={2} sx={{ p: 3, textAlign: "center" }}>
-        <Typography variant="h6" color="text.secondary">
-          Aucun contrat trouvé pour ce client.
-        </Typography>
-      </Paper>
-    );
+  if (loading || error || contractItems.length === 0) {
+    return null;
   }
 
   return (
@@ -128,12 +127,12 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({ clientId }) => {
               <TableCell>N° Proforma</TableCell>
               <TableCell>Véhicule</TableCell>
               <TableCell>Destination</TableCell>
-              <TableCell>Nb. Jours</TableCell>
-              <TableCell>Date Départ</TableCell>
-              <TableCell>Date Arrivée</TableCell>
+              <TableCell>Jours</TableCell>
+              <TableCell>D.Départ</TableCell>
+              <TableCell>D.Arrivée</TableCell>
               <TableCell>Date Visite</TableCell>
               <TableCell>Km Estimatif</TableCell>
-              <TableCell>Prix Unitaire</TableCell>
+              <TableCell>Prix U</TableCell>
               <TableCell>Prix Carburant</TableCell>
               <TableCell>Total Net</TableCell>
             </TableRow>
@@ -142,7 +141,7 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({ clientId }) => {
             {contractItems.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{item.id}</TableCell>
-                <TableCell>{item.proforma?.id || "N/A"}</TableCell>
+                <TableCell>{item.proforma?.proformaNumber || "N/A"}</TableCell>
                 <TableCell>{`${item.vehicle?.marque || ""} ${
                   item.vehicle?.modele || "N/A"
                 }`}</TableCell>
@@ -161,7 +160,9 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({ clientId }) => {
                 </TableCell>
                 <TableCell>{item.kmEstimatif || "N/A"}</TableCell>
                 <TableCell>
-                  {item.prix?.prix ? `${item.prix.prix} Ar` : "N/A"}
+                  {item.prix?.prix
+                    ? `${item.prix.prix.toLocaleString("fr-FR")} Ar`
+                    : "N/A"}
                 </TableCell>
                 <TableCell>
                   {item.prixCarburant

@@ -9,6 +9,6 @@ import { ProformaModule } from 'src/proforma/proforma.module';
   imports: [TypeOrmModule.forFeature([Client]), ProformaModule],
   controllers: [ClientController],
   providers: [ClientService],
-  exports: [TypeOrmModule],
+  exports: [ClientService, TypeOrmModule],
 })
 export class ClientModule {}

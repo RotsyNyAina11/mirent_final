@@ -27,4 +27,21 @@ export class PrixsService {
       relations: ['region'],
     });
   }
+
+  async getTotalRevenueFromRegionPrices(): Promise<number> {
+    try {
+      const result = await this.prixsRepository
+        .createQueryBuilder('prix')
+        .select('SUM(prix.prix)', 'totalRevenue')
+        .getRawOne();
+
+      return parseFloat(result?.totalRevenue) || 0;
+    } catch (error) {
+      console.error(
+        'Erreur lors du calcul du revenu total par région :',
+        error,
+      );
+      throw error;
+    }
+  }
 }

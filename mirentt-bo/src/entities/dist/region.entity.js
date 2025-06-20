@@ -9,6 +9,7 @@ exports.__esModule = true;
 exports.Region = void 0;
 var typeorm_1 = require("typeorm");
 var prix_entity_1 = require("./prix.entity");
+var reservation_entity_1 = require("./reservation.entity");
 var Region = /** @class */ (function () {
     function Region() {
     }
@@ -22,8 +23,11 @@ var Region = /** @class */ (function () {
         typeorm_1.Column({ nullable: true })
     ], Region.prototype, "nom_district");
     __decorate([
-        typeorm_1.OneToOne(function () { return prix_entity_1.Prix; }, function (prix) { return prix.region; })
+        typeorm_1.OneToOne(function () { return prix_entity_1.Prix; }, function (prix) { return prix.region; }, { eager: false })
     ], Region.prototype, "prix");
+    __decorate([
+        typeorm_1.OneToMany(function () { return reservation_entity_1.Reservation; }, function (reservation) { return reservation.pickupRegion; })
+    ], Region.prototype, "reservations");
     Region = __decorate([
         typeorm_1.Entity()
     ], Region);

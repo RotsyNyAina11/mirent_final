@@ -11,7 +11,7 @@ import { Vehicule } from './vehicle.entity';
 import { Proforma } from './proforma.entity';
 import { Region } from './region.entity';
 import { Prix } from './prix.entity';
-import { NumericTransformer } from '../numeric.transformer'; // Assurez-vous que le chemin est correct
+import { NumericTransformer } from '../numeric.transformer';
 
 @Entity()
 export class ProformaItem {

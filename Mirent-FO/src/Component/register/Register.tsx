@@ -12,38 +12,67 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import loginImage from "../../assets/2.jpg"; // Image d'illustration
-import logo from "../../assets/horizontal.png"; // Logo
+import loginImage from "../../assets/2.jpg";
+import logo from "../../assets/horizontal.png";
+import axios from "axios";
 
 const Register: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    setError(null);
+    setSuccess(null);
+
+    // Vérification côté client : champs requis
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      console.error("Tous les champs sont requis");
+      setError("Tous les champs sont requis.");
       return;
     }
+    // Vérification côté client : mots de passe correspondants
     if (password !== confirmPassword) {
-      console.error("Les mots de passe ne correspondent pas");
+      setError("Les mots de passe ne correspondent pas.");
       return;
     }
-    console.log(
-      "Prénom:",
-      firstName,
-      "Nom:",
-      lastName,
-      "Email:",
-      email,
-      "Mot de passe:",
-      password
-    );
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/utilisateur/register",
+        {
+          firstName,
+          lastName,
+          email,
+          password,
+          confirmPassword,
+        }
+      );
+      setSuccess(response.data.message || "Inscription réussie !");
+      console.log("Inscription réussie :", response.data);
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (err: any) {
+      // Gestion des erreurs de la requête API
+      if (err.response && err.response.data && err.response.data.message) {
+        // Erreur renvoyée par le backend (ex: email déjà utilisé, validation)
+        setError(err.response.data.message);
+      } else {
+        // Autres erreurs (problème réseau, serveur injoignable, etc.)
+        setError(
+          "Une erreur est survenue lors de l'inscription. Veuillez réessayer."
+        );
+      }
+      console.error("Erreur d'inscription:", err);
+    }
   };
 
   return (
@@ -126,6 +155,18 @@ const Register: React.FC = () => {
                 </Typography>
               </Box>
 
+              {/* Affichage des messages d'erreur et de succès */}
+              {error && (
+                <Typography color="error" textAlign="center" sx={{ mt: 2 }}>
+                  {error}
+                </Typography>
+              )}
+              {success && (
+                <Typography color="primary" textAlign="center" sx={{ mt: 2 }}>
+                  {success}
+                </Typography>
+              )}
+
               <Stack spacing={2}>
                 <TextField
                   label="Prénom"
@@ -134,6 +175,8 @@ const Register: React.FC = () => {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   size="small"
+                  error={!!error && error.includes("prénom")}
+                  helperText={error && error.includes("prénom") ? error : ""}
                 />
                 <TextField
                   label="Nom"
@@ -142,6 +185,8 @@ const Register: React.FC = () => {
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   size="small"
+                  error={!!error && error.includes("nom")}
+                  helperText={error && error.includes("nom") ? error : ""}
                 />
                 <TextField
                   label="Adresse Email"
@@ -150,6 +195,16 @@ const Register: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   size="small"
+                  error={
+                    !!error &&
+                    (error.includes("email") || error.includes("existe déjà"))
+                  }
+                  helperText={
+                    error &&
+                    (error.includes("email") || error.includes("existe déjà"))
+                      ? error
+                      : ""
+                  }
                 />
                 <TextField
                   label="Mot de passe"
@@ -158,6 +213,18 @@ const Register: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   size="small"
+                  error={
+                    !!error &&
+                    (error.includes("mot de passe") ||
+                      error.includes("correspondent pas"))
+                  }
+                  helperText={
+                    error &&
+                    (error.includes("mot de passe") ||
+                      error.includes("correspondent pas"))
+                      ? error
+                      : ""
+                  }
                 />
                 <TextField
                   label="Confirmer le mot de passe"
@@ -166,6 +233,12 @@ const Register: React.FC = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   size="small"
+                  error={!!error && error.includes("correspondent pas")}
+                  helperText={
+                    error && error.includes("correspondent pas")
+                      ? "Les mots de passe ne correspondent pas."
+                      : ""
+                  }
                 />
               </Stack>
 

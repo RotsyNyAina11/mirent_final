@@ -17,7 +17,7 @@ import { UpdateVehiculeDto } from './updateVehicule.dto';
 export class VehiclesService {
   constructor(
     @InjectRepository(Vehicule)
-    private readonly vehiculeRepository: Repository<Vehicule>,
+    public vehiculeRepository: Repository<Vehicule>,
     @InjectRepository(Type)
     private readonly typeRepository: Repository<Type>,
     @InjectRepository(Status)
@@ -138,7 +138,6 @@ export class VehiclesService {
 
     return result;
   }
-  // mettre à jour le status d'un véhicule par son nom
 
   // Cette méthode recherche le véhicule par son ID, puis met à jour son statut
 

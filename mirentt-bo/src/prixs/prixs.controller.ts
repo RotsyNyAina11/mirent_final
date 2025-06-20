@@ -9,14 +9,19 @@ export class PrixsController {
   getCount(): Promise<number> {
     return this.prixsService.getAvailableCountPrixs();
   }
-  // prix.controller.ts
+
   @Get()
   findAll() {
-    return this.prixsService.findAll(); // Assure-toi que ce service existe
+    return this.prixsService.findAll();
   }
 
   @Get('region/:id')
   findByRegion(@Param('id') id: number) {
     return this.prixsService.findByRegion(id);
+  }
+
+  @Get('total-revenue-from-regions')
+  async getTotalRevenueFromRegions() {
+    return this.prixsService.getTotalRevenueFromRegionPrices();
   }
 }

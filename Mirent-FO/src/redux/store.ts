@@ -9,6 +9,7 @@ import customersReducer from "./features/clients/customersSlice";
 import contractReducer from "./features/contrat/contratSlice";
 import proformasReducer from "./features/proforma/proformaSlice";
 import reservationReducer from "./features/reservation/reservationSlice";
+import fichebordReducer from "./features/ficheBord/ficheBordSlice";
 interface ProformaState {
   proformas: Proforma[];
   addProforma: (newProforma: Proforma) => void;
@@ -30,6 +31,7 @@ export const store = configureStore({
     contrat: contractReducer as any,
     proformas: proformasReducer,
     reservation: reservationReducer,
+    fichebord: fichebordReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

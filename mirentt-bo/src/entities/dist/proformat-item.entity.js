@@ -13,7 +13,7 @@ var vehicle_entity_1 = require("./vehicle.entity");
 var proforma_entity_1 = require("./proforma.entity");
 var region_entity_1 = require("./region.entity");
 var prix_entity_1 = require("./prix.entity");
-var numeric_transformer_1 = require("../numeric.transformer"); // Assurez-vous que le chemin est correct
+var numeric_transformer_1 = require("../numeric.transformer");
 var ProformaItem = /** @class */ (function () {
     function ProformaItem() {
     }

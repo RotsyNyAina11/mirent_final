@@ -271,12 +271,7 @@ var VehiclesService = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        statusNames = [
-                            'Disponible',
-                            'Indisponible',
-                            'Maintenance',
-                            'Réservé',
-                        ];
+                        statusNames = ['Disponible', 'Maintenance', 'Réservé'];
                         _i = 0, statusNames_1 = statusNames;
                         _a.label = 1;
                     case 1:
@@ -294,6 +289,56 @@ var VehiclesService = /** @class */ (function () {
                         _i++;
                         return [3 /*break*/, 1];
                     case 5: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    VehiclesService.prototype.removeIndisponibleStatus = function () {
+        return __awaiter(this, void 0, Promise, function () {
+            var indisponibleStatus, defaultStatus, vehicles, _i, vehicles_1, vehicle;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.statusRepository.findOneBy({
+                            status: 'Indisponible'
+                        })];
+                    case 1:
+                        indisponibleStatus = _a.sent();
+                        if (!indisponibleStatus) return [3 /*break*/, 9];
+                        return [4 /*yield*/, this.statusRepository.findOneBy({
+                                status: 'Disponible'
+                            })];
+                    case 2:
+                        defaultStatus = _a.sent();
+                        if (!defaultStatus) {
+                            throw new common_1.NotFoundException('Statut "Disponible" non trouvé pour la réaffectation.');
+                        }
+                        return [4 /*yield*/, this.vehiculeRepository.find({
+                                where: { status: { id: indisponibleStatus.id } },
+                                relations: ['status']
+                            })];
+                    case 3:
+                        vehicles = _a.sent();
+                        _i = 0, vehicles_1 = vehicles;
+                        _a.label = 4;
+                    case 4:
+                        if (!(_i < vehicles_1.length)) return [3 /*break*/, 7];
+                        vehicle = vehicles_1[_i];
+                        vehicle.status = defaultStatus;
+                        return [4 /*yield*/, this.vehiculeRepository.save(vehicle)];
+                    case 5:
+                        _a.sent();
+                        _a.label = 6;
+                    case 6:
+                        _i++;
+                        return [3 /*break*/, 4];
+                    case 7: 
+                    // Supprimer le statut "Indisponible"
+                    return [4 /*yield*/, this.statusRepository.remove(indisponibleStatus)];
+                    case 8:
+                        // Supprimer le statut "Indisponible"
+                        _a.sent();
+                        _a.label = 9;
+                    case 9: return [2 /*return*/];
                 }
             });
         });

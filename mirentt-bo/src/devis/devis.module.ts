@@ -12,9 +12,9 @@ import { VehiclesModule } from 'src/vehicles/vehicles.module';
     TypeOrmModule.forFeature([Devis]),
     RegionsModule,
     ClientModule,
-    VehiclesModule
+    VehiclesModule,
   ],
   providers: [DevisService],
-  controllers: [DevisController]
+  controllers: [DevisController],
 })
 export class DevisModule {}

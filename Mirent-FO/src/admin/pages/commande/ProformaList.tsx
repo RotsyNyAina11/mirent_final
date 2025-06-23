@@ -1,6 +1,6 @@
 import { Container, Grid } from "@mui/material";
 import React from "react";
-import ProformasList from "../../../admin/Components/Proforma/proformaList";
+import ProformasList from "../../Components/Commandes/ProformaList";
 
 const ProformaList: React.FC = () => {
   return (

@@ -1,31 +1,37 @@
-// src/devis/entities/devis.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+} from 'typeorm';
 import { Client } from './client.entity';
 
-@Entity('devis') 
+@Entity('devis')
 export class Devis {
-  @PrimaryGeneratedColumn('uuid') 
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'jsonb', nullable: true }) 
-  items: { description: string; quantity: number; unitPrice: number; }[];
+  @Column({ type: 'jsonb', nullable: true })
+  items: { description: string; quantity: number; unitPrice: number }[];
 
-  @Column({ type: 'date' }) 
+  @Column({ type: 'date' })
   startDate: Date;
 
-  @Column({ type: 'date' }) 
+  @Column({ type: 'date' })
   endDate: Date;
 
-  @Column({ default: false }) 
+  @Column({ default: false })
   includesFuel: boolean;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true }) 
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   fuelCostPerDay?: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   totalAmount: number;
 
-  @Column({ default: 'pending' }) 
+  @Column({ default: 'pending' })
   status: string;
 
   @CreateDateColumn()

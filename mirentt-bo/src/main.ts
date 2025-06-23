@@ -21,6 +21,15 @@ async function bootstrap() {
     }),
   );
 
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Supprime les propriétés inconnues
+      forbidNonWhitelisted: true, // Renvoie une erreur si des propriétés inconnues sont présentes
+      transform: true, // <--- DÉCOMMENTEZ ET ACTIVEZ CETTE LIGNE
+      disableErrorMessages: false, // <--- AJOUTEZ CETTE LIGNE : Permet d'obtenir des messages d'erreur détaillés
+    }),
+  );
+
   // Middleware pour ajouter les en-têtes CORS aux fichiers statiques
   app.use('/uploads', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');

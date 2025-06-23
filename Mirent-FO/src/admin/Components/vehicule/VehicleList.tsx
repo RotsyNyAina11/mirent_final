@@ -29,9 +29,11 @@ import {
   useMediaQuery,
   Toolbar,
 } from "@mui/material";
+
 import { Delete, SearchOutlined, Edit, Add, DirectionsCar, LocalShipping, TwoWheeler, FilterList } from "@mui/icons-material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { styled } from "@mui/material/styles";
+
 import { useAppDispatch } from "../../../hooks";
 import {
   deleteVehicle,
@@ -44,6 +46,7 @@ import {
 } from "../../../redux/features/vehicle/vehiclesSlice";
 import EditVehicle from "./EditVehicles";
 import AddVehicle from "./AddVehicles";
+
 
 // Thème personnalisé (identique à LocationList.tsx)
 const theme = createTheme({
@@ -115,6 +118,7 @@ const theme = createTheme({
 });
 
 // Styles personnalisés (alignés avec LocationList.tsx)
+
 const PrimaryButton = styled(Button)(({ theme }) => ({
   backgroundColor: "#3b82f6",
   color: theme.palette.common.white,
@@ -192,15 +196,12 @@ const SearchField = styled(TextField)(() => ({
 
 const VehiclesList: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { vehicles, loading, error, vehiclesType, vehiclesStatus } =
-    useSelector((state: any) => state.vehicles);
+  const { vehicles, loading, error, vehiclesType, vehiclesStatus } = useSelector((state: any) => state.vehicles);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm")); 
 
-  const [vehicleTypesRedux, setVehicleTypesRedux] =
-    useState<VehicleType[]>(vehiclesType);
-  const [vehicleStatusesRedux, setVehicleStatusesRedux] =
-    useState<VehicleStatus[]>(vehiclesStatus);
+  const [vehicleTypesRedux, setVehicleTypesRedux] = useState<VehicleType[]>(vehiclesType);
+  const [vehicleStatusesRedux, setVehicleStatusesRedux] = useState<VehicleStatus[]>(vehiclesStatus);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -216,8 +217,7 @@ const VehiclesList: React.FC = () => {
   const [showAddVehicle, setShowAddVehicle] = useState(false);
   const [filterOpen, setFilterOpen] = useState(!isMobile); // Collapsed by default on mobile
   const [selectedVehicles, setSelectedVehicles] = useState<number[]>([]);
-  const [confirmDeleteSelectedOpen, setConfirmDeleteSelectedOpen] =
-    useState(false);
+  const [confirmDeleteSelectedOpen, setConfirmDeleteSelectedOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchVehicles());
@@ -239,10 +239,8 @@ const VehiclesList: React.FC = () => {
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((veh: any) => {
       const lowercasedSearch = search.toLowerCase();
-      const typeName =
-        vehicleTypesRedux.find((t) => t.id === veh.type?.id)?.type || "";
-      const statusName =
-        vehicleStatusesRedux.find((s) => s.id === veh.status?.id)?.status || "";
+      const typeName = vehicleTypesRedux.find((t) => t.id === veh.type?.id)?.type || "";
+      const statusName = vehicleStatusesRedux.find((s) => s.id === veh.status?.id)?.status || "";
       return (
         (veh.nom.toLowerCase().includes(lowercasedSearch) ||
           veh.marque.toLowerCase().includes(lowercasedSearch) ||
@@ -254,19 +252,9 @@ const VehiclesList: React.FC = () => {
         (filterStatus ? statusName === filterStatus : true)
       );
     });
-  }, [
-    vehicles,
-    search,
-    filterType,
-    filterStatus,
-    vehicleTypesRedux,
-    vehicleStatusesRedux,
-  ]);
+  }, [vehicles, search, filterType, filterStatus, vehicleTypesRedux, vehicleStatusesRedux]);
 
-  const paginatedVehicles = filteredVehicles.slice(
-    currentPage * rowsPerPage,
-    (currentPage + 1) * rowsPerPage
-  );
+  const paginatedVehicles = filteredVehicles.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   const handleEditClick = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
@@ -276,9 +264,7 @@ const VehiclesList: React.FC = () => {
   const handleDeleteVehicle = () => {
     if (vehicleToDelete) {
       dispatch(deleteVehicle(vehicleToDelete.id));
-      setSelectedVehicles((prev) =>
-        prev.filter((id) => id !== vehicleToDelete.id)
-      );
+      setSelectedVehicles((prev) => prev.filter((id) => id !== vehicleToDelete.id));
       setOpenSnackbar(true);
     }
     setOpenDeleteDialog(false);
@@ -293,6 +279,7 @@ const VehiclesList: React.FC = () => {
       return false;
     }
   };
+
   // Gestion de la sélection des véhicules
   const handleSelectAllVehicles = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -306,6 +293,7 @@ const VehiclesList: React.FC = () => {
       setSelectedVehicles([]);
     }
   };
+
 
   const handleSelectVehicle = (id: number) => {
     setSelectedVehicles((prev) =>
@@ -599,8 +587,7 @@ const VehiclesList: React.FC = () => {
                             src={veh.imageUrl}
                             alt={veh.nom}
                             onError={(e) => {
-                              (e.target as HTMLImageElement).src =
-                                "/default-vehicle.png";
+                              (e.target as HTMLImageElement).src = "/default-vehicle.png";
                             }}
                             sx={{
                               width: "100%",
@@ -750,8 +737,7 @@ const VehiclesList: React.FC = () => {
                 id="confirm-delete-description"
                 sx={{ color: "#1f2937", fontSize: { xs: "0.9rem", sm: "1rem" }, textAlign: "center" }}
               >
-                Êtes-vous sûr de vouloir supprimer le véhicule{" "}
-                {vehicleToDelete?.nom} ?
+                Êtes-vous sûr de vouloir supprimer le véhicule {vehicleToDelete?.nom} ?
               </DialogContentText>
             </DialogContent>
             <DialogActions
@@ -811,8 +797,7 @@ const VehiclesList: React.FC = () => {
                 id="confirm-delete-selected-description"
                 sx={{ color: "#1f2937", fontSize: { xs: "0.9rem", sm: "1rem" }, textAlign: "center" }}
               >
-                Êtes-vous sûr de vouloir supprimer {selectedVehicles.length}{" "}
-                véhicule(s) sélectionné(s) ?
+                Êtes-vous sûr de vouloir supprimer {selectedVehicles.length} véhicule(s) sélectionné(s) ?
               </DialogContentText>
             </DialogContent>
             <DialogActions
@@ -883,7 +868,9 @@ const VehiclesList: React.FC = () => {
           {showAddVehicle && (
             <AddVehicle
               open={showAddVehicle}
+
               onClose={() => setShowAddVehicle(false)} vehicleId={0} currentStatus={""}            />
+
           )}
         </Grid>
       </Box>

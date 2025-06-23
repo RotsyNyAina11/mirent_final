@@ -39,7 +39,8 @@ var ProformaModule = /** @class */ (function () {
                 ]),
             ],
             providers: [proforma_service_1.ProformaService, mailer_service_1.MailService, pdf_service_1.PdfService],
-            controllers: [proforma_controller_1.ProformaController]
+            controllers: [proforma_controller_1.ProformaController],
+            exports: [proforma_service_1.ProformaService]
         })
     ], ProformaModule);
     return ProformaModule;

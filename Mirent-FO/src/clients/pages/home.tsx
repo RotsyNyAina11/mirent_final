@@ -15,9 +15,9 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import image from "../../assets/bg.jpeg";
 import { motion } from "framer-motion";
-import Navbar from "../components/Navbar";
-import ReservationForm from "../components/ReservationForm";
-import Footer from "../components/Footer";
+import Navbar from "../Components/Navbar";
+import ReservationForm from "../Components/ReservationForm";
+import Footer from "../Components/Footer";
 
 const ClientHome = () => {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ const ClientHome = () => {
 
   return (
     <Box sx={{ pb: 8, pt: { xs: 10, md: 12 } }}>
-        <Navbar />
+      <Navbar />
 
       {/* HERO */}
       <Box
@@ -250,7 +250,7 @@ const ClientHome = () => {
               color: "#f3f4f6",
             }}
           >
-           Nos Véhicules 
+            Nos Véhicules
           </Typography>
           <Grid container spacing={4}>
             {[1, 2, 3].map((_, index) => (

@@ -60,6 +60,12 @@ function bootstrap() {
                         allowedHeaders: ['Content-Type', 'Authorization'],
                         credentials: true
                     }));
+                    app.useGlobalPipes(new common_1.ValidationPipe({
+                        whitelist: true,
+                        forbidNonWhitelisted: true,
+                        transform: true,
+                        disableErrorMessages: false
+                    }));
                     // Middleware pour ajouter les en-têtes CORS aux fichiers statiques
                     app.use('/uploads', function (req, res, next) {
                         res.header('Access-Control-Allow-Origin', '*');

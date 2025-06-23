@@ -8,7 +8,6 @@ import {
 import { Proforma } from './proforma.entity';
 import { Devis } from './devis.entity';
 
-
 @Entity()
 export class Client {
   @PrimaryGeneratedColumn()

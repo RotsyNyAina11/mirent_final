@@ -8,12 +8,9 @@ import { Status } from 'src/entities/status.entity';
 import { TypeModule } from 'src/type/type.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Vehicule, Type, Status]),
-        TypeModule
-    ],
-    controllers: [VehiclesController],
-    providers: [VehiclesService],
-    exports: [VehiclesService, TypeOrmModule]
+  imports: [TypeOrmModule.forFeature([Vehicule, Type, Status]), TypeModule],
+  controllers: [VehiclesController],
+  providers: [VehiclesService],
+  exports: [VehiclesService, TypeOrmModule.forFeature([Status])],
 })
 export class VehiclesModule {}

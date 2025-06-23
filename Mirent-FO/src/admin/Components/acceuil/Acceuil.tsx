@@ -37,6 +37,7 @@ import {
 } from "@mui/icons-material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useDispatch, useSelector } from "react-redux";
+<<<<<<< HEAD
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import { AppDispatch, RootState } from "../../../redux/store";
 import { fetchVehicles, Vehicle } from "../../../redux/features/vehicle/vehiclesSlice";
@@ -44,6 +45,18 @@ import { Devis, fetchDevis } from "../../../redux/features/devis/devisSlice";
 import { useNavigate } from "react-router-dom";
 
 // Thème personnalisé (inchangé)
+=======
+import axios from "axios";
+
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { AppDispatch, RootState } from "../../../redux/store";
+import {
+  fetchVehicles,
+  Vehicle,
+} from "../../../redux/features/vehicle/vehiclesSlice";
+
+// Thème personnalisé (identique à LocationList.tsx et VehiclesList.tsx)
+>>>>>>> 378d007bef06e0058bbf44b29cc863d4e0638763
 const theme = createTheme({
   palette: {
     primary: { main: "#3b82f6" },
@@ -119,14 +132,34 @@ const Accueil: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
+<<<<<<< HEAD
   const [availableVehiclesCount, setAvailableVehiclesCount] = useState<number | null>(null);
   const [availableClientsCount, setAvailableClientsCount] = useState<number | null>(null);
+=======
+  const [availableVehiclesCount, setAvailableVehiclesCount] = useState<
+    number | null
+  >(null);
+  const [availableClientsCount, setAvailableClientsCount] = useState<
+    number | null
+  >(null);
+  const [availablePrixCount, setAvailablePrixCount] = useState<number | null>(
+    null
+  );
+>>>>>>> 378d007bef06e0058bbf44b29cc863d4e0638763
   const [error, setError] = useState<string | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [devisToDelete, setDevisToDelete] = useState<Devis | null>(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
+<<<<<<< HEAD
   // Récupérer les véhicules et les devis via Redux
+=======
+  const [totalRevenue, setTotalRevenue] = useState<null | number>(null);
+  const [loadingRevenue, setLoadingRevenue] = useState(true);
+  const [errorRevenue, setErrorRevenue] = useState<string | null>(null);
+
+  // Récupérer les véhicules via Redux
+>>>>>>> 378d007bef06e0058bbf44b29cc863d4e0638763
   useEffect(() => {
     dispatch(fetchVehicles());
     dispatch(fetchDevis()); 
@@ -170,6 +203,29 @@ const Accueil: React.FC = () => {
       }
     };
     fetchAvailableClients();
+  }, []);
+
+  //recuperer le prix total
+  useEffect(() => {
+    const fetchTotalRevenue = async () => {
+      try {
+        setLoadingRevenue(true);
+        const response = await axios.get(
+          "http://localhost:3000/prixs/total-revenue-from-regions"
+        );
+        setTotalRevenue(response.data);
+      } catch (error) {
+        console.error(
+          "Erreur lors du chargement du revenu total des régions :",
+          error
+        );
+        setErrorRevenue("Impossible de charger le revenu total.");
+      } finally {
+        setLoadingRevenue(false);
+      }
+    };
+
+    fetchTotalRevenue();
   }, []);
 
   // Fonctions pour les actions du tableau
@@ -244,10 +300,54 @@ const Accueil: React.FC = () => {
             </DashboardCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
+<<<<<<< HEAD
             <DashboardCard sx={{ p: isMobile ? 2 : 3, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
               <MoneyIcon sx={{ fontSize: isMobile ? 30 : 40, color: "#3b82f6", mb: 1 }} aria-label="Icône de revenus totaux" />
               <Typography variant="body2" color="#6b7280" fontSize={isMobile ? "0.8rem" : "0.875rem"}>Revenus totaux</Typography>
               <Typography variant="h5" fontSize={isMobile ? "1.2rem" : "1.5rem"} color="#1f2937">2 000 000 Ar</Typography>
+=======
+            <DashboardCard
+              sx={{
+                p: isMobile ? 2 : 3,
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <MoneyIcon
+                sx={{
+                  fontSize: isMobile ? 30 : 40,
+                  color: "#3b82f6",
+                  mb: 1,
+                  transition: "all 0.3s ease",
+                }}
+                aria-label="Icône de revenus totaux"
+              />
+              <Typography
+                variant="body2"
+                color="#6b7280"
+                fontSize={isMobile ? "0.8rem" : "0.875rem"}
+              >
+                Revenus totaux
+              </Typography>
+              <Typography
+                variant="h5"
+                fontSize={isMobile ? "1.2rem" : "1.5rem"}
+                color="#1f2937"
+              >
+                {loadingRevenue
+                  ? "Chargement..."
+                  : errorRevenue
+                  ? "Erreur"
+                  : typeof totalRevenue === "number"
+                  ? `${totalRevenue.toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })} Ar`
+                  : "N/A"}
+              </Typography>
+>>>>>>> 378d007bef06e0058bbf44b29cc863d4e0638763
             </DashboardCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>

@@ -10,7 +10,6 @@ class CreatePrixDto {
   @IsNumber()
   prix: number;
 }
-
 export class CreateRegionDto {
   @IsString()
   nom_region: string;

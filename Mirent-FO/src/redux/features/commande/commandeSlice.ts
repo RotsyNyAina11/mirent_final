@@ -11,7 +11,7 @@ interface Proforma {
   totalAmount: number;
   status: "En attente" | "Confirmé" | "Annulé";
   items: ProformaItem[];
-  carburant?: number; // Ajouter le champ carburant pour la mise à jour
+  carburant?: number;
 }
 
 // Interface pour un élément de proforma
@@ -24,8 +24,8 @@ interface ProformaItem {
   dateRetour: string;
   nombreJours: number;
   subTotal: number;
-  carburant: number; // Ajouter le champ carburant
-  prixTotal: number; // Ajouter le champ prixTotal
+  carburant: number;
+  prixTotal: number;
 }
 
 // Interface pour les données de création de proforma
@@ -37,8 +37,8 @@ interface CreateProformaData {
   contractReference?: string;
   notes?: string;
   items: CreateProformaItemData[];
-  carburant?: number; // Optionnel lors de la création du proforma global
-  prixTotal?: number; // Optionnel lors de la création du proforma global
+  carburant?: number;
+  prixTotal?: number;
 }
 
 interface CreateProformaItemData {
@@ -46,8 +46,6 @@ interface CreateProformaItemData {
   regionName: string;
   dateDepart: string;
   dateRetour: string;
-  // Ajoutez ici les champs nécessaires pour calculer carburant et prixTotal par item
-  // Par exemple:
   prixUnitaire?: number;
   quantite?: number;
   carburant?: number;
@@ -136,7 +134,7 @@ export const fetchProformas = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        "http://localhost:3000/proforma?_expand=client&_expand=items.vehicle" // Ajustez si nécessaire pour inclure carburant et prixTotal
+        "http://localhost:3000/proforma?_expand=client&_expand=items.vehicle"
       );
       if (!response.ok) {
         const errorData = await response.json();
@@ -221,19 +219,16 @@ export const deleteProforma = createAsyncThunk(
 
 // Thunk pour mettre à jour UN SEUL ITEM de proforma
 export const updateProforma = createAsyncThunk(
-  "proformas/updateProformaItem", // Nom de l'action plus spécifique
+  "proformas/updateProformaItem",
   async (proformaItem: UpdateProformaData, { rejectWithValue }) => {
     try {
       const { id, proformaId, ...updateData } = proformaItem;
 
-      const response = await fetch(
-        `http://localhost:3000/proforma/${id}`, // Endpoint pour mettre à jour un item
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updateData),
-        }
-      );
+      const response = await fetch(`http://localhost:3000/proforma/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
@@ -242,7 +237,7 @@ export const updateProforma = createAsyncThunk(
         );
       }
       const data = await response.json();
-      return data; // Retourne l'item mis à jour
+      return data;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -289,7 +284,7 @@ const proformasSlice = createSlice({
       })
       .addCase(fetchProformas.fulfilled, (state, action) => {
         state.loading = false;
-        state.proformas = action.payload; // Assurez-vous que action.payload contient carburant et prixTotal
+        state.proformas = action.payload;
       })
       .addCase(fetchProformas.rejected, (state, action) => {
         state.loading = false;
@@ -305,7 +300,7 @@ const proformasSlice = createSlice({
       })
       .addCase(fetchProformaById.fulfilled, (state, action) => {
         state.loading = false;
-        state.proforma = action.payload; // Assurez-vous que action.payload contient carburant et prixTotal
+        state.proforma = action.payload;
       })
       .addCase(fetchProformaById.rejected, (state, action) => {
         state.loading = false;
@@ -366,7 +361,7 @@ const proformasSlice = createSlice({
           }
           return proforma;
         });
-        state.proforma = action.payload; // action.payload devrait contenir les champs mis à jour
+        state.proforma = action.payload;
       })
       .addCase(updateProforma.rejected, (state, action) => {
         state.loading = false;

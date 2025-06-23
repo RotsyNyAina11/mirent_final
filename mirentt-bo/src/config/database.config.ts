@@ -13,6 +13,9 @@ import { ProformaItem } from 'src/entities/proformat-item.entity';
 import { Proforma } from 'src/entities/proforma.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { Devis } from 'src/entities/devis.entity';
+import { Reservation } from 'src/entities/reservation.entity';
+import { Utilisateur } from 'src/entities/utilisateur.entity';
+import { Notification } from 'src/entities/notifications.entity';
 
 dotenv.config();
 
@@ -35,6 +38,9 @@ export const typeOrmConfig: DataSourceOptions = {
     ProformaItem,
     Proforma,
     Devis,
+    Reservation,
+    Utilisateur,
+    Notification,
   ],
 
   synchronize: true,

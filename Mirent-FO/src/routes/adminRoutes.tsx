@@ -6,15 +6,20 @@ import {
 import "react-toastify/dist/ReactToastify.css";
 
 import MainLayout from "../layouts/MainLayouts";
+<<<<<<< HEAD
 import ProformaPage from "../admin/pages/proforma/proformaPage";
+=======
+import Devis from "../admin/pages/Devis/DevisPage";
+>>>>>>> 378d007bef06e0058bbf44b29cc863d4e0638763
 import Commande from "../admin/pages/commande/CommandePage";
 import LocationsPage from "../admin/pages/lieux/locationPage";
 import Home from "../admin/pages/acceuil/HomePage";
 import Vehicule from "../admin/pages/vehicules/vehiculePage";
 import Types from "../admin/pages/Types/type";
 import ClientPage from "../admin/pages/clients/ClientPage";
-import ProformaList from "../admin/pages/proforma/ProformaList";
-import UserProfile from "../components/profile/userProfile";
+import ClientDetailPage from "../admin/pages/ClientDetailPage/clientdetailPage";
+import ProformaList from "../admin/pages/commande/ProformaList";
+import UserProfile from "../Components/profile/userProfile";
 import ContratPage from "../admin/pages/contrat/contratPage";
 import ContactPage from "../admin/pages/Contact/ContactPage";
 import QuoteForm from "../admin/pages/Quote/quoteForm";
@@ -22,19 +27,18 @@ import DevisListPage from "../admin/pages/Quote/quoteListPage";
 import DevisDetailsPage from "../admin/pages/Quote/quoteDetailsPage";
 
 
-
 const AdminRoutes = () => {
-    return (
-        <Routes>
-            <Route path="/" element={<Navigate to="home" />} />
-            <Route
-                path="home"
-                element={
-                <MainLayout>
-                    <Home />
-                </MainLayout>
-                }
-            />
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="home" />} />
+      <Route
+        path="home"
+        element={
+          <MainLayout>
+            <Home />
+          </MainLayout>
+        }
+      />
 
       {/* Route pour l'accueil avec Sidebar */}
       <Route
@@ -83,16 +87,17 @@ const AdminRoutes = () => {
           </MainLayout>
         }
       />
+      {/* Route pour la page de la détail d'un client */}
 
-      {/* Route pour la page de Performat sur la commande */}
       <Route
-        path="proformat"
+        path="client_detail"
         element={
           <MainLayout>
-            <ProformaPage />
+            <ClientDetailPage />
           </MainLayout>
         }
       />
+
       {/* Route pour la page de liste des proformas */}
       <Route
         path="/proformat/liste"
@@ -102,24 +107,34 @@ const AdminRoutes = () => {
           </MainLayout>
         }
       />
-
+      {/* Route pour la page sur la commande */}
       <Route
-        path="/proformas"
+        path="/proformat/nouveau"
         element={
           <MainLayout>
-            <ProformaPage />
+            <Commande />
           </MainLayout>
         }
       />
 
-            <Route
-                path="profile"
-                element={
-                    <MainLayout>
-                        <UserProfile />
-                    </MainLayout>
-                }
-            />
+      {/* Route pour la page de Devis sur la commande */}
+      <Route
+        path="devis"
+        element={
+          <MainLayout>
+            <Devis />
+          </MainLayout>
+        }
+      />
+
+      <Route
+        path="profile"
+        element={
+          <MainLayout>
+            <UserProfile />
+          </MainLayout>
+        }
+      />
 
       {/* Route pour la page des lieux */}
       <Route
@@ -127,15 +142,6 @@ const AdminRoutes = () => {
         element={
           <MainLayout>
             <LocationsPage />
-          </MainLayout>
-        }
-      />
-      {/* Route pour la page sur la commande */}
-      <Route
-        path="/proformat/nouveau"
-        element={
-          <MainLayout>
-            <Commande />
           </MainLayout>
         }
       />
@@ -158,6 +164,7 @@ const AdminRoutes = () => {
           </MainLayout>
         }
       />
+<<<<<<< HEAD
 
       // Route pour la page de devis
       <Route
@@ -176,6 +183,10 @@ const AdminRoutes = () => {
           </MainLayout>
         } 
       />
+=======
+      {/* Route pour deconnecter*/}
+      <Route path="logout" />
+>>>>>>> 378d007bef06e0058bbf44b29cc863d4e0638763
     </Routes>
   );
 };

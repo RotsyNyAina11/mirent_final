@@ -218,12 +218,12 @@ var ProformaService = /** @class */ (function () {
                                                 subTotal: subTotalCalculated
                                             });
                                             return [4 /*yield*/, this.statusRepository.findOne({
-                                                    where: { status: 'Indisponible' }
+                                                    where: { status: 'Réservé' }
                                                 })];
                                         case 7:
                                             statusIndisponible = _a.sent();
                                             if (!statusIndisponible) {
-                                                throw new common_1.NotFoundException("Statut \"Indisponible\" non trouv\u00E9");
+                                                throw new common_1.NotFoundException("Statut \"R\u00E9serv\u00E9\" non trouv\u00E9");
                                             }
                                             vehiculeChoisi.status = statusIndisponible;
                                             return [4 /*yield*/, this.vehiculeRepository.save(vehiculeChoisi)];
@@ -283,7 +283,9 @@ var ProformaService = /** @class */ (function () {
             var proforma;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.proformaRepository.findOne({ where: { id: id } })];
+                    case 0: return [4 /*yield*/, this.proformaRepository.findOne({
+                            where: { id: Number(id) }
+                        })];
                     case 1:
                         proforma = _a.sent();
                         if (!proforma) {
@@ -445,74 +447,94 @@ var ProformaService = /** @class */ (function () {
             });
         });
     };
+    // mettre à jour un proforma
     ProformaService.prototype.update = function (id, updateDto) {
         return __awaiter(this, void 0, Promise, function () {
-            var item, proforma, vehicule, region, prix;
+            var item, region, vehicleCriteria, typeEntity, vehicle, prix, prixValue;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.proformaItemRepository.findOne({ where: { id: id } })];
+                    case 0: return [4 /*yield*/, this.proformaItemRepository.findOne({
+                            where: { id: id },
+                            relations: ['region', 'vehicle', 'prix', 'vehicle.type']
+                        })];
                     case 1:
                         item = _a.sent();
                         if (!item) {
-                            throw new common_1.NotFoundException("ProformaItem avec l'id " + id + " non trouv\u00E9");
+                            throw new common_1.NotFoundException("Proforma item avec l'id " + id + " non trouv\u00E9.");
                         }
-                        if (!updateDto.proformaId) return [3 /*break*/, 3];
-                        return [4 /*yield*/, this.proformaRepository.findOne({
-                                where: { id: updateDto.proformaId }
+                        if (!updateDto.regionName) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this.regionRepository.findOne({
+                                where: { nom_region: updateDto.regionName }
                             })];
                     case 2:
-                        proforma = _a.sent();
-                        if (!proforma)
-                            throw new common_1.NotFoundException('Proforma non trouvée');
-                        item.proforma = proforma;
+                        region = _a.sent();
+                        if (!region) {
+                            throw new common_1.NotFoundException("R\u00E9gion avec le nom \"" + updateDto.regionName + "\" non trouv\u00E9e.");
+                        }
+                        item.region = region;
                         _a.label = 3;
                     case 3:
-                        if (!updateDto.vehicleId) return [3 /*break*/, 5];
-                        return [4 /*yield*/, this.vehiculeRepository.findOne({
-                                where: { id: updateDto.vehicleId }
+                        if (!updateDto.vehicleCriteria) return [3 /*break*/, 8];
+                        vehicleCriteria = __assign({}, updateDto.vehicleCriteria);
+                        if (!vehicleCriteria.type) return [3 /*break*/, 5];
+                        return [4 /*yield*/, this.typeRepository.findOne({
+                                where: { type: vehicleCriteria.type }
                             })];
                     case 4:
-                        vehicule = _a.sent();
-                        if (!vehicule)
-                            throw new common_1.NotFoundException('Véhicule non trouvé');
-                        item.vehicle = vehicule;
+                        typeEntity = _a.sent();
+                        if (!typeEntity) {
+                            throw new common_1.NotFoundException("Type de v\u00E9hicule \"" + vehicleCriteria.type + "\" non trouv\u00E9.");
+                        }
+                        vehicleCriteria.type = typeEntity;
                         _a.label = 5;
-                    case 5:
-                        if (!updateDto.regionId) return [3 /*break*/, 7];
-                        return [4 /*yield*/, this.regionRepository.findOne({
-                                where: { id: updateDto.regionId }
-                            })];
+                    case 5: return [4 /*yield*/, this.vehiculeRepository.findOne({
+                            where: vehicleCriteria
+                        })];
                     case 6:
-                        region = _a.sent();
-                        if (!region)
-                            throw new common_1.NotFoundException('Région non trouvée');
-                        item.region = region;
-                        _a.label = 7;
+                        vehicle = _a.sent();
+                        if (!vehicle) {
+                            throw new common_1.NotFoundException("V\u00E9hicule avec les crit\u00E8res fournis non trouv\u00E9.");
+                        }
+                        if (updateDto.vehicleCriteria.marque)
+                            vehicle.marque = updateDto.vehicleCriteria.marque;
+                        if (updateDto.vehicleCriteria.modele)
+                            vehicle.modele = updateDto.vehicleCriteria.modele;
+                        if (updateDto.vehicleCriteria.type) {
+                        }
+                        return [4 /*yield*/, this.vehiculeRepository.save(vehicle)];
                     case 7:
-                        if (!updateDto.prixId) return [3 /*break*/, 9];
+                        _a.sent();
+                        item.vehicle = vehicle;
+                        _a.label = 8;
+                    case 8:
+                        // Mise à jour des dates
+                        if (updateDto.dateDepart)
+                            item.dateDepart = updateDto.dateDepart;
+                        if (updateDto.dateRetour)
+                            item.dateRetour = updateDto.dateRetour;
+                        if (!updateDto.prixId) return [3 /*break*/, 10];
                         return [4 /*yield*/, this.prixRepository.findOne({
                                 where: { id: updateDto.prixId }
                             })];
-                    case 8:
-                        prix = _a.sent();
-                        if (!prix)
-                            throw new common_1.NotFoundException('Prix non trouvé');
-                        item.prix = prix;
-                        _a.label = 9;
                     case 9:
-                        // Mise à jour des champs simples
-                        if (updateDto.dateDepart)
-                            item.dateDepart = new Date(updateDto.dateDepart);
-                        if (updateDto.dateRetour)
-                            item.dateRetour = new Date(updateDto.dateRetour);
-                        // ✅ Mettre ici avec une vérification correcte même si la valeur est 0
+                        prix = _a.sent();
+                        if (!prix) {
+                            throw new common_1.BadRequestException("Prix avec l'id " + updateDto.prixId + " non trouv\u00E9.");
+                        }
+                        item.prix = prix;
+                        _a.label = 10;
+                    case 10:
+                        // Mise à jour du nombre de jours
                         if (updateDto.nombreJours !== undefined) {
                             item.nombreJours = updateDto.nombreJours;
                         }
-                        if (updateDto.subTotal !== undefined) {
-                            item.subTotal = updateDto.subTotal;
+                        // Recalcul du subTotal si prix et nombreJours sont présents
+                        if (item.prix && item.nombreJours !== undefined) {
+                            prixValue = typeof item.prix.prix === 'number'
+                                ? item.prix.prix
+                                : Number(item.prix.prix);
+                            item.subTotal = prixValue * item.nombreJours;
                         }
-                        // Enregistrement de l'élément mis à jour
                         return [2 /*return*/, this.proformaItemRepository.save(item)];
                 }
             });
@@ -551,6 +573,20 @@ var ProformaService = /** @class */ (function () {
                         res.send(pdfBuffer);
                         return [2 /*return*/];
                 }
+            });
+        });
+    };
+    ProformaService.prototype.getProformaItemsByClientId = function (clientId) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.proformaItemRepository.find({
+                        where: {
+                            proforma: {
+                                client: { id: clientId }
+                            }
+                        },
+                        relations: ['proforma', 'proforma.client', 'vehicle', 'region', 'prix']
+                    })];
             });
         });
     };

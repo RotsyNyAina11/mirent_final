@@ -12,8 +12,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import loginImage from "../../assets/2.jpg"; // Image de fond
-import logo from "../../assets/horizontal.png"; // Logo
+import loginImage from "../../assets/2.jpg";
+import logo from "../../assets/horizontal.png";
+import axios from "axios";
 
 const Login: React.FC = () => {
   const theme = useTheme();
@@ -21,21 +22,31 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // État pour le message d'erreur
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = () => {
-    setError(""); // Réinitialiser le message d'erreur
+  const handleLogin = async () => {
+    setError(null);
 
-    // Simulation de la vérification des identifiants
-    if (email === "admin@mirent.com" && password === "admin123") {
-      console.log("Connexion réussie : Administrateur");
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/utilisateur/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      console.log("Connexion réussie :", response.data);
+      localStorage.setItem("access_token", response.data.access_token);
+      localStorage.setItem("user_info", JSON.stringify(response.data.user));
       navigate("/admin/home");
-    } else if (email === "client@gmail.com" && password === "client123") {
-      console.log("Connexion réussie : Client");
-      navigate("/acceuil");
-    } else {
-      setError("Email ou mot de passe incorrect");
-      console.log("Échec de la connexion : Identifiants incorrects");
+    } catch (err: any) {
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Erreur lors de la connexion. Veuillez réessayer.");
+      }
+      console.error("Erreur de connexion:", err);
     }
   };
 

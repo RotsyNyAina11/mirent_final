@@ -11,9 +11,11 @@ var prix_entity_1 = require("src/entities/prix.entity");
 var client_entity_1 = require("../entities/client.entity");
 var proformat_item_entity_1 = require("src/entities/proformat-item.entity");
 var proforma_entity_1 = require("src/entities/proforma.entity");
-var devis_entity_1 = require("src/entities/devis.entity");
-var devis_item_entity_1 = require("src/entities/devis-item.entity");
 var user_entity_1 = require("src/auth/entities/user.entity");
+var devis_entity_1 = require("src/entities/devis.entity");
+var reservation_entity_1 = require("src/entities/reservation.entity");
+var utilisateur_entity_1 = require("src/entities/utilisateur.entity");
+var notifications_entity_1 = require("src/entities/notifications.entity");
 dotenv.config();
 exports.typeOrmConfig = {
     type: 'postgres',
@@ -34,7 +36,9 @@ exports.typeOrmConfig = {
         proformat_item_entity_1.ProformaItem,
         proforma_entity_1.Proforma,
         devis_entity_1.Devis,
-        devis_item_entity_1.DevisItem,
+        reservation_entity_1.Reservation,
+        utilisateur_entity_1.Utilisateur,
+        notifications_entity_1.Notification,
     ],
     synchronize: true
 };

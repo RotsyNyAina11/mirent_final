@@ -44,9 +44,6 @@ var DevisItem = /** @class */ (function () {
         typeorm_1.Column()
     ], DevisItem.prototype, "nombreJours");
     __decorate([
-        typeorm_1.Column({ type: 'decimal' })
-    ], DevisItem.prototype, "prixUnitaire");
-    __decorate([
         typeorm_1.Column()
     ], DevisItem.prototype, "prixCarburant");
     __decorate([

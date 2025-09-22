@@ -26,9 +26,6 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <Box sx={{ width: isCollapsed ? `${collapsedWidth}px` : `${expandedWidth}px`, flexShrink: 0 }}>
           <Sidebar
             onCollapseChange={setIsCollapsed}
-            headerHeight={headerHeight}
-            expandedWidth={expandedWidth}
-            collapsedWidth={collapsedWidth}
           />
         </Box>
         <Box flexGrow={1} p={3}>

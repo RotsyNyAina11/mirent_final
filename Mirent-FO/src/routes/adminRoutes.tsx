@@ -4,29 +4,18 @@ import MainLayout from "../layouts/MainLayouts";
 import LocationsPage from "../admin/pages/lieux/locationPage";
 import Home from "../admin/pages/accueil/HomePage";
 import Vehicule from "../admin/pages/vehicules/vehiculePage";
-import Types from "../admin/pages/Types/type";
+import Types from "../admin/pages/types/type";
 import ClientPage from "../admin/pages/clients/ClientPage";
 import ClientDetailPage from "../admin/pages/ClientDetailPage/clientdetailPage";
 import ProtectedRoute from "./ProtectedRoute";
 import ReservationManager from "../admin/Components/reservation/ReservationList";
 import BonDeCommandeManager from "../admin/Components/commande/BonDeCommandeManager";
 import PaiementPage from "../admin/Components/paiement/paiement";
-import { useAppDispatch } from "../hooks";
-import { useEffect } from "react";
-import { logout } from "../redux/features/auth/authSlice";
 import Login from "../Component/login/Login";
 import FacturePage from "../admin/Components/facture/factureManagement";
 import Contact from "../admin/Components/Contact/Contact";
 
-const Logout = () => {
-  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    dispatch(logout());
-  }, [dispatch]);
-
-  return <Navigate to="/login" replace />;
-};
 
 
 const AdminRoutes = () => {

@@ -143,7 +143,7 @@ const paiementSlice = createSlice({
       .addCase(addPaiement.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(addPaiement.fulfilled, (state, action: PayloadAction<Paiement>) => {
+      .addCase(addPaiement.fulfilled, (state, _action: PayloadAction<Paiement>) => {
         state.isLoading = false;
         state.isSuccess = true;
       })

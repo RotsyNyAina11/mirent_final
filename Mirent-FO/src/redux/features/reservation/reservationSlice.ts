@@ -78,9 +78,7 @@ const initialState: ReservationState = {
 
 const API_URL = "http://localhost:3000/reservations";
 
-// ----------------------
-// 📌 Thunks Asynchrones
-// ----------------------
+
 export const fetchReservations = createAsyncThunk(
   "reservations/fetchReservations",
   async (_, { rejectWithValue }) => {

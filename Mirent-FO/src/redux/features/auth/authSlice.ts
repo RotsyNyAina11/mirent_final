@@ -37,7 +37,7 @@ export const login = createAsyncThunk(
 // Thunk pour le logout
 export const logout = createAsyncThunk(
   "auth/logout",
-  async (_, { rejectWithValue }) => {
+  async (_, { }) => {
     try {
       const token = localStorage.getItem("token");
       

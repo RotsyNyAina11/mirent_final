@@ -50,7 +50,7 @@ const Container = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down("sm")]: { padding: theme.spacing(2) },
 }));
 
-const SearchField = styled(TextField)(({ theme }) => ({
+const SearchField = styled(TextField)(({ }) => ({
   width: "300px",
   backgroundColor: "#fff",
   borderRadius: "4px",

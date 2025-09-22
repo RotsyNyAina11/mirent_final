@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState  } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../../hooks';
 import { RootState } from '../../../redux/store';
@@ -30,7 +30,6 @@ import {
   useMediaQuery,
   TablePagination,
   Grid,
-  Divider,
   TextField,
   InputAdornment
 } from '@mui/material';
@@ -49,7 +48,6 @@ const BonDeCommandeManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const printRef = useRef<HTMLDivElement>(null);
 
   // Sélecteurs pour accéder à l'état Redux
   const bonsDeCommande = useSelector((state: RootState) => state.bonDeCommande.bonsDeCommande);
@@ -99,7 +97,7 @@ const BonDeCommandeManager: React.FC = () => {
   };
 
   // Gestion des changements de page
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 

@@ -9,7 +9,6 @@ import {
     useMediaQuery,
     Avatar, 
   } from "@mui/material";
-  import { useNavigate } from "react-router-dom"; // 
   import { useState } from "react";
   import { Link as RouterLink } from "react-router-dom";
   // import loginImage from "../../assets/2.jpg";
@@ -28,7 +27,6 @@ import {
   const UserProfile: React.FC = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-    const navigate = useNavigate();
   
     // Dans un cas réel, ces données seraient chargées depuis un état global ou une API
     const [user] = useState(userProfileData);

@@ -47,7 +47,7 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import { styled } from '@mui/material/styles';
 
 // Styles cohérents avec la page d'accueil
-const DashboardCard = styled(Card)(({ theme }) => ({
+const DashboardCard = styled(Card)(({}) => ({
   borderRadius: "12px",
   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
   backgroundColor: "#fff",
@@ -205,7 +205,7 @@ const PaiementPage: React.FC = () => {
     dispatch(resetPaiementState());
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 

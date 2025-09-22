@@ -43,7 +43,7 @@ import logoImage from '../../../assets/horizontal.png';
 import signatureImage from '../../../assets/signature.png';
 
 // Styles cohérents avec la page de paiement
-const DashboardCard = styled(Card)(({ theme }) => ({
+const DashboardCard = styled(Card)(({ }) => ({
   borderRadius: "12px",
   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
   backgroundColor: "#fff",
@@ -60,7 +60,7 @@ const FacturePage: React.FC = () => {
   const { factures, currentFacture, loading: isLoading, error: isError } = useAppSelector((state) => state.facture);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selectedFactureId, setSelectedFactureId] = useState<number | null>(null);
+  const [_selectedFactureId, setSelectedFactureId] = useState<number | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'pending'>('all');
@@ -482,7 +482,7 @@ const FacturePage: React.FC = () => {
               count={filteredFactures.length}
               rowsPerPage={rowsPerPage}
               page={page}
-              onPageChange={(event, newPage) => setPage(newPage)}
+              onPageChange={(_event, newPage) => setPage(newPage)}
               onRowsPerPageChange={(event) => {
                 setRowsPerPage(parseInt(event.target.value, 10));
                 setPage(0);

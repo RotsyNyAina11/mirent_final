@@ -42,14 +42,12 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-  useMediaQuery,
-  Paper
+  useMediaQuery,  
 } from '@mui/material';
 import { 
   Add as AddIcon, 
   Edit as EditIcon, 
   Delete as DeleteIcon,
-  Close as CloseIcon,
   Save as SaveIcon,
   DirectionsCar as CarIcon,
   CheckCircle as CheckIcon,

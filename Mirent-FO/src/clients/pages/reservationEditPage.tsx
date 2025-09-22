@@ -104,35 +104,9 @@ const ReservationEditDialog: React.FC<ReservationEditDialogProps> = ({
       setIsLoading(true);
       setError(null);
       setSuccess(null);
-      try {
-        const response = await fetch(
-          `http://localhost:3000/reservations/${reservationId}`
-        );
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            errorData.message ||
-              "Échec du chargement des données pour modification."
-          );
-        }
-        const data: Reservation = await response.json();
-        setOriginalReservation(data); // Garde une copie de l'original
-        setReservationData({
-          startDate: data.startDate,
-          endDate: data.endDate,
-          fullName: data.fullName,
-          phone: data.phone,
-          email: data.email,
-        });
-      } catch (err) {
-        console.error(
-          "Erreur lors du chargement des données de réservation:",
-          err
-        );
-        setError("Impossible de charger les données pour la modification.");
-      } finally {
-        setIsLoading(false);
-      }
+      console.log(`API call to fetch reservation ${reservationId} for edit is disabled.`);
+      setError("Les appels API sont désactivés.");
+      setIsLoading(false);
     };
 
     fetchReservationForEdit();
@@ -166,75 +140,10 @@ const ReservationEditDialog: React.FC<ReservationEditDialogProps> = ({
     setIsSaving(true);
     setError(null);
     setSuccess(null);
-
-    try {
-      const dataToSend: UpdateReservationDto = {};
-
-      // Construire le DTO à envoyer, seulement avec les champs qui ont changé
-      if (reservationData.fullName !== originalReservation.fullName) {
-        dataToSend.fullName = reservationData.fullName;
-      }
-      if (reservationData.phone !== originalReservation.phone) {
-        dataToSend.phone = reservationData.phone;
-      }
-      if (reservationData.email !== originalReservation.email) {
-        dataToSend.email = reservationData.email;
-      }
-      // Comparer les dates après conversion en Dayjs pour ignorer les différences minimes de format ou fuseau horaire
-      const originalStartDate = dayjs(originalReservation.startDate);
-      const originalEndDate = dayjs(originalReservation.endDate);
-      const currentStartDate = dayjs(reservationData.startDate);
-      const currentEndDate = dayjs(reservationData.endDate);
-
-      if (
-        !currentStartDate.isSame(originalStartDate, "day") ||
-        !currentStartDate.isSame(originalStartDate, "hour")
-      ) {
-        dataToSend.startDate = reservationData.startDate;
-      }
-      if (
-        !currentEndDate.isSame(originalEndDate, "day") ||
-        !currentEndDate.isSame(originalEndDate, "hour")
-      ) {
-        dataToSend.endDate = reservationData.endDate;
-      }
-
-      // Si aucune donnée n'a changé, on ne fait pas d'appel API
-      if (Object.keys(dataToSend).length === 0) {
-        setSuccess("Aucune modification à sauvegarder.");
-        setIsSaving(false);
-        return;
-      }
-
-      const response = await fetch(
-        `http://localhost:3000/reservations/${reservationId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            // 'Authorization': `Bearer votre_token_jwt` // Si authentification requise
-          },
-          body: JSON.stringify(dataToSend),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Échec de la mise à jour.");
-      }
-
-      setSuccess("Réservation mise à jour avec succès !");
-      // Appelez onClose avec true pour indiquer que la liste doit être rafraîchie
-      onClose(true);
-    } catch (err) {
-      console.error("Erreur lors de la sauvegarde:", err);
-      setError(
-        "Erreur lors de la sauvegarde: " +
-          (err instanceof Error ? err.message : String(err))
-      );
-    } finally {
-      setIsSaving(false);
-    }
+    console.log(`API call to update reservation ${reservationId} is disabled.`);
+    setSuccess("La mise à jour est désactivée.");
+    setIsSaving(false);
+    onClose(true);
   };
 
   return (

@@ -112,22 +112,9 @@ const ReservationList: React.FC = () => {
   const fetchReservations = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    try {
-      const response = await fetch(`${API_BASE_URL}/reservations`); // Endpoint pour toutes les réservations
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || "Échec de la récupération des réservations."
-        );
-      }
-      const data: Reservation[] = await response.json();
-      setReservations(data);
-    } catch (err) {
-      console.error("Erreur lors de la récupération des réservations:", err);
-      setError("Erreur lors du chargement des réservations.");
-    } finally {
-      setIsLoading(false);
-    }
+    console.log("API call to fetch reservations is disabled.");
+    setReservations([]);
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -171,41 +158,9 @@ const ReservationList: React.FC = () => {
   const handleCancelReservation = async () => {
     if (reservationToCancel === null) return;
 
-    setOpenCancelDialog(false); // Ferme la modale de confirmation
-    setIsLoading(true); // Indique le chargement
-    setError(null); // Réinitialise l'erreur
-
-    try {
-      // Le backend attend maintenant un PATCH à /reservations/:id/cancel
-      const response = await fetch(
-        `${API_BASE_URL}/reservations/${reservationToCancel}/cancel`,
-        {
-          method: "PATCH", // CHANGEMENT: Passer de DELETE à PATCH
-          headers: { "Content-Type": "application/json" },
-          // Pas besoin de corps car la logique de statut est gérée côté service
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || "Échec de l'annulation de la réservation."
-        );
-      }
-
-      await fetchReservations(); // Recharger la liste après succès
-      // Utiliser une alerte MUI ou un SnackBar pour un meilleur UX au lieu de `alert()`
-      // setSuccessMessage("Réservation annulée avec succès !");
-      console.log("Réservation annulée avec succès !"); // À remplacer par un vrai système de notification
-    } catch (err) {
-      console.error("Erreur lors de l'annulation:", err);
-      setError(
-        "Échec de l'annulation de la réservation: " + (err as Error).message
-      );
-    } finally {
-      setIsLoading(false); // Arrête le chargement
-      setReservationToCancel(null); // Réinitialise l'ID de la réservation à annuler
-    }
+    setOpenCancelDialog(false);
+    console.log(`API call to cancel reservation ${reservationToCancel} is disabled.`);
+    setReservationToCancel(null);
   };
 
   // Logique de filtrage, tri et pagination

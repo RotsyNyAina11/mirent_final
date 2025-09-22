@@ -26,36 +26,10 @@ import { useNavigate } from "react-router-dom";
 
 import { motion } from "framer-motion";
 
-const popoverVariants = {
-  hidden: {
-    opacity: 0,
-    y: 30,
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 15,
-    },
-  },
-};
-
-const buttonVariants = {
-  hover: {
-    scale: 1.05,
-    transition: {
-      duration: 0.3,
-    },
-  },
-  tap: {
-    scale: 0.95,
-  },
-};
+// supprimé: doublons de variants non utilisés
 
 const navItems = [
-  { label: "Accueil", path: "/acceuil" },
+  { label: "Accueil", path: "/accueil" },
   { label: "Nos voitures", path: "/list-vehicule" },
   { label: "Mes réservations", path: "/reservations-list" },
   { label: "Contact", path: "#contact" },
@@ -118,7 +92,7 @@ const Navbar: React.FC = () => {
 
   const drawerVariants = {
     hidden: { x: "100%" },
-    visible: { x: 0, transition: { duration: 0.3, ease: "easeOut" } },
+    visible: { x: 0, transition: { duration: 0.3 } },
   };
 
   const popoverVariants = {

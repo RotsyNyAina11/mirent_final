@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 
 export class CreateVehiculeDto {
@@ -24,6 +24,17 @@ export class CreateVehiculeDto {
     @Type(() => Number)
     nombrePlace: number;
 
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    distance_moyenne?: number;
+
+
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    derniere_visite?: Date;
+
     @IsNotEmpty()
     @IsInt()
     @Type(() => Number)
@@ -37,4 +48,5 @@ export class CreateVehiculeDto {
     @IsOptional()
     @IsString()
     imageUrl?: string;
+
   }

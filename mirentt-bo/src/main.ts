@@ -23,10 +23,10 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Supprime les propriétés inconnues
-      forbidNonWhitelisted: true, // Renvoie une erreur si des propriétés inconnues sont présentes
-      transform: true, // <--- DÉCOMMENTEZ ET ACTIVEZ CETTE LIGNE
-      disableErrorMessages: false, // <--- AJOUTEZ CETTE LIGNE : Permet d'obtenir des messages d'erreur détaillés
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      disableErrorMessages: false,
     }),
   );
 
@@ -41,17 +41,8 @@ async function bootstrap() {
     next();
   });
 
-  // Gérer les fichiers statiques avec Express
+  // Gérer les fichiers statiques avec Express (déjà servi par ServeStaticModule, gardé ici pour compatibilité locale)
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
-
-  // Ajout de la validation globale pour sécuriser les entrées
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      //transform: true,
-    }),
-  );
 
   const PORT = process.env.PORT || 3000;
   const logger = new Logger('Main');

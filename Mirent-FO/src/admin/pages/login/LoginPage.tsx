@@ -1,16 +1,16 @@
 import { Container, Grid } from "@mui/material";
-import LoginPage from "../../../admin/Components/Authentification/Login";
+import Login from "../../../Component/login/Login";
 
-const LocationsPage: React.FC = () => {
+const LoginPage: React.FC = () => {
   return (
     <Container maxWidth="lg">
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <LoginPage />
+          <Login />
         </Grid>
       </Grid>
     </Container>
   );
 };
 
-export default LocationsPage;
+export default LoginPage;

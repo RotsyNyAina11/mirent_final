@@ -5,8 +5,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { Proforma } from './proforma.entity';
-import { Devis } from './devis.entity';
+
 
 @Entity()
 export class Client {
@@ -25,9 +24,5 @@ export class Client {
   @Column({ type: 'varchar', nullable: true })
   logo: string | null;
 
-  @OneToMany(() => Proforma, (proforma) => proforma.client)
-  proformas: Proforma[];
 
-  @OneToMany(() => Devis, (devis) => devis.client)
-  devis: Devis[];
 }

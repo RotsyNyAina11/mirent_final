@@ -5,25 +5,6 @@ import { Injectable } from '@nestjs/common';
 export class MailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendProforma(
-    to: string,
-    proforma: any,
-    pdfBuffer: Buffer,
-  ): Promise<void> {
-    await this.mailerService.sendMail({
-      to,
-      subject: `Votre facture proforma N° ${proforma.proformaNumber}`,
-      template: './proforma',
-      context: {
-        proforma: proforma,
-      },
-      attachments: [
-        {
-          filename: `proforma_${proforma.proformaNumber}.pdf`,
-          content: pdfBuffer,
-          contentType: 'application/pdf',
-        },
-      ],
-    });
-  }
+  // Service de base pour l'envoi d'emails
+  // Les méthodes spécifiques peuvent être ajoutées selon les besoins
 }

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Typography,
   Paper,
-  Box,
   Table,
   TableBody,
   TableCell,
@@ -12,10 +10,6 @@ import {
   TableRow,
 } from "@mui/material";
 import moment from "moment";
-
-interface Prix {
-  valeur: number;
-}
 
 interface ContractItem {
   id: number; // N° Demande
@@ -65,42 +59,23 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
 
   useEffect(() => {
     const fetchContractItems = async () => {
-      // Vérifier si les fonctions de rappel sont définies avant de les appeler
       if (onLoadingChange) onLoadingChange(true);
       if (onError) onError(null);
       if (onNoContracts) onNoContracts(false);
       setLoading(true);
       setError(null);
 
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/clients/${clientId}/proforma-items`
-        );
-        const fetchedItems = response.data;
-        setContractItems(fetchedItems);
-
-        if (fetchedItems.length === 0) {
-          if (onNoContracts) onNoContracts(true);
-        }
-      } catch (err) {
-        console.error(
-          `Erreur lors du chargement des items de contrat pour le client ${clientId}:`,
-          err
-        );
-        const errorMessage = "Impossible de charger les détails des contrats.";
-        setError(errorMessage);
-        if (onError) onError(errorMessage);
-      } finally {
-        setLoading(false);
-        if (onLoadingChange) onLoadingChange(false);
-      }
+      console.log(`API call to fetch proforma items for client ${clientId} is disabled.`);
+      // API call is disabled as per user request.
+      // Immediately setting state to indicate no contracts and stop loading.
+      if (onNoContracts) onNoContracts(true);
+      setLoading(false);
+      if (onLoadingChange) onLoadingChange(false);
     };
 
-    // Assurez-vous que clientId est valide avant de lancer la requête
     if (clientId) {
       fetchContractItems();
     } else {
-      // Si clientId est null ou 0, réinitialisez l'état
       setContractItems([]);
       setLoading(false);
       if (onLoadingChange) onLoadingChange(false);

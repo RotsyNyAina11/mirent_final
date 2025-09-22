@@ -114,24 +114,9 @@ const ReservationDetailsDialog: React.FC<ReservationDetailsDialogProps> = ({
 
       setIsLoading(true);
       setError(null);
-      try {
-        const response = await fetch(
-          `http://localhost:3000/reservations/${reservationId}`
-        );
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            errorData.message || "Échec du chargement des détails."
-          );
-        }
-        const data: Reservation = await response.json();
-        setReservation(data);
-      } catch (err) {
-        console.error("Erreur lors du chargement des détails:", err);
-        setError("Impossible de charger les détails de la réservation.");
-      } finally {
-        setIsLoading(false);
-      }
+      console.log(`API call to fetch reservation details for ${reservationId} is disabled.`);
+      setError("Les appels API sont désactivés.");
+      setIsLoading(false);
     };
 
     fetchReservationDetails();

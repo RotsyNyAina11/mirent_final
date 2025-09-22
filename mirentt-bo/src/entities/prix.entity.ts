@@ -15,7 +15,6 @@ export class Prix {
   @Column('decimal', { precision: 10, scale: 2 })
   prix: number;
 
-  @OneToOne(() => Region, { onDelete: 'CASCADE' })
-  @JoinColumn()
+  @OneToOne(() => Region, (region) => region.prix)
   region: Region;
 }

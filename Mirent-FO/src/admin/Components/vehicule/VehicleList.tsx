@@ -1,223 +1,135 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { 
+  createVehicle, 
+  deleteVehicle, 
+  fetchVehicles, 
+  fetchVehicleStatuses, 
+  fetchVehicleTypes, 
+  updateVehicle, 
+  Vehicle, 
+  VehicleStatus, 
+  VehicleType 
+} from '../../../redux/features/vehicle/vehiclesSlice';
+import { useAppDispatch } from '../../../hooks';
 import {
   Box,
   Typography,
-  Card,
   Grid,
-  Button,
-  Chip,
-  Stack,
   TextField,
-  InputAdornment,
-  Snackbar,
-  Alert,
-  FormControl,
   Select,
   MenuItem,
   InputLabel,
-  TablePagination,
+  FormControl,
+  Button,
+  Avatar,
+  IconButton,
+  CircularProgress,
+  Snackbar,
+  Alert,
   Dialog,
-  DialogActions,
   DialogTitle,
   DialogContent,
-  DialogContentText,
-  Skeleton,
-  Checkbox,
-  Collapse,
-  useTheme,
+  DialogActions,
+  FormHelperText,
+  SelectChangeEvent,
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
   useMediaQuery,
-  Toolbar,
-} from "@mui/material";
+  Paper
+} from '@mui/material';
+import { 
+  Add as AddIcon, 
+  Edit as EditIcon, 
+  Delete as DeleteIcon,
+  Close as CloseIcon,
+  Save as SaveIcon,
+  DirectionsCar as CarIcon,
+  CheckCircle as CheckIcon,
+  Cancel as CancelIcon,
+  Search as SearchIcon
+} from '@mui/icons-material';
+import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 
-import { Delete, SearchOutlined, Edit, Add, DirectionsCar, LocalShipping, TwoWheeler, FilterList } from "@mui/icons-material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { styled } from "@mui/material/styles";
-
-import { useAppDispatch } from "../../../hooks";
-import {
-  deleteVehicle,
-  fetchVehicles,
-  fetchVehicleStatuses,
-  fetchVehicleTypes,
-  Vehicle,
-  VehicleStatus,
-  VehicleType,
-} from "../../../redux/features/vehicle/vehiclesSlice";
-import EditVehicle from "./EditVehicles";
-import AddVehicle from "./AddVehicles";
-
-
-// Thème personnalisé (identique à LocationList.tsx)
+// Création du thème cohérent avec CustomerManagement
 const theme = createTheme({
   palette: {
-    primary: {
-      main: "#3b82f6",
-    },
-    secondary: {
-      main: "#ef4444",
-    },
-    background: {
-      default: "#f9fafb",
-    },
-    text: {
-      primary: "#1f2937",
-      secondary: "#6b7280",
-    },
+    primary: { main: "#3b82f6" },
+    secondary: { main: "#ef4444" },
+    background: { default: "#f9fafb" },
+    text: { primary: "#1f2937", secondary: "#6b7280" },
   },
   typography: {
     fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
-    h5: {
-      fontWeight: 600,
-      color: "#1f2937",
-    },
-    body1: {
-      fontSize: "0.9rem",
-      color: "#1f2937",
-    },
-    body2: {
-      fontSize: "0.85rem",
-      color: "#6b7280",
-    },
-  },
-  components: {
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          padding: "12px 16px",
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: "none",
-          borderRadius: "8px",
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          "& .MuiOutlinedInput-root": {
-            borderRadius: "8px",
-            "& fieldset": {
-              borderColor: "#d1d5db",
-            },
-            "&:hover fieldset": {
-              borderColor: "#9ca3af",
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: "#3b82f6",
-            },
-          },
-        },
-      },
-    },
+    h4: { fontWeight: 600, color: "#1f2937" },
+    h6: { fontWeight: 600, color: "#1f2937" },
+    body1: { fontSize: "0.9rem", color: "#1f2937" },
+    body2: { fontSize: "0.85rem", color: "#6b7280" },
   },
 });
 
-// Styles personnalisés (alignés avec LocationList.tsx)
+interface RootState {
+  vehicles: {
+    vehicles: Vehicle[];
+    vehiclesType: VehicleType[];
+    vehiclesStatus: VehicleStatus[];
+    vehiclesLoading: boolean;
+    vehiclesError: string | null;
+    vehiclesTypeLoading: boolean;
+    vehiclesTypeError: string | null;
+    vehiclesStatusLoading: boolean;
+    vehiclesStatusError: string | null;
+  };
+}
 
-const PrimaryButton = styled(Button)(({ theme }) => ({
-  backgroundColor: "#3b82f6",
-  color: theme.palette.common.white,
-  padding: "8px 16px",
-  borderRadius: "8px",
-  textTransform: "none",
-  fontWeight: 500,
-  fontSize: "0.875rem",
-  "&:hover": {
-    backgroundColor: "#2563eb",
-    transform: "scale(1.02)",
-    transition: "all 0.3s ease",
-  },
-  "&.Mui-disabled": {
-    backgroundColor: "#d1d5db",
-    color: "#6b7280",
-  },
-}));
-
-const SecondaryButton = styled(Button)(({ theme }) => ({
-  backgroundColor: "#ef4444",
-  color: theme.palette.common.white,
-  padding: "8px 16px",
-  borderRadius: "8px",
-  textTransform: "none",
-  fontWeight: 500,
-  fontSize: "0.875rem",
-  "&:hover": {
-    backgroundColor: "#dc2626",
-    transform: "scale(1.02)",
-    transition: "all 0.3s ease",
-  },
-  "&.Mui-disabled": {
-    backgroundColor: "#d1d5db",
-    color: "#6b7280",
-  },
-}));
-
-const CancelButton = styled(Button)(() => ({
-  color: "#6b7280",
-  borderColor: "#d1d5db",
-  padding: "8px 16px",
-  borderRadius: "8px",
-  textTransform: "none",
-  fontWeight: 500,
-  fontSize: "0.875rem",
-  "&:hover": {
-    borderColor: "#9ca3af",
-    backgroundColor: "#f3f4f6",
-    transform: "scale(1.02)",
-    transition: "all 0.3s ease",
-  },
-}));
-
-const SearchField = styled(TextField)(() => ({
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "12px",
-    backgroundColor: "#fff",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-    "& fieldset": {
-      borderColor: "#d1d5db",
-    },
-    "&:hover fieldset": {
-      borderColor: "#9ca3af",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#3b82f6",
-    },
-  },
-  "& .MuiInputBase-input": {
-    fontSize: { xs: "0.85rem", sm: "0.9rem" },
-    padding: { xs: "8px 12px", sm: "10px 14px" },
-  },
-}));
-
-const VehiclesList: React.FC = () => {
+const VehicleList: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { vehicles, loading, error, vehiclesType, vehiclesStatus } = useSelector((state: any) => state.vehicles);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); 
+  const muiTheme = useTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  
+  const {
+    vehicles,
+    vehiclesType,
+    vehiclesStatus,
+    vehiclesLoading,
+    vehiclesError,
+    vehiclesTypeLoading,
+    vehiclesTypeError,
+    vehiclesStatusLoading,
+    vehiclesStatusError,
+  } = useSelector((state: RootState) => state.vehicles);
 
-  const [vehicleTypesRedux, setVehicleTypesRedux] = useState<VehicleType[]>(vehiclesType);
-  const [vehicleStatusesRedux, setVehicleStatusesRedux] = useState<VehicleStatus[]>(vehiclesStatus);
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [filterType, setFilterType] = useState<string>("");
-  const [filterStatus, setFilterStatus] = useState<string>("");
-  const [vehicleTypes, setVehicleTypes] = useState<string[]>([]);
-  const [vehicleStatuses, setVehicleStatuses] = useState<string[]>([]);
-  const [showAddVehicle, setShowAddVehicle] = useState(false);
-  const [filterOpen, setFilterOpen] = useState(!isMobile); // Collapsed by default on mobile
-  const [selectedVehicles, setSelectedVehicles] = useState<number[]>([]);
-  const [confirmDeleteSelectedOpen, setConfirmDeleteSelectedOpen] = useState(false);
+  const [newVehicle, setNewVehicle] = useState({
+    nom: '',
+    marque: '',
+    modele: '',
+    immatriculation: '',
+    nombrePlace: '' as number | '',
+    typeId: 0,
+    statusId: 0,
+    distance_moyenne: '' as number | '',
+    derniere_visite: '',
+    image: undefined as File | undefined,
+  });
+  
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success' as 'success' | 'error',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     dispatch(fetchVehicles());
@@ -226,656 +138,767 @@ const VehiclesList: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    setVehicleTypesRedux(vehiclesType);
-    setVehicleStatusesRedux(vehiclesStatus);
-    if (vehiclesType && vehiclesType.length > 0) {
-      setVehicleTypes(vehiclesType.map((t: VehicleType) => t.type));
+    if (vehiclesError || vehiclesTypeError || vehiclesStatusError) {
+      setSnackbar({
+        open: true,
+        message: vehiclesError || vehiclesTypeError || vehiclesStatusError || 'Erreur inconnue',
+        severity: 'error'
+      });
     }
-    if (vehiclesStatus && vehiclesStatus.length > 0) {
-      setVehicleStatuses(vehiclesStatus.map((s: VehicleStatus) => s.status));
-    }
-  }, [vehiclesType, vehiclesStatus]);
+  }, [vehiclesError, vehiclesTypeError, vehiclesStatusError]);
 
+  // Filtrage des véhicules
   const filteredVehicles = useMemo(() => {
-    return vehicles.filter((veh: any) => {
-      const lowercasedSearch = search.toLowerCase();
-      const typeName = vehicleTypesRedux.find((t) => t.id === veh.type?.id)?.type || "";
-      const statusName = vehicleStatusesRedux.find((s) => s.id === veh.status?.id)?.status || "";
-      return (
-        (veh.nom.toLowerCase().includes(lowercasedSearch) ||
-          veh.marque.toLowerCase().includes(lowercasedSearch) ||
-          veh.modele.toLowerCase().includes(lowercasedSearch) ||
-          veh.immatriculation.toLowerCase().includes(lowercasedSearch) ||
-          typeName.toLowerCase().includes(lowercasedSearch) ||
-          statusName.toLowerCase().includes(lowercasedSearch)) &&
-        (filterType ? typeName === filterType : true) &&
-        (filterStatus ? statusName === filterStatus : true)
-      );
-    });
-  }, [vehicles, search, filterType, filterStatus, vehicleTypesRedux, vehicleStatusesRedux]);
-
-  const paginatedVehicles = filteredVehicles.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
-
-  const handleEditClick = (vehicle: Vehicle) => {
-    setSelectedVehicle(vehicle);
-    setIsEditOpen(true);
-  };
-
-  const handleDeleteVehicle = () => {
-    if (vehicleToDelete) {
-      dispatch(deleteVehicle(vehicleToDelete.id));
-      setSelectedVehicles((prev) => prev.filter((id) => id !== vehicleToDelete.id));
-      setOpenSnackbar(true);
-    }
-    setOpenDeleteDialog(false);
-    setVehicleToDelete(null);
-  };
-
-  const isValidImageUrl = (url: string) => {
-    try {
-      new URL(url, window.location.origin);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  };
-
-  // Gestion de la sélection des véhicules
-  const handleSelectAllVehicles = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (event.target.checked) {
-      const newSelected = paginatedVehicles.map(
-        (vehicle: Vehicle) => vehicle.id
-      );
-      setSelectedVehicles(newSelected);
-    } else {
-      setSelectedVehicles([]);
-    }
-  };
-
-
-  const handleSelectVehicle = (id: number) => {
-    setSelectedVehicles((prev) =>
-      prev.includes(id)
-        ? prev.filter((vehicleId) => vehicleId !== id)
-        : [...prev, id]
+    return vehicles.filter(vehicle => 
+      vehicle.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.immatriculation.toLowerCase().includes(searchTerm.toLowerCase())
     );
+  }, [vehicles, searchTerm]);
+
+  // Calcul des statistiques - CORRECTION: ajout de vérifications pour status
+  const stats = useMemo(() => {
+    const total = vehicles.length;
+    const available = vehicles.filter(v => v.status?.status?.toLowerCase() === 'disponible').length;
+    const inMaintenance = vehicles.filter(v => v.status?.status?.toLowerCase() === 'en maintenance').length;
+
+    return [
+      { title: "Total des Véhicules", value: total, icon: <CarIcon fontSize="large" color="primary" />, bg: "#e3f2fd" },
+      { title: "Disponibles", value: available, icon: <CheckIcon fontSize="large" color="success" />, bg: "#e8f5e9" },
+      { title: "En Maintenance", value: inMaintenance, icon: <CancelIcon fontSize="large" color="warning" />, bg: "#fff3e0" },
+    ];
+  }, [vehicles]);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!newVehicle.nom) newErrors.nom = 'Le nom est requis';
+    if (!newVehicle.marque) newErrors.marque = 'La marque est requise';
+    if (!newVehicle.modele) newErrors.modele = 'Le modèle est requis';
+    if (!newVehicle.immatriculation) newErrors.immatriculation = "L'immatriculation est requise";
+    if (!newVehicle.nombrePlace) newErrors.nombrePlace = 'Le nombre de places est requis';
+    if (newVehicle.typeId === 0) newErrors.typeId = 'Le type est requis';
+    if (newVehicle.statusId === 0) newErrors.statusId = 'Le statut est requis';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const openConfirmDeleteSelected = () => {
-    setConfirmDeleteSelectedOpen(true);
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setNewVehicle((prev) => ({
+      ...prev,
+      [name]:
+        name === 'nombrePlace' || name === 'distance_moyenne'
+          ? value === '' ? '' : parseFloat(value) || 0
+          : value,
+    }));
   };
 
-  const handleConfirmDeleteSelected = () => {
-    selectedVehicles.forEach((id) => {
-      dispatch(deleteVehicle(id));
+  const handleSelectChange = (e: SelectChangeEvent<number>) => {
+    const { name, value } = e.target;
+    setNewVehicle(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setNewVehicle((prev) => ({ ...prev, image: e.target.files![0] }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    
+    const vehicleData = {
+      nom: newVehicle.nom,
+      marque: newVehicle.marque,
+      modele: newVehicle.modele,
+      immatriculation: newVehicle.immatriculation,
+      nombrePlace: newVehicle.nombrePlace === '' ? 0 : Number(newVehicle.nombrePlace),
+      typeId: Number(newVehicle.typeId),
+      statusId: Number(newVehicle.statusId),
+      distance_moyenne: newVehicle.distance_moyenne === '' ? undefined : Number(newVehicle.distance_moyenne),
+      derniere_visite: newVehicle.derniere_visite || undefined,
+      image: newVehicle.image,
+    };
+
+    try {
+      if (editingVehicle) {
+        await dispatch(
+          updateVehicle({
+            id: editingVehicle.id,
+            data: {
+              nom: vehicleData.nom,
+              marque: vehicleData.marque,
+              modele: vehicleData.modele,
+              immatriculation: vehicleData.immatriculation,
+              nombrePlace: vehicleData.nombrePlace,
+              type: { id: vehicleData.typeId, type: '' },
+              status: { id: vehicleData.statusId, status: '' },
+              distance_moyenne: vehicleData.distance_moyenne,
+              derniere_visite: vehicleData.derniere_visite,
+            },
+            image: vehicleData.image,
+          })
+        ).unwrap();
+        
+        setSnackbar({
+          open: true,
+          message: 'Véhicule mis à jour avec succès',
+          severity: 'success'
+        });
+        setEditingVehicle(null);
+      } else {
+        await dispatch(createVehicle(vehicleData)).unwrap();
+        setSnackbar({
+          open: true,
+          message: 'Véhicule créé avec succès',
+          severity: 'success'
+        });
+      }
+      
+      setNewVehicle({
+        nom: '',
+        marque: '',
+        modele: '',
+        immatriculation: '',
+        nombrePlace: '',
+        typeId: 0,
+        statusId: 0,
+        distance_moyenne: '',
+        derniere_visite: '',
+        image: undefined,
+      });
+      setOpenDialog(false);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Une erreur est survenue',
+        severity: 'error'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEdit = (vehicle: Vehicle) => {
+    setEditingVehicle(vehicle);
+    setNewVehicle({
+      nom: vehicle.nom,
+      marque: vehicle.marque,
+      modele: vehicle.modele,
+      immatriculation: vehicle.immatriculation,
+      nombrePlace: vehicle.nombrePlace ?? '',
+      typeId: vehicle.type.id,
+      statusId: vehicle.status.id,
+      distance_moyenne: vehicle.distance_moyenne ?? '',
+      derniere_visite: vehicle.derniere_visite ?? '',
+      image: undefined,
     });
-    setSelectedVehicles([]);
-    setConfirmDeleteSelectedOpen(false);
-    setOpenSnackbar(true);
+    setOpenDialog(true);
   };
 
-  const handleCloseConfirmDeleteSelected = () => {
-    setConfirmDeleteSelectedOpen(false);
+  const handleDelete = (id: number) => {
+    setDeleteConfirm(id);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteConfirm) {
+      try {
+        await dispatch(deleteVehicle(deleteConfirm)).unwrap();
+        setSnackbar({
+          open: true,
+          message: 'Véhicule supprimé avec succès',
+          severity: 'success'
+        });
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          message: 'Échec de la suppression',
+          severity: 'error'
+        });
+      } finally {
+        setDeleteConfirm(null);
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setNewVehicle({
+      nom: '',
+      marque: '',
+      modele: '',
+      immatriculation: '',
+      nombrePlace: '',
+      typeId: 0,
+      statusId: 0,
+      distance_moyenne: '',
+      derniere_visite: '',
+      image: undefined,
+    });
+    setEditingVehicle(null);
+    setErrors({});
+    setOpenDialog(false);
+  };
+
+  // CORRECTION: Gestion des statuts potentiellement undefined
+  const getStatusColor = (status: string | undefined) => {
+    if (!status) return theme.palette.text.secondary;
+    
+    switch (status.toLowerCase()) {
+      case 'disponible':
+        return theme.palette.success.main;
+      case 'en maintenance':
+        return theme.palette.warning.main;
+      case 'réservé':
+        return theme.palette.info.main;
+      case 'hors service':
+        return theme.palette.error.main;
+      default:
+        return theme.palette.text.secondary;
+    }
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ maxWidth: "95%", margin: "auto", mt: { xs: 2, sm: 4 }, mb: 8 }}>
-        <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ padding: { xs: 1, sm: 3 }, backgroundColor: "#f9fafb", minHeight: "100vh" }}>
-          {/* Header */}
-          <Grid item xs={12}>
-            <Typography variant="h5" sx={{ fontWeight: 600, color: "text.primary", mb: 1 }}>
-              Liste des Véhicules
+      <Box sx={{ 
+        px: isMobile ? 2 : 3, 
+        py: 2, 
+        backgroundColor: "#f9fafb", 
+        minHeight: "100vh" 
+      }}>
+        {/* Header et recherche */}
+        <Grid container spacing={1} mb={3} alignItems="center">
+          <Grid item xs={12} sm={6}>
+            <Typography variant="h4" sx={{ fontWeight: 600, color: "#1f2937" }}>
+              Gestion du Parc Automobile
             </Typography>
-            <Typography variant="body1" sx={{ fontSize: { xs: "0.85rem", sm: "0.9rem" }, color: "#6b7280" }}>
-              Recherchez, filtrez, modifiez ou supprimez les véhicules de votre agence.
+            <Typography variant="body2" color="text.secondary" mt={0.5}>
+              Consultez, ajoutez et gérez les véhicules de votre flotte
             </Typography>
           </Grid>
-
-          {/* Barre de recherche, filtres et bouton d'ajout */}
-          <Grid item xs={12}>
-            <Toolbar
-              sx={{
-                justifyContent: "space-between",
-                flexDirection: { xs: "column", sm: "row" },
-                gap: { xs: 1.5, sm: 0 },
-                padding: 0,
-                position: "sticky",
-                top: { xs: "56px", sm: "64px" },
-                backgroundColor: "#f9fafb",
-                zIndex: 2,
-                mb: { xs: 1, sm: 2 },
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            display="flex"
+            justifyContent={isMobile ? "flex-start" : "flex-end"}
+            gap={1}
+            mt={isMobile ? 1 : 0}
+          >
+            <TextField
+              size="small"
+              placeholder="Rechercher..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ color: theme.palette.text.secondary, mr: 1 }} />,
               }}
-            >
-              <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 1, width: { xs: "100%", sm: "auto" }, alignItems: { xs: "stretch", sm: "center" } }}>
-                <SearchField
-                  placeholder="Rechercher un véhicule..."
-                  variant="outlined"
-                  size="small"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchOutlined sx={{ color: "text.secondary", fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{ width: { xs: "100%", sm: "300px" } }}
-                />
-                <Button
-                  variant="outlined"
-                  startIcon={<FilterList />}
-                  onClick={() => setFilterOpen(!filterOpen)}
-                  sx={{
-                    borderColor: "#d1d5db",
-                    color: "#1f2937",
-                    borderRadius: "8px",
-                    textTransform: "none",
-                    width: { xs: "100%", sm: "auto" },
-                    "&:hover": {
-                      borderColor: "#9ca3af",
-                      backgroundColor: "#f3f4f6",
-                    },
-                  }}
-                >
-                  Filtres
-                </Button>
-              </Box>
-              <Box sx={{ display: "flex", gap: 1, width: { xs: "100%", sm: "auto" } }}>
-                <PrimaryButton
-                  startIcon={<Add />}
-                  onClick={() => setShowAddVehicle(true)}
-                  variant="contained"
-                  aria-label="Ajouter un véhicule"
-                  sx={{ width: { xs: "100%", sm: "auto" } }}
-                >
-                  Ajouter un véhicule
-                </PrimaryButton>
-              </Box>
-            </Toolbar>
-          </Grid>
-
-          {/* Barre d'actions contextuelle pour la sélection */}
-          {selectedVehicles.length > 0 && (
-            <Grid item xs={12}>
-              <Toolbar
-                sx={{
-                  justifyContent: { xs: "center", sm: "space-between" },
-                  flexDirection: { xs: "column", sm: "row" },
-                  gap: { xs: 1, sm: 0 },
-                  p: { xs: 1, sm: 2 },
-                  backgroundColor: "#fff",
-                  borderRadius: "12px",
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                  mb: { xs: 1, sm: 2 },
-                  position: "sticky",
-                  top: { xs: "108px", sm: "120px" },
-                  zIndex: 1,
-                  alignItems: { xs: "center", sm: "center" },
-                }}
-              >
-                <Typography variant="body1" sx={{ fontWeight: 500, color: "#1f2937", textAlign: { xs: "center", sm: "left" } }}>
-                  {selectedVehicles.length} véhicule(s) sélectionné(s)
-                </Typography>
-                <SecondaryButton
-                  variant="contained"
-                  size="small"
-                  onClick={openConfirmDeleteSelected}
-                  aria-label="Supprimer les véhicules sélectionnés"
-                >
-                  Supprimer ({selectedVehicles.length})
-                </SecondaryButton>
-              </Toolbar>
-            </Grid>
-          )}
-
-          {/* Section des filtres */}
-          <Grid item xs={12}>
-            <Collapse in={filterOpen}>
-              <Box
-                sx={{
-                  p: { xs: 1, sm: 2 },
-                  backgroundColor: "#fff",
-                  borderRadius: "12px",
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                  mb: { xs: 1, sm: 2 },
-                }}
-              >
-                <Typography variant="body1" sx={{ fontWeight: 500, mb: 1, color: "#1f2937", fontSize: { xs: "0.85rem", sm: "0.9rem" } }}>
-                  Filtres
-                </Typography>
-                <Grid container spacing={1}>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel sx={{ fontSize: { xs: "0.85rem", sm: "0.9rem" } }}>Type de véhicule</InputLabel>
-                      <Select
-                        value={filterType}
-                        onChange={(e) => setFilterType(e.target.value)}
-                        label="Type de véhicule"
-                        sx={{
-                          borderRadius: "8px",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#d1d5db",
-                          },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#9ca3af",
-                          },
-                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#3b82f6",
-                          },
-                          fontSize: { xs: "0.85rem", sm: "0.9rem" },
-                        }}
-                      >
-                        <MenuItem value="">Tous</MenuItem>
-                        {vehicleTypes.map((type) => (
-                          <MenuItem key={type} value={type} sx={{ fontSize: { xs: "0.85rem", sm: "0.9rem" } }}>
-                            {type}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel sx={{ fontSize: { xs: "0.85rem", sm: "0.9rem" } }}>Statut</InputLabel>
-                      <Select
-                        value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value)}
-                        label="Statut"
-                        sx={{
-                          borderRadius: "8px",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#d1d5db",
-                          },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#9ca3af",
-                          },
-                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#3b82f6",
-                          },
-                          fontSize: { xs: "0.85rem", sm: "0.9rem" },
-                        }}
-                      >
-                        <MenuItem value="">Tous</MenuItem>
-                        {vehicleStatuses.map((status) => (
-                          <MenuItem key={status} value={status} sx={{ fontSize: { xs: "0.85rem", sm: "0.9rem" } }}>
-                            {status}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Collapse>
-          </Grid>
-
-          {/* Affichage des véhicules */}
-          <Grid item xs={12}>
-            {loading ? (
-              <Grid container spacing={{ xs: 2, sm: 3 }}>
-                {[...Array(rowsPerPage)].map((_, idx) => (
-                  <Grid item xs={12} key={idx}>
-                    <Card sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, p: { xs: 1, sm: 2 }, borderRadius: 3 }}>
-                      <Skeleton
-                        variant="rectangular"
-                        width="100%"
-                        height={120}
-                        sx={{
-                          borderRadius: 2,
-                          mb: { xs: 1, sm: 0 },
-                          mr: { sm: 2 },
-                          width: { xs: "100%", sm: 200 },
-                          height: { xs: 120, sm: 150 }
-                        }}
-                      />
-                      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", gap: 1, p: 1 }}>
-                        <Skeleton variant="text" width="60%" />
-                        <Skeleton variant="text" width="40%" />
-                        <Skeleton variant="text" width="40%" />
-                        <Skeleton variant="text" width="30%" />
-                      </Box>
-                      <Skeleton
-                        variant="rectangular"
-                        width="100%"
-                        height={80}
-                        sx={{
-                          alignSelf: { xs: "center", sm: "flex-end" },
-                          width: { xs: "100%", sm: 100 },
-                          height: { xs: 80, sm: 100 }
-                        }}
-                      />
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            ) : error ? (
-              <Typography color="error" variant="h6" textAlign="center" sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}>
-                Erreur de chargement des données. Veuillez réessayer plus tard.
-              </Typography>
-            ) : filteredVehicles.length === 0 ? (
-              <Typography variant="body1" color="text.secondary" textAlign="center" sx={{ fontSize: { xs: "0.85rem", sm: "0.9rem" } }}>
-                Aucun véhicule trouvé.
-              </Typography>
-            ) : (
-              <Grid container spacing={{ xs: 2, sm: 3 }}>
-                {paginatedVehicles.map((veh: Vehicle) => (
-                  <Grid item xs={12} key={veh.id}>
-                    <Card
-                      sx={{
-                        display: "flex",
-                        flexDirection: { xs: "column", sm: "row" },
-                        p: { xs: 1, sm: 2 },
-                        borderRadius: 3,
-                        alignItems: { xs: "center", sm: "stretch" },
-                      }}
-                    >
-                      {/* Case à cocher et image */}
-                      <Box sx={{ position: "relative", width: { xs: "100%", sm: 200 }, height: { xs: 120, sm: 150 }, mb: { xs: 1, sm: 0 }, mr: { sm: 2 } }}>
-                        <Checkbox
-                          checked={selectedVehicles.includes(veh.id)}
-                          onChange={() => handleSelectVehicle(veh.id)}
-                          sx={{ position: "absolute", top: 8, left: 8, zIndex: 1 }}
-                          aria-label={`Sélectionner le véhicule ${veh.nom}`}
-                        />
-                        {veh.imageUrl && isValidImageUrl(veh.imageUrl) ? (
-                          <Box
-                            component="img"
-                            src={veh.imageUrl}
-                            alt={veh.nom}
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = "/default-vehicle.png";
-                            }}
-                            sx={{
-                              width: "100%",
-                              height: "100%",
-                              borderRadius: 2,
-                              objectFit: "cover",
-                            }}
-                          />
-                        ) : (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              width: "100%",
-                              height: "100%",
-                              backgroundColor: "#f5f5f5",
-                              borderRadius: 2,
-                            }}
-                          >
-                            {vehicleTypesRedux.find((t) => t.id === veh.type?.id)?.type.toLowerCase().includes("voiture") ? (
-                              <DirectionsCar sx={{ fontSize: { xs: "3rem", sm: "4rem" }, color: "#ccc" }} />
-                            ) : vehicleTypesRedux.find((t) => t.id === veh.type?.id)?.type.toLowerCase().includes("camion") ? (
-                              <LocalShipping sx={{ fontSize: { xs: "3rem", sm: "4rem" }, color: "#ccc" }} />
-                            ) : (
-                              <TwoWheeler sx={{ fontSize: { xs: "3rem", sm: "4rem" }, color: "#ccc" }} />
-                            )}
-                          </Box>
-                        )}
-                      </Box>
-                      {/* Informations du véhicule */}
-                      <Box
-                        sx={{
-                          flexGrow: 1,
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          gap: { xs: 0.5, sm: 1 },
-                          p: 1,
-                          textAlign: { xs: "center", sm: "left" },
-                        }}
-                      >
-                        <Typography variant="h6" sx={{ fontWeight: "bold", fontSize: { xs: "1rem", sm: "1.25rem" } }}>
-                          {veh.nom}
-                        </Typography>
-                        <Typography variant="body2">{veh.marque} - {veh.modele}</Typography>
-                        <Typography variant="body2">Immatriculation: {veh.immatriculation}</Typography>
-                        <Typography variant="body2">Type: {vehicleTypesRedux.find((t) => t.id === veh.type?.id)?.type}</Typography>
-                        <Typography variant="body2">Places: {veh.nombrePlace}</Typography>
-                      </Box>
-                      {/* Statut et actions */}
-                      <Stack
-                        justifyContent="space-between"
-                        alignItems={{ xs: "center", sm: "flex-end" }}
-                        sx={{ width: { xs: "100%", sm: "auto" }, mt: { xs: 1, sm: 0 } }}
-                      >
-                        <Chip
-                          label={vehicleStatusesRedux.find((s) => s.id === veh.status?.id)?.status}
-                          color={vehicleStatusesRedux.find((s) => s.id === veh.status?.id)?.status === "Disponible" ? "success" : "error"}
-                          variant="outlined"
-                          sx={{ fontSize: { xs: "0.75rem", sm: "0.85rem" } }}
-                        />
-                        <Stack direction={{ xs: "column", sm: "row" }} spacing={1} mt={1}>
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            color="warning"
-                            startIcon={<Edit />}
-                            onClick={() => handleEditClick(veh)}
-                            aria-label={`Modifier le véhicule ${veh.nom}`}
-                            sx={{ width: { xs: "100%", sm: "auto" } }}
-                          >
-                            Modifier
-                          </Button>
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            color="error"
-                            startIcon={<Delete />}
-                            onClick={() => {
-                              setVehicleToDelete(veh);
-                              setOpenDeleteDialog(true);
-                            }}
-                            disabled={selectedVehicles.length > 0}
-                            aria-label={`Supprimer le véhicule ${veh.nom}`}
-                            sx={{ width: { xs: "100%", sm: "auto" } }}
-                          >
-                            Supprimer
-                          </Button>
-                        </Stack>
-                      </Stack>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </Grid>
-
-          {/* Pagination */}
-          <Grid item xs={12}>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 15]}
-              component="div"
-              count={filteredVehicles.length}
-              rowsPerPage={rowsPerPage}
-              page={currentPage}
-              onPageChange={(_, newPage) => setCurrentPage(newPage)}
-              onRowsPerPageChange={(e) => {
-                setRowsPerPage(parseInt(e.target.value, 10));
-                setCurrentPage(0);
-              }}
-              sx={{
-                "& .MuiTablePagination-selectLabel": { fontSize: { xs: "0.75rem", sm: "0.85rem" }, color: "text.secondary" },
-                "& .MuiTablePagination-displayedRows": { fontSize: { xs: "0.75rem", sm: "0.85rem" }, color: "text.secondary" },
-                "& .MuiTablePagination-actions": { color: "primary.main" },
-                "& .MuiTablePagination-toolbar": { justifyContent: "center", py: { xs: 0.5, sm: 1 } },
+              sx={{ 
+                backgroundColor: "#fff", 
+                borderRadius: "8px", 
+                minWidth: 140,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: "8px",
+                }
               }}
             />
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenDialog(true)}
+              sx={{ 
+                borderRadius: "8px", 
+                textTransform: "none", 
+                minHeight: 36, 
+                fontSize: "0.8rem", 
+                px: 2,
+                fontWeight: 600
+              }}
+            >
+              Ajouter un véhicule
+            </Button>
           </Grid>
-
-          {/* Dialogue de confirmation de suppression individuelle */}
-          <Dialog
-            open={openDeleteDialog}
-            onClose={() => setOpenDeleteDialog(false)}
-            fullScreen={isMobile}
-            sx={{
-              "& .MuiDialog-paper": {
-                borderRadius: { xs: 0, sm: "12px" },
-                boxShadow: { xs: "none", sm: "0 4px 16px rgba(0, 0, 0, 0.15)" },
-                backgroundColor: "#fff",
-              },
-            }}
-          >
-            <DialogTitle
-              sx={{
-                fontWeight: 600,
-                textAlign: "center",
-                color: "text.primary",
-                py: { xs: 2, sm: 3 },
-                fontSize: { xs: "1rem", sm: "1.25rem" },
-              }}
-            >
-              Confirmer la suppression
-            </DialogTitle>
-            <DialogContent sx={{ p: { xs: 2, sm: 4 } }}>
-              <DialogContentText
-                id="confirm-delete-description"
-                sx={{ color: "#1f2937", fontSize: { xs: "0.9rem", sm: "1rem" }, textAlign: "center" }}
-              >
-                Êtes-vous sûr de vouloir supprimer le véhicule {vehicleToDelete?.nom} ?
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions
-              sx={{
-                p: { xs: 2, sm: 3 },
-                display: "flex",
-                justifyContent: "space-between",
-                flexDirection: { xs: "column", sm: "row" },
-                gap: { xs: 1, sm: 0 },
-              }}
-            >
-              <CancelButton
-                onClick={() => setOpenDeleteDialog(false)}
-                variant="outlined"
-                aria-label="Annuler la suppression"
-                sx={{ width: { xs: "100%", sm: "auto" } }}
-              >
-                Annuler
-              </CancelButton>
-              <SecondaryButton
-                onClick={handleDeleteVehicle}
-                variant="contained"
-                aria-label="Confirmer la suppression"
-                sx={{ width: { xs: "100%", sm: "auto" } }}
-              >
-                Supprimer
-              </SecondaryButton>
-            </DialogActions>
-          </Dialog>
-
-          {/* Dialogue de confirmation pour supprimer les véhicules sélectionnés */}
-          <Dialog
-            open={confirmDeleteSelectedOpen}
-            onClose={handleCloseConfirmDeleteSelected}
-            fullScreen={isMobile}
-            sx={{
-              "& .MuiDialog-paper": {
-                borderRadius: { xs: 0, sm: "12px" },
-                boxShadow: { xs: "none", sm: "0 4px 16px rgba(0, 0, 0, 0.15)" },
-                backgroundColor: "#fff",
-              },
-            }}
-          >
-            <DialogTitle
-              sx={{
-                fontWeight: 600,
-                textAlign: "center",
-                color: "text.primary",
-                py: { xs: 2, sm: 3 },
-                fontSize: { xs: "1rem", sm: "1.25rem" },
-              }}
-            >
-              Confirmer la suppression
-            </DialogTitle>
-            <DialogContent sx={{ p: { xs: 2, sm: 4 } }}>
-              <DialogContentText
-                id="confirm-delete-selected-description"
-                sx={{ color: "#1f2937", fontSize: { xs: "0.9rem", sm: "1rem" }, textAlign: "center" }}
-              >
-                Êtes-vous sûr de vouloir supprimer {selectedVehicles.length} véhicule(s) sélectionné(s) ?
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions
-              sx={{
-                p: { xs: 2, sm: 3 },
-                display: "flex",
-                justifyContent: "space-between",
-                flexDirection: { xs: "column", sm: "row" },
-                gap: { xs: 1, sm: 0 },
-              }}
-            >
-              <CancelButton
-                onClick={handleCloseConfirmDeleteSelected}
-                variant="outlined"
-                aria-label="Annuler la suppression des véhicules sélectionnés"
-                sx={{ width: { xs: "100%", sm: "auto" } }}
-              >
-                Annuler
-              </CancelButton>
-              <SecondaryButton
-                onClick={handleConfirmDeleteSelected}
-                variant="contained"
-                aria-label="Confirmer la suppression des véhicules sélectionnés"
-                sx={{ width: { xs: "100%", sm: "auto" } }}
-              >
-                Supprimer
-              </SecondaryButton>
-            </DialogActions>
-          </Dialog>
-
-          {/* Snackbar de succès */}
-          <Snackbar
-            open={openSnackbar}
-            autoHideDuration={3000}
-            onClose={() => setOpenSnackbar(false)}
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            sx={{ maxWidth: { xs: "90%", sm: "400px" } }}
-          >
-            <Alert
-              onClose={() => setOpenSnackbar(false)}
-              severity="success"
-              sx={{
-                width: "100%",
-                backgroundColor: "#10b981",
-                color: "#fff",
-                "& .MuiAlert-icon": {
-                  color: "#fff",
-                },
-                fontSize: { xs: "0.8rem", sm: "0.875rem" },
-              }}
-            >
-              {selectedVehicles.length > 1
-                ? `${selectedVehicles.length} véhicule(s) supprimé(s) avec succès !`
-                : "Véhicule supprimé avec succès !"}
-            </Alert>
-          </Snackbar>
-
-          {/* Dialog d'édition */}
-          {isEditOpen && selectedVehicle && (
-            <EditVehicle
-              open={isEditOpen}
-              onClose={() => setIsEditOpen(false)}
-              vehicle={selectedVehicle}
-            />
-          )}
-
-          {/* Modal d'ajout de véhicule */}
-          {showAddVehicle && (
-            <AddVehicle
-              open={showAddVehicle}
-
-              onClose={() => setShowAddVehicle(false)} vehicleId={0} currentStatus={""}            />
-
-          )}
         </Grid>
+
+        {/* Cartes de statistiques */}
+        <Grid container spacing={2} mb={3}>
+          {stats.map((stat, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card
+                sx={{
+                  backgroundColor: stat.bg,
+                  borderRadius: 3,
+                  boxShadow: 3,
+                  transition: "0.3s",
+                  "&:hover": { transform: "translateY(-5px)", boxShadow: 6 },
+                  height: "100%",
+                }}
+              >
+                <CardContent>
+                  <Box display="flex" alignItems="center" gap={2}>
+                    {stat.icon}
+                    <Box>
+                      <Typography variant="subtitle2" color="text.secondary">{stat.title}</Typography>
+                      <Typography variant="h5" fontWeight="bold">{stat.value}</Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Tableau des véhicules */}
+        <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', boxShadow: 3 }}>
+          <CardContent sx={{ p: 0 }}>
+            {vehiclesLoading || vehiclesTypeLoading || vehiclesStatusLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                <CircularProgress size={50} />
+              </Box>
+            ) : (
+              <>
+                <TableContainer>
+                  <Table>
+                    <TableHead sx={{ bgcolor: theme.palette.grey[100] }}>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 700 }}>Véhicule</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Détails</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Statut</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Dernière visite</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }} align="center">Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredVehicles.map((vehicle) => (
+                        <TableRow key={vehicle.id} hover>
+                          <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
+                            {vehicle.imageUrl ? (
+                              <Avatar 
+                                src={vehicle.imageUrl} 
+                                alt={vehicle.nom} 
+                                variant="rounded"
+                                sx={{ 
+                                  width: 80, 
+                                  height: 60, 
+                                  mr: 2,
+                                  boxShadow: theme.shadows[1]
+                                }}
+                              />
+                            ) : (
+                              <Avatar 
+                                variant="rounded" 
+                                sx={{ 
+                                  width: 80, 
+                                  height: 60, 
+                                  mr: 2,
+                                  bgcolor: theme.palette.grey[200],
+                                  boxShadow: theme.shadows[1]
+                                }}
+                              >
+                                <CarIcon sx={{ fontSize: 30, color: theme.palette.grey[500] }} />
+                              </Avatar>
+                            )}
+                            <Box>
+                              <Typography variant="subtitle1" fontWeight={600}>
+                                {vehicle.nom}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                {vehicle.marque} {vehicle.modele}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                {vehicle.immatriculation}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              Type: <strong>{vehicle.type?.type || 'N/A'}</strong>
+                            </Typography>
+                            <Typography variant="body2">
+                              Places: <strong>{vehicle.nombrePlace}</strong>
+                            </Typography>
+                            <Typography variant="body2">
+                              Distance: <strong>{vehicle.distance_moyenne ?? 'N/A'} km</strong>
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            {/* CORRECTION: Gestion du statut potentiellement undefined */}
+                            <Box sx={{ 
+                              display: 'inline-flex', 
+                              alignItems: 'center',
+                              px: 1.5, 
+                              py: 0.5, 
+                              borderRadius: 1,
+                              bgcolor: `${getStatusColor(vehicle.status?.status)}20`,
+                              color: getStatusColor(vehicle.status?.status),
+                              fontWeight: 600
+                            }}>
+                              {vehicle.status?.status || 'N/A'}
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {vehicle.derniere_visite || 'N/A'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Tooltip title="Modifier" arrow>
+                              <IconButton 
+                                color="primary" 
+                                onClick={() => handleEdit(vehicle)}
+                                sx={{ mx: 0.5 }}
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Supprimer" arrow>
+                              <IconButton 
+                                color="error" 
+                                onClick={() => handleDelete(vehicle.id)}
+                                sx={{ mx: 0.5 }}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                
+                {filteredVehicles.length === 0 && (
+                  <Box sx={{ textAlign: 'center', py: 6 }}>
+                    <CarIcon sx={{ fontSize: 60, color: theme.palette.grey[400], mb: 2 }} />
+                    <Typography variant="h6" color="textSecondary">
+                      Aucun véhicule trouvé
+                    </Typography>
+                    <Typography color="textSecondary" sx={{ mt: 1 }}>
+                      Aucun résultat ne correspond à votre recherche
+                    </Typography>
+                  </Box>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Dialog d'ajout/modification */}
+        <Dialog 
+          open={openDialog} 
+          onClose={resetForm} 
+          fullWidth 
+          maxWidth="md"
+          PaperProps={{ 
+            sx: { 
+              borderRadius: 3,
+              boxShadow: 3
+            } 
+          }}
+        >
+          <DialogTitle sx={{ 
+            fontWeight: 600,
+            fontSize: '1.2rem',
+            py: 2,
+            borderBottom: `1px solid ${theme.palette.divider}`
+          }}>
+            {editingVehicle ? 'Modifier le véhicule' : 'Ajouter un nouveau véhicule'}
+          </DialogTitle>
+          
+          <DialogContent sx={{ py: 3 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Nom du véhicule"
+                  name="nom"
+                  value={newVehicle.nom}
+                  onChange={handleInputChange}
+                  error={!!errors.nom}
+                  helperText={errors.nom}
+                  required
+                  variant="outlined"
+                  size="small"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Marque"
+                  name="marque"
+                  value={newVehicle.marque}
+                  onChange={handleInputChange}
+                  error={!!errors.marque}
+                  helperText={errors.marque}
+                  required
+                  variant="outlined"
+                  size="small"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Modèle"
+                  name="modele"
+                  value={newVehicle.modele}
+                  onChange={handleInputChange}
+                  error={!!errors.modele}
+                  helperText={errors.modele}
+                  required
+                  variant="outlined"
+                  size="small"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Immatriculation"
+                  name="immatriculation"
+                  value={newVehicle.immatriculation}
+                  onChange={handleInputChange}
+                  error={!!errors.immatriculation}
+                  helperText={errors.immatriculation}
+                  required
+                  variant="outlined"
+                  size="small"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Nombre de places"
+                  name="nombrePlace"
+                  type="number"
+                  value={newVehicle.nombrePlace}
+                  onChange={handleInputChange}
+                  error={!!errors.nombrePlace}
+                  helperText={errors.nombrePlace}
+                  required
+                  inputProps={{ min: 1 }}
+                  variant="outlined"
+                  size="small"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Distance moyenne (km)"
+                  name="distance_moyenne"
+                  type="number"
+                  value={newVehicle.distance_moyenne}
+                  onChange={handleInputChange}
+                  variant="outlined"
+                  size="small"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Dernière visite"
+                  name="derniere_visite"
+                  type="date"
+                  value={newVehicle.derniere_visite}
+                  onChange={handleInputChange}
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  size="small"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth error={!!errors.typeId} required size="small" sx={{ mb: 2 }}>
+                  <InputLabel>Type de véhicule</InputLabel>
+                  <Select
+                    name="typeId"
+                    value={newVehicle.typeId}
+                    onChange={handleSelectChange}
+                    label="Type de véhicule"
+                    variant="outlined"
+                  >
+                    <MenuItem value={0} disabled>
+                      Sélectionner le type
+                    </MenuItem>
+                    {vehiclesType.map((type) => (
+                      <MenuItem key={type.id} value={type.id}>
+                        {type.type}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {errors.typeId && <FormHelperText>{errors.typeId}</FormHelperText>}
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth error={!!errors.statusId} required size="small" sx={{ mb: 2 }}>
+                  <InputLabel>Statut du véhicule</InputLabel>
+                  <Select
+                    name="statusId"
+                    value={newVehicle.statusId}
+                    onChange={handleSelectChange}
+                    label="Statut du véhicule"
+                    variant="outlined"
+                  >
+                    <MenuItem value={0} disabled>
+                      Sélectionner le statut
+                    </MenuItem>
+                    {vehiclesStatus.map((status) => (
+                      <MenuItem key={status.id} value={status.id}>
+                        {status.status}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {errors.statusId && <FormHelperText>{errors.statusId}</FormHelperText>}
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <Button 
+                  variant="outlined" 
+                  component="label" 
+                  fullWidth
+                  sx={{ 
+                    py: 1.5,
+                    borderRadius: '8px',
+                    borderStyle: 'dashed',
+                    borderWidth: 1.5,
+                    borderColor: theme.palette.grey[400]
+                  }}
+                >
+                  Télécharger une image
+                  <input
+                    type="file"
+                    name="image"
+                    onChange={handleImageChange}
+                    hidden
+                    accept="image/*"
+                  />
+                </Button>
+                {newVehicle.image && (
+                  <Typography variant="caption" sx={{ mt: 1, display: 'block', color: theme.palette.text.secondary }}>
+                    {newVehicle.image.name}
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
+          </DialogContent>
+          
+          <DialogActions sx={{ 
+            px: 3, 
+            py: 2,
+            borderTop: `1px solid ${theme.palette.divider}`
+          }}>
+            <Button 
+              onClick={resetForm} 
+              color="inherit"
+              sx={{ 
+                fontWeight: 600,
+                borderRadius: '8px',
+                textTransform: 'none',
+                px: 3,
+                py: 1
+              }}
+            >
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleSubmit} 
+              color="primary" 
+              variant="contained"
+              disabled={isSubmitting}
+              sx={{ 
+                fontWeight: 600,
+                borderRadius: '8px',
+                textTransform: 'none',
+                px: 3,
+                py: 1
+              }}
+            >
+              {isSubmitting ? (
+                <CircularProgress size={20} sx={{ color: 'white', mr: 1 }} />
+              ) : editingVehicle ? (
+                <SaveIcon sx={{ mr: 1 }} />
+              ) : (
+                <AddIcon sx={{ mr: 1 }} />
+              )}
+              {editingVehicle ? 'Enregistrer' : 'Ajouter'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Confirmation de suppression */}
+        <Dialog 
+          open={!!deleteConfirm} 
+          onClose={() => setDeleteConfirm(null)}
+          PaperProps={{ sx: { borderRadius: 3 } }}
+        >
+          <DialogTitle sx={{ fontWeight: 600 }}>
+            Confirmer la suppression
+          </DialogTitle>
+          <DialogContent>
+            <Typography>
+              Êtes-vous sûr de vouloir supprimer définitivement ce véhicule ? 
+              Cette action est irréversible.
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, py: 2 }}>
+            <Button 
+              onClick={() => setDeleteConfirm(null)} 
+              color="inherit"
+              sx={{ fontWeight: 600 }}
+            >
+              Annuler
+            </Button>
+            <Button 
+              onClick={confirmDelete} 
+              color="error" 
+              variant="contained"
+              startIcon={<DeleteIcon />}
+              sx={{ fontWeight: 600 }}
+            >
+              Supprimer
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Snackbar pour les notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Alert 
+            onClose={() => setSnackbar({ ...snackbar, open: false })} 
+            severity={snackbar.severity}
+            sx={{ 
+              width: '100%', 
+              borderRadius: 2,
+              boxShadow: theme.shadows[3]
+            }}
+            iconMapping={{
+              success: <CheckIcon fontSize="inherit" />,
+              error: <CancelIcon fontSize="inherit" />
+            }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Box>
     </ThemeProvider>
   );
 };
 
-export default VehiclesList;
+export default VehicleList;

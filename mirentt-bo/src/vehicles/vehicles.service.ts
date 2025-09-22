@@ -1,15 +1,9 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Type } from 'src/entities/type.entity';
-import { Status } from 'src/entities/status.entity';
 import { Repository } from 'typeorm';
 import { Vehicule } from 'src/entities/vehicle.entity';
+import { Type } from 'src/entities/type.entity';
+import { Status } from 'src/entities/status.entity';
 import { CreateVehiculeDto } from './createVehicule.dto';
 import { UpdateVehiculeDto } from './updateVehicule.dto';
 
@@ -17,217 +11,119 @@ import { UpdateVehiculeDto } from './updateVehicule.dto';
 export class VehiclesService {
   constructor(
     @InjectRepository(Vehicule)
-    public vehiculeRepository: Repository<Vehicule>,
+    private readonly vehiculeRepository: Repository<Vehicule>,
     @InjectRepository(Type)
     private readonly typeRepository: Repository<Type>,
     @InjectRepository(Status)
     private readonly statusRepository: Repository<Status>,
   ) {}
 
+  // Compter les véhicules disponibles
   async getAvailableVehiculeCount(): Promise<number> {
     const availableStatus = await this.statusRepository.findOne({
       where: { status: 'Disponible' },
-      relations: ['vehicules'],
     });
+    if (!availableStatus) throw new NotFoundException('Statut "Disponible" non trouvé');
 
-    if (!availableStatus) {
-      throw new NotFoundException('Statut "Disponible" non trouvé');
-    }
-
-    const availableVehiculeCount = await this.vehiculeRepository.count({
-      where: {
-        status: availableStatus,
-      },
-    });
-    return availableVehiculeCount;
+    return this.vehiculeRepository.count({ where: { status: availableStatus } });
   }
 
+  // Récupérer tous les véhicules
   async findAll(): Promise<Vehicule[]> {
     return this.vehiculeRepository.find({ relations: ['type', 'status'] });
   }
 
+  // Récupérer un véhicule par ID
   async findOne(id: number): Promise<Vehicule | null> {
-    return (
-      (await this.vehiculeRepository.findOne({
-        where: { id },
-        relations: ['type', 'status'],
-      })) || null
-    );
+    return this.vehiculeRepository.findOne({
+      where: { id },
+      relations: ['type', 'status'],
+    }) || null;
   }
 
+  // Créer un véhicule
   async create(dto: CreateVehiculeDto, imageUrl?: string): Promise<Vehicule> {
-    console.log('DTO reçu :', dto);
-    const type = await this.typeRepository.findOne({
-      where: { id: dto.typeId },
-    });
-    const status = await this.statusRepository.findOne({
-      where: { id: dto.statusId },
+    const type = await this.typeRepository.findOne({ where: { id: dto.typeId } });
+    const status = await this.statusRepository.findOne({ where: { id: dto.statusId } });
+
+    if (!type || !status) throw new NotFoundException('Type ou Status non trouvé');
+
+    const vehicule =this.vehiculeRepository.create({
+      nom: dto.nom,
+      marque: dto.marque,
+      modele: dto.modele,
+      immatriculation: dto.immatriculation,
+      nombrePlace: dto.nombrePlace,
+      imageUrl: dto.imageUrl,
+      distance_moyenne: dto.distance_moyenne,
+      derniere_visite: dto.derniere_visite,
+
+      type: { id: dto.typeId },      
+      status: { id: dto.statusId },  
     });
 
-    console.log('Type récupéré :', type);
-    console.log('Status récupéré :', status);
-
-    if (!type || !status) {
-      throw new Error('Type ou Status non trouvé');
-    }
-
-    const vehicule = this.vehiculeRepository.create({
-      ...dto,
-      type,
-      status,
-      imageUrl: imageUrl || undefined,
-    });
-    console.log('Vehicule à sauvegarder :', vehicule);
 
     return this.vehiculeRepository.save(vehicule);
   }
 
-  async update(
-    id: number,
-    dto: UpdateVehiculeDto,
-    imageUrl?: string,
-  ): Promise<Vehicule | null> {
-    console.log(`Mise à jour du véhicule avec l'ID : ${id}`);
-    console.log('DTO reçu :', dto);
+  // Mettre à jour un véhicule
+  async update(id: number, dto: UpdateVehiculeDto, imageUrl?: string): Promise<Vehicule> {
     const vehicule = await this.vehiculeRepository.findOne({
       where: { id },
       relations: ['type', 'status'],
     });
+    if (!vehicule) throw new NotFoundException('Véhicule non trouvé');
 
-    if (!vehicule) {
-      throw new NotFoundException('Véhicule non trouvé');
-    }
-    console.log('Véhicule récupéré :', vehicule);
-
-    // Modification du status
     if (dto.statusId !== undefined) {
-      console.log('Status avant modification :', vehicule.status);
-      const status = await this.statusRepository.findOne({
-        where: { id: dto.statusId },
-      });
-      if (!status) {
-        throw new BadRequestException('Status non trouvé');
-      }
+      const status = await this.statusRepository.findOne({ where: { id: dto.statusId } });
+      if (!status) throw new BadRequestException('Status non trouvé');
       vehicule.status = status;
-      console.log('Status après modification :', vehicule.status);
     }
 
-    // Modification du type
     if (dto.typeId !== undefined) {
-      console.log('Type avant modification :', vehicule.type);
-      const type = await this.typeRepository.findOne({
-        where: { id: dto.typeId },
-      });
-      if (!type) {
-        throw new BadRequestException('Type non trouvé');
-      }
+      const type = await this.typeRepository.findOne({ where: { id: dto.typeId } });
+      if (!type) throw new BadRequestException('Type non trouvé');
       vehicule.type = type;
-      console.log('Type après modification :', vehicule.type);
     }
 
-    vehicule.nom = dto.nom || vehicule.nom;
-    vehicule.marque = dto.marque || vehicule.marque;
-    vehicule.modele = dto.modele || vehicule.modele;
-    vehicule.immatriculation = dto.immatriculation || vehicule.immatriculation;
-    vehicule.nombrePlace = dto.nombrePlace || vehicule.nombrePlace;
-    vehicule.imageUrl = imageUrl || vehicule.imageUrl;
+    vehicule.nom = dto.nom ?? vehicule.nom;
+    vehicule.marque = dto.marque ?? vehicule.marque;
+    vehicule.modele = dto.modele ?? vehicule.modele;
+    vehicule.immatriculation = dto.immatriculation ?? vehicule.immatriculation;
+    vehicule.nombrePlace = dto.nombrePlace ?? vehicule.nombrePlace;
+    vehicule.imageUrl = imageUrl ?? vehicule.imageUrl;
+    vehicule.distance_moyenne = dto.distance_moyenne ?? vehicule.distance_moyenne;
+    vehicule.derniere_visite = dto.derniere_visite ? new Date(dto.derniere_visite) : vehicule.derniere_visite;
 
-    console.log('Véhicule avant sauvegarde :', vehicule);
-    const result = await this.vehiculeRepository.save(vehicule);
-    console.log('Véhicule après sauvegarde :', result);
 
-    return result;
+    return this.vehiculeRepository.save(vehicule);
   }
 
-  // Cette méthode recherche le véhicule par son ID, puis met à jour son statut
+  // Mettre à jour le statut par ID
+  async updateStatus(id: number, statusId: number): Promise<Vehicule> {
+    const vehicule = await this.vehiculeRepository.findOne({ where: { id }, relations: ['status'] });
+    if (!vehicule) throw new NotFoundException('Véhicule non trouvé');
 
-  async updateStatusByName(
-    vehicleId: number,
-    statusName: string,
-  ): Promise<Vehicule> {
-    const vehicule = await this.vehiculeRepository.findOne({
-      where: { id: vehicleId },
-      relations: ['status'],
-    });
-
-    if (!vehicule) {
-      throw new NotFoundException('Véhicule non trouvé');
-    }
-
-    const newStatus = await this.statusRepository.findOne({
-      where: { status: statusName },
-    });
-
-    if (!newStatus) {
-      throw new NotFoundException(`Statut "${statusName}" introuvable`);
-    }
-
-    vehicule.status = newStatus;
-    return await this.vehiculeRepository.save(vehicule);
-  }
-  async updateStatus(id: number, statusId: number): Promise<Vehicule | null> {
-    const vehicule = await this.vehiculeRepository.findOne({
-      where: { id },
-      relations: ['status'],
-    });
-    if (!vehicule) {
-      throw new NotFoundException('Véhicule non trouvé');
-    }
-
-    const status = await this.statusRepository.findOne({
-      where: { id: statusId },
-    });
-    if (!status) {
-      throw new NotFoundException('Statut non trouvé');
-    }
+    const status = await this.statusRepository.findOne({ where: { id: statusId } });
+    if (!status) throw new NotFoundException('Statut non trouvé');
 
     vehicule.status = status;
     return this.vehiculeRepository.save(vehicule);
   }
 
-  async initStatuses(): Promise<void> {
-    const statusNames = ['Disponible', 'Maintenance', 'Réservé'];
+  // Mettre à jour le statut par nom
+  async updateStatusByName(vehicleId: number, statusName: string): Promise<Vehicule> {
+    const vehicule = await this.vehiculeRepository.findOne({ where: { id: vehicleId }, relations: ['status'] });
+    if (!vehicule) throw new NotFoundException('Véhicule non trouvé');
 
-    for (const name of statusNames) {
-      const existing = await this.statusRepository.findOneBy({ status: name });
-      if (!existing) {
-        await this.statusRepository.save({ status: name });
-      }
-    }
+    const status = await this.statusRepository.findOne({ where: { status: statusName } });
+    if (!status) throw new NotFoundException(`Statut "${statusName}" introuvable`);
+
+    vehicule.status = status;
+    return this.vehiculeRepository.save(vehicule);
   }
 
-  async removeIndisponibleStatus(): Promise<void> {
-    const indisponibleStatus = await this.statusRepository.findOneBy({
-      status: 'Indisponible',
-    });
-
-    if (indisponibleStatus) {
-      const defaultStatus = await this.statusRepository.findOneBy({
-        status: 'Disponible',
-      }); // ou 'Maintenance'
-
-      if (!defaultStatus) {
-        throw new NotFoundException(
-          'Statut "Disponible" non trouvé pour la réaffectation.',
-        );
-      }
-
-      // Met à jour tous les véhicules qui ont le statut "Indisponible"
-      const vehicles = await this.vehiculeRepository.find({
-        where: { status: { id: indisponibleStatus.id } },
-        relations: ['status'],
-      });
-
-      for (const vehicle of vehicles) {
-        vehicle.status = defaultStatus;
-        await this.vehiculeRepository.save(vehicle);
-      }
-
-      // Supprimer le statut "Indisponible"
-      await this.statusRepository.remove(indisponibleStatus);
-    }
-  }
-
+  // Supprimer un véhicule
   async remove(id: number): Promise<void> {
     await this.vehiculeRepository.delete(id);
   }

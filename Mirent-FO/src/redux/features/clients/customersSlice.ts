@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { Customer, Contract } from "../../../types/clientDetail";
+import { Customer } from "../../../types/clientDetail";
 
 interface ClientState {
   clients: Customer[];
@@ -13,81 +13,74 @@ const initialState: ClientState = {
   error: null,
 };
 
-// 🛠️ **Async Thunks**
+const API_URL = "http://localhost:3000/clients";
+
+
 export const fetchClients = createAsyncThunk(
   "clients/fetchClients",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3000/clients");
-      if (!response.ok) {
-        throw new Error("Failed to fetch clients.");
-      }
-      return await response.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error("Erreur lors du chargement des clients");
+      return await res.json();
+    } catch (err: any) {
+      return rejectWithValue(err.message);
     }
   }
 );
 
 export const addClient = createAsyncThunk(
   "clients/addClient",
-  async (client: Omit<Customer, "id" | "contracts">, { rejectWithValue }) => {
+  async (
+    client: { lastName: string; email: string; phone: string; logo?: File },
+    { rejectWithValue }
+  ) => {
     try {
       const formData = new FormData();
       formData.append("lastName", client.lastName);
       formData.append("email", client.email);
       formData.append("phone", client.phone);
-
       if (client.logo) {
-        const file = await fetch(client.logo).then((res) => res.blob());
-        formData.append("logo", file, "logo.jpg");
+        formData.append("logo", client.logo);
       }
 
-      const response = await fetch("http://localhost:3000/clients", {
+      const res = await fetch(API_URL, {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to add client.");
-      }
-
-      return (await response.json()) as Customer;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+      if (!res.ok) throw new Error("Erreur lors de l'ajout du client");
+      return await res.json();
+    } catch (err: any) {
+      return rejectWithValue(err.message);
     }
   }
 );
 
 export const updateClient = createAsyncThunk(
   "clients/updateClient",
-  async (client: Customer, { rejectWithValue }) => {
+  async (
+    client: { id: number; lastName: string; email: string; phone: string; logo?: File },
+    { rejectWithValue }
+  ) => {
     try {
       const formData = new FormData();
       formData.append("lastName", client.lastName);
       formData.append("email", client.email);
       formData.append("phone", client.phone);
-
       if (client.logo) {
-        const file = await fetch(client.logo).then((res) => res.blob());
-        formData.append("logo", file, "logo.jpg");
+        formData.append("logo", client.logo);
       }
 
-      const response = await fetch(
-        `http://localhost:3000/clients/${client.id}`,
-        {
-          method: "PUT",
-          body: formData,
-        }
-      );
+      const res = await fetch(`${API_URL}/${client.id}`, {
+        method: "PUT",
+        body: formData,
+      });
 
-      if (!response.ok) {
-        throw new Error("Failed to update client.");
-      }
-
-      return (await response.json()) as Customer;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+      if (!res.ok) throw new Error("Erreur lors de la mise à jour du client");
+      return await res.json();
+    } catch (err: any) {
+      return rejectWithValue(err.message);
     }
   }
 );
@@ -96,57 +89,21 @@ export const deleteClient = createAsyncThunk(
   "clients/deleteClient",
   async (id: number, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:3000/clients/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete client.");
-      }
-
+      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Erreur lors de la suppression du client");
       return id;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (err: any) {
+      return rejectWithValue(err.message);
     }
   }
 );
 
-// 📝 **Gestion des contrats**
-export const addContract = createAsyncThunk(
-  "clients/addContract",
-  async (
-    {
-      clientId,
-      contract,
-    }: { clientId: number; contract: Omit<Contract, "id"> },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/clients/${clientId}/contracts`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(contract),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to add contract.");
-      }
-
-      return { clientId, contract: await response.json() };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// **Slice Redux**
+// ----------------------
+// 📌 Slice Redux
+// ----------------------
 const clientSlice = createSlice({
-  name: "customer",
+  name: "clients",
   initialState,
-
   reducers: {
     setClients(state, action: PayloadAction<Customer[]>) {
       state.clients = action.payload;
@@ -154,60 +111,34 @@ const clientSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Fetch
       .addCase(fetchClients.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        fetchClients.fulfilled,
-        (state, action: PayloadAction<Customer[]>) => {
-          state.loading = false;
-          state.clients = action.payload;
-        }
-      )
+      .addCase(fetchClients.fulfilled, (state, action) => {
+        state.loading = false;
+        state.clients = action.payload;
+      })
       .addCase(fetchClients.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-      .addCase(
-        addClient.fulfilled,
-        (state, action: PayloadAction<Customer>) => {
-          state.clients.push(action.payload);
-        }
-      )
-      .addCase(
-        updateClient.fulfilled,
-        (state, action: PayloadAction<Customer>) => {
-          const index = state.clients.findIndex(
-            (c) => c.id === action.payload.id
-          );
-          if (index !== -1) {
-            state.clients[index] = action.payload;
-          }
-        }
-      )
-      .addCase(
-        deleteClient.fulfilled,
-        (state, action: PayloadAction<number>) => {
-          state.clients = state.clients.filter((c) => c.id !== action.payload);
-        }
-      )
-      .addCase(
-        addContract.fulfilled,
-        (
-          state,
-          action: PayloadAction<{ clientId: number; contract: Contract }>
-        ) => {
-          const client = state.clients.find(
-            (c) => c.id === action.payload.clientId
-          );
-          if (client) {
-            client.contracts.push(action.payload.contract);
-          }
-        }
-      );
+      // Add
+      .addCase(addClient.fulfilled, (state, action) => {
+        state.clients.push(action.payload);
+      })
+      // Update
+      .addCase(updateClient.fulfilled, (state, action) => {
+        const index = state.clients.findIndex((c) => c.id === action.payload.id);
+        if (index !== -1) state.clients[index] = action.payload;
+      })
+      // Delete
+      .addCase(deleteClient.fulfilled, (state, action) => {
+        state.clients = state.clients.filter((c) => c.id !== action.payload);
+      });
   },
 });
-export const { setClients } = clientSlice.actions;
 
+export const { setClients } = clientSlice.actions;
 export default clientSlice.reducer;

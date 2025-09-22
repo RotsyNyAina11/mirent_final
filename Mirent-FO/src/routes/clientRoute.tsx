@@ -10,17 +10,17 @@ import ReservationEdit from "../clients/pages/reservationEditPage";
 const ClientRoutes = () => {
   return (
     <Routes>
-      <Route index element={<Navigate to="acceuil" />} />
-      <Route path="acceuil" element={<ClientHome />} />
-      <Route path="/list-vehicule" element={<VehiclesPage />} />
+      <Route index element={<Navigate to="accueil" />} />
+      <Route path="accueil" element={<ClientHome />} />
+      <Route path="list-vehicule" element={<VehiclesPage />} />
       <Route
-        path="/voitures/:id/details"
+        path="voitures/:id/details"
         element={<VehicleDetails vehicle={{}} onClose={() => {}} />}
       />
-      <Route path="/voitures/:id/reserver" element={<ReservationPage />} />
-      <Route path="/reservations-list" element={<ReservationList />} />
+      <Route path="voitures/:id/reserver" element={<ReservationPage />} />
+      <Route path="reservations-list" element={<ReservationList />} />
       <Route
-        path="/reservations/:id/details"
+        path="reservations/:id/details"
         element={
           <ReservationDetails
             open={true}
@@ -30,7 +30,7 @@ const ClientRoutes = () => {
         }
       />
       <Route
-        path="/reservations/:id/edit"
+        path="reservations/:id/edit"
         element={
           <ReservationEdit
             open={true}

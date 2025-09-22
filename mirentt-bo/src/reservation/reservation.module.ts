@@ -1,25 +1,23 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Reservation } from '../entities/reservation.entity';
 import { ReservationService } from './reservation.service';
 import { ReservationController } from './reservation.controller';
-import { Reservation } from '../entities/reservation.entity';
-import { VehiclesModule } from '../vehicles/vehicles.module';
-import { RegionsModule } from '../regions/regions.module';
-import { PrixsModule } from 'src/prixs/prixs.module';
-import { StatusModule } from 'src/status/status.module';
+import { Vehicule } from 'src/entities/vehicle.entity';
+import { Client } from 'src/entities/client.entity';
+import { District } from 'src/entities/district.entity';
+import { Prix } from 'src/entities/prix.entity';
+import { Region } from 'src/entities/region.entity';
 import { Status } from 'src/entities/status.entity';
-import { NotificationsModule } from 'src/notifications/notifications.module';
+import { BonDeCommande } from 'src/entities/commande.entity';
+import { PrixCarburant } from 'src/entities/carburant-price.entity';
+import { Facture } from 'src/entities/facture.entity';
+import { FactureModule } from 'src/facturation/facturation.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Reservation, Status]),
-    VehiclesModule,
-    RegionsModule,
-    PrixsModule,
-    StatusModule,
-    NotificationsModule,
-  ],
-  controllers: [ReservationController],
+  imports: [TypeOrmModule.forFeature([Reservation, Vehicule, Client, District, Prix, Region, Status, BonDeCommande, PrixCarburant, Facture]),
+  FactureModule],
   providers: [ReservationService],
+  controllers: [ReservationController],
 })
 export class ReservationModule {}

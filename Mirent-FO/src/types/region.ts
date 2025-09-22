@@ -9,3 +9,5 @@ export interface Region {
   nom_district: string | null;
   prix: Prix;
 }
+
+export type CreateRegion = Omit<Region, "id" | "prix"> & { prix: Omit<Prix, "id"> };

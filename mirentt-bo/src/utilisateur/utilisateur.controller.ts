@@ -11,7 +11,7 @@ import {
 import { UtilisateurService } from './utilisateur.service';
 import { CreateUserDto } from './create_utilisateur.dto';
 import { LoginUserDto } from './create_Login.dto';
-import { JwtAuthGuard } from '../utilisateur/utilisateur.jwt-auth.guard'; // Assurez-vous que le chemin est correct
+import { JwtAuthGuard } from '../utilisateur/utilisateur.jwt-auth.guard';
 import { ApiBearerAuth, ApiTags, ApiResponse } from '@nestjs/swagger'; // Pour Swagger
 
 @ApiTags('Utilisateurs') // Catégorise les routes pour la documentation Swagger

@@ -1,192 +1,170 @@
-import {
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-
 import MainLayout from "../layouts/MainLayouts";
-<<<<<<< HEAD
-import ProformaPage from "../admin/pages/proforma/proformaPage";
-=======
-import Devis from "../admin/pages/Devis/DevisPage";
->>>>>>> 378d007bef06e0058bbf44b29cc863d4e0638763
-import Commande from "../admin/pages/commande/CommandePage";
 import LocationsPage from "../admin/pages/lieux/locationPage";
-import Home from "../admin/pages/acceuil/HomePage";
+import Home from "../admin/pages/accueil/HomePage";
 import Vehicule from "../admin/pages/vehicules/vehiculePage";
 import Types from "../admin/pages/Types/type";
 import ClientPage from "../admin/pages/clients/ClientPage";
 import ClientDetailPage from "../admin/pages/ClientDetailPage/clientdetailPage";
-import ProformaList from "../admin/pages/commande/ProformaList";
-import UserProfile from "../Components/profile/userProfile";
-import ContratPage from "../admin/pages/contrat/contratPage";
-import ContactPage from "../admin/pages/Contact/ContactPage";
-import QuoteForm from "../admin/pages/Quote/quoteForm";
-import DevisListPage from "../admin/pages/Quote/quoteListPage";
-import DevisDetailsPage from "../admin/pages/Quote/quoteDetailsPage";
+import ProtectedRoute from "./ProtectedRoute";
+import ReservationManager from "../admin/Components/reservation/ReservationList";
+import BonDeCommandeManager from "../admin/Components/commande/BonDeCommandeManager";
+import PaiementPage from "../admin/Components/paiement/paiement";
+import { useAppDispatch } from "../hooks";
+import { useEffect } from "react";
+import { logout } from "../redux/features/auth/authSlice";
+import Login from "../Component/login/Login";
+import FacturePage from "../admin/Components/facture/factureManagement";
+import Contact from "../admin/Components/Contact/Contact";
+
+const Logout = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(logout());
+  }, [dispatch]);
+
+  return <Navigate to="/login" replace />;
+};
 
 
 const AdminRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="home" />} />
+
+      {/* Home - Admin uniquement */}
       <Route
         path="home"
         element={
-          <MainLayout>
-            <Home />
-          </MainLayout>
+          <ProtectedRoute roles={["admin"]}>
+            <MainLayout>
+              <Home />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
 
-      {/* Route pour l'accueil avec Sidebar */}
-      <Route
-        path="home"
-        element={
-          <MainLayout>
-            <Home />
-          </MainLayout>
-        }
-      />
-
-      {/* Route pour la liste des véhicules avec Sidebar */}
+      {/* Véhicules - Admin uniquement */}
       <Route
         path="vehicules"
         element={
-          <MainLayout>
-            <Vehicule />
-          </MainLayout>
+          <ProtectedRoute roles={["admin"]}>
+            <MainLayout>
+              <Vehicule />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
 
-      <Route
-        path="createCommande"
-        element={
-          <MainLayout>
-            <QuoteForm />
-          </MainLayout>
-        }
-      />
-
-      {/* Route pour la liste des types de véhicules avec Sidebar */}
+      {/* Types - Admin uniquement */}
       <Route
         path="types"
         element={
-          <MainLayout>
-            <Types />
-          </MainLayout>
+          <ProtectedRoute roles={["admin"]}>
+            <MainLayout>
+              <Types />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
-      {/* Route pour la liste des clients avec Sidebar */}
+
+      {/* Clients - Admin et Manager */}
       <Route
         path="clients"
         element={
-          <MainLayout>
-            <ClientPage />
-          </MainLayout>
+          <ProtectedRoute roles={["admin", "manager"]}>
+            <MainLayout>
+              <ClientPage />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
-      {/* Route pour la page de la détail d'un client */}
 
+      {/* Client Detail - Admin et Manager */}
       <Route
         path="client_detail"
         element={
-          <MainLayout>
-            <ClientDetailPage />
-          </MainLayout>
+          <ProtectedRoute roles={["admin", "manager"]}>
+            <MainLayout>
+              <ClientDetailPage />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
 
-      {/* Route pour la page de liste des proformas */}
-      <Route
-        path="/proformat/liste"
-        element={
-          <MainLayout>
-            <ProformaList />
-          </MainLayout>
-        }
-      />
-      {/* Route pour la page sur la commande */}
-      <Route
-        path="/proformat/nouveau"
-        element={
-          <MainLayout>
-            <Commande />
-          </MainLayout>
-        }
-      />
-
-      {/* Route pour la page de Devis sur la commande */}
-      <Route
-        path="devis"
-        element={
-          <MainLayout>
-            <Devis />
-          </MainLayout>
-        }
-      />
-
-      <Route
-        path="profile"
-        element={
-          <MainLayout>
-            <UserProfile />
-          </MainLayout>
-        }
-      />
-
-      {/* Route pour la page des lieux */}
+      {/* Lieux - Admin et Manager */}
       <Route
         path="lieux"
         element={
-          <MainLayout>
-            <LocationsPage />
-          </MainLayout>
+          <ProtectedRoute roles={["admin", "manager"]}>
+            <MainLayout>
+              <LocationsPage />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
 
-      {/* Route pour la page de Contrat */}
+      {/* Réservations - Admin et Manager */}
       <Route
-        path="contrats"
+        path="reservations"
         element={
-          <MainLayout>
-            <ContratPage />
-          </MainLayout>
+          <ProtectedRoute roles={["admin", "manager"]}>
+            <MainLayout>
+              <ReservationManager />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
-      {/* Route pour la page de Contact */}
+
+      {/* Bons de commande - Admin et Manager */}
+      <Route
+        path="commandes"
+        element={
+          <ProtectedRoute roles={["admin", "manager"]}>
+            <MainLayout>
+              <BonDeCommandeManager />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="paiements"
+        element={
+          <ProtectedRoute roles={["admin", "manager"]}>
+            <MainLayout>
+              <PaiementPage />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="factures"
+        element={
+          <ProtectedRoute roles={["admin", "manager"]}>
+            <MainLayout>
+              <FacturePage />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="contact"
         element={
-          <MainLayout>
-            <ContactPage />
-          </MainLayout>
+          <ProtectedRoute roles={["admin", "manager"]}>
+            <MainLayout>
+              <Contact />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
-<<<<<<< HEAD
 
-      // Route pour la page de devis
-      <Route
-        path="devis"
-        element={
-          <MainLayout>
-            <DevisListPage />
-          </MainLayout>
-        }
-      />
-      <Route 
-        path="/devis/:id" 
-        element={
-          <MainLayout>
-            <DevisDetailsPage />
-          </MainLayout>
-        } 
-      />
-=======
-      {/* Route pour deconnecter*/}
-      <Route path="logout" />
->>>>>>> 378d007bef06e0058bbf44b29cc863d4e0638763
+      {/* Déconnexion */}
+      <Route path="logout" element={<Login />} />
     </Routes>
   );
 };

@@ -1,134 +1,118 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { RegionsService } from "../../../services/regions.service";
-import { Region } from "../../../types/region";
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-interface RegionsState {
+export interface Prix {
+  prix: number;
+}
+
+export interface Region {
+  id: number;
+  nom_region: string;
+  nom_district?: string;
+  prix?: Prix;
+}
+
+interface RegionState {
   regions: Region[];
-  status: "idle" | "loading" | "succeeded" | "failed";
+  loading: boolean;
   error: string | null;
 }
 
-const initialState: RegionsState = {
+const initialState: RegionState = {
   regions: [],
-  status: "idle",
+  loading: false,
   error: null,
 };
 
-export const fetchRegions = createAsyncThunk(
-  "regions/fetchRegions",
-
-  async (_, { rejectWithValue }) => {
+// 🔹 Récupérer toutes les régions
+export const fetchRegions = createAsyncThunk<Region[]>(
+  'region/fetchRegions',
+  async (_, thunkAPI) => {
     try {
-      return await RegionsService.findAllWithDetails();
+      const response = await axios.get('http://localhost:3000/regions');
+      return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Erreur lors du fetch');
     }
   }
 );
 
-export const addRegion = createAsyncThunk(
-  "regions/addRegion",
-  async (region: Omit<Region, "id">, { rejectWithValue }) => {
+// 🔹 Ajouter une région
+export const addRegion = createAsyncThunk<Region, Omit<Region, 'id'>>(
+  'region/addRegion',
+  async (newRegion, thunkAPI) => {
     try {
-      return await RegionsService.createFull(region);
+      const response = await axios.post('http://localhost:3000/regions', newRegion);
+      return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Erreur lors de l\'ajout');
     }
   }
 );
 
-export const updateRegion = createAsyncThunk(
-  "regions/updateRegion",
-  async (
-    { id, region }: { id: number; region: Partial<Region> },
-    { rejectWithValue }
-  ) => {
+// 🔹 Mettre à jour une région
+export const updateRegion = createAsyncThunk<Region, { id: number; data: Partial<Region> }>(
+  'region/updateRegion',
+  async ({ id, data }, thunkAPI) => {
     try {
-      return await RegionsService.updateFull(id, region);
+      const response = await axios.put(`http://localhost:3000/regions/${id}`, data);
+      return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Erreur lors de la mise à jour');
     }
   }
 );
 
-export const deleteRegion = createAsyncThunk(
-  "regions/deleteRegion",
-  async (id: number, { rejectWithValue }) => {
+// 🔹 Supprimer une région
+export const deleteRegion = createAsyncThunk<number, number>(
+  'region/deleteRegion',
+  async (id, thunkAPI) => {
     try {
-      await RegionsService.removeRegion(id);
+      await axios.delete(`http://localhost:3000/regions/${id}`);
       return id;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Erreur lors de la suppression');
     }
   }
 );
 
-const regionsSlice = createSlice({
-  name: "regions",
+const regionSlice = createSlice({
+  name: 'region',
   initialState,
-  reducers: {
-    setRegions(state, action: PayloadAction<Region[]>) {
-      state.regions = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchRegions.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(
-        fetchRegions.fulfilled,
-        (state, action: PayloadAction<Region[]>) => {
-          state.status = "succeeded";
-          state.regions = action.payload;
-        }
-      )
-      .addCase(fetchRegions.rejected, (state, action) => {
-        state.status = "failed";
+    // FETCH
+    builder.addCase(fetchRegions.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(fetchRegions.fulfilled, (state, action: PayloadAction<Region[]>) => {
+      state.loading = false;
+      state.regions = action.payload;
+    });
+    builder.addCase(fetchRegions.rejected, (state, action: any) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
 
-        state.error = (action as any).payload || null;
-      })
-      .addCase(addRegion.fulfilled, (state, action: PayloadAction<Region>) => {
-        state.regions.push(action.payload);
-      })
-      .addCase(addRegion.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action as any).payload || null;
-      })
-      .addCase(
-        updateRegion.fulfilled,
-        (state, action: PayloadAction<Region>) => {
-          state.regions = state.regions.map((region) =>
-            region.id === action.payload.id ? action.payload : region
-          );
-        }
-      )
-      .addCase(updateRegion.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action as any).payload || null;
-      })
-      .addCase(
-        deleteRegion.fulfilled,
-        (state, action: PayloadAction<number>) => {
-          state.regions = state.regions.filter(
-            (region) => region.id !== action.payload
-          );
-        }
-      )
-      .addCase(deleteRegion.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action as any).payload || null;
-      })
-      .addMatcher(
-        (action) => action.type.endsWith("/rejected"),
-        (state, action) => {
-          state.status = "failed";
-          state.error = (action as any).payload || null;
-        }
-      );
+    // ADD
+    builder.addCase(addRegion.fulfilled, (state, action: PayloadAction<Region>) => {
+      state.regions.push(action.payload);
+    });
+
+    // UPDATE
+    builder.addCase(updateRegion.fulfilled, (state, action: PayloadAction<Region>) => {
+      const index = state.regions.findIndex((r) => r.id === action.payload.id);
+      if (index !== -1) {
+        state.regions[index] = action.payload;
+      }
+    });
+
+    // DELETE
+    builder.addCase(deleteRegion.fulfilled, (state, action: PayloadAction<number>) => {
+      state.regions = state.regions.filter((r) => r.id !== action.payload);
+    });
   },
 });
 
-export const { setRegions } = regionsSlice.actions;
-
-export default regionsSlice.reducer;
+export default regionSlice.reducer;

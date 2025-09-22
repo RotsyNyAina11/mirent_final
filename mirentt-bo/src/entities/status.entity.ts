@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Vehicule } from './vehicle.entity';
-import { Reservation } from './reservation.entity';
+
 
 @Entity()
 export class Status {
@@ -22,6 +22,5 @@ export class Status {
   @OneToMany(() => Vehicule, (vehicule) => vehicule.status)
   vehicules: Vehicule[];
 
-  @ManyToOne(() => Reservation, (reservation) => reservation.status)
-  reservation: Reservation;
+
 }

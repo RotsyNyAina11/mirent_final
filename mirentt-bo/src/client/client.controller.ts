@@ -21,13 +21,12 @@ import { UpdateClientDto } from 'src/client/updateClient.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { ProformaService } from 'src/proforma/proforma.service';
+
 
 @Controller('clients')
 export class ClientController {
   constructor(
     private readonly clientService: ClientService,
-    private readonly proformaService: ProformaService,
   ) {}
 
   @Get('client-count')
@@ -42,7 +41,7 @@ export class ClientController {
   /**ajoutt */
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.clientService.findOne(id); // Utilisez le service pour récupérer le client
+    return this.clientService.findOne(id); 
   }
 
   @Put(':id')
@@ -62,7 +61,7 @@ export class ClientController {
     }),
   )
   async update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateClientDto,
     @UploadedFile() file: Express.Multer.File | undefined,
   ): Promise<Client | null> {
@@ -116,29 +115,5 @@ export class ClientController {
     return { message: 'Client supprimé avec succès' };
   }
 
-  @Get(':clientId/proforma-items')
-  async getClientProformaItems(
-    @Param('clientId', ParseIntPipe) clientId: number,
-  ) {
-    console.log(
-      `Backend: Requête reçue pour les items de proforma du client ID: ${clientId}`,
-    );
-    try {
-      const items =
-        await this.proformaService.getProformaItemsByClientId(clientId);
-      console.log(
-        `Backend: ${items.length} items de proforma trouvés pour le client ID: ${clientId}`,
-      );
-      return items;
-    } catch (error) {
-      console.error(
-        `Backend: Erreur lors de la récupération des items de proforma pour le client ${clientId}:`,
-        error,
-      );
 
-      throw new InternalServerErrorException(
-        'Erreur lors du chargement des items de proforma.',
-      );
-    }
-  }
 }

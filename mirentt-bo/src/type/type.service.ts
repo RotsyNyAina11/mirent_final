@@ -2,10 +2,12 @@ import {
   Injectable,
   NotFoundException,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Type } from 'src/entities/type.entity';
 import { Repository } from 'typeorm';
+import { CreateTypeDto } from './dto/create-type.dto';
 
 @Injectable()
 export class TypeService {
@@ -18,7 +20,23 @@ export class TypeService {
     return this.typesRepository.find();
   }
 
-  // Dans votre service TypesService
+  async create(dto: CreateTypeDto): Promise<Type> {
+    // Vérifie si un type avec ce nom existe déjà
+    const existingType = await this.typesRepository.findOne({
+      where: { type: dto.type },
+    });
+
+    if (existingType) {
+      throw new BadRequestException(
+        `Le type "${dto.type}" existe déjà.`
+      );
+    }
+
+    // Crée et sauvegarde le nouveau type
+    const newType = this.typesRepository.create(dto);
+    return await this.typesRepository.save(newType);
+  }
+
   async delete(id: number): Promise<void> {
     try {
       const result = await this.typesRepository.delete(id);
@@ -34,16 +52,22 @@ export class TypeService {
     }
   }
 
-  async update(id: number, type: Partial<Type>): Promise<Type> {
+  async update(id: number, dto: Partial<Type>): Promise<Type> {
     const existingType = await this.typesRepository.findOneBy({ id });
+
     if (!existingType) {
-      throw new NotFoundException(`Type with ID ${id} not found`);
+      throw new NotFoundException(`Type avec ID ${id} introuvable`);
     }
-    await this.typesRepository.update(id, type);
+
+    await this.typesRepository.update(id, dto);
+
     const updatedType = await this.typesRepository.findOneBy({ id });
     if (!updatedType) {
-      throw new NotFoundException(`Type with ID ${id} not found after update`);
+      throw new NotFoundException(`Type avec ID ${id} introuvable après la mise à jour`);
     }
+
     return updatedType;
   }
+
+
 }

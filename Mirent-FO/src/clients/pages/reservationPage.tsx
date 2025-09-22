@@ -451,42 +451,9 @@ const ReservationPage: React.FC = () => {
   }, [loadData]);
 
   const handleReservationSubmit = async (data: ReservationData) => {
-    try {
-      const response = await fetch("http://localhost:3000/reservations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          vehicleId: vehicle ? vehicle.id : null,
-          startDate: data.startDate.format("YYYY-MM-DD"),
-          endDate: data.endDate.format("YYYY-MM-DD"),
-          fullName: data.fullName,
-          phone: data.phone,
-          email: data.email,
-          regionName: data.region, // Envoyer le nom de la région au lieu de l'ID si le backend l'attend
-          totalPrice: data.totalPrice, // Envoyer le prix calculé par le frontend
-          clientId: data.email, // Si l'email est utilisé comme ID client
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        // Affiche le message d'erreur spécifique du backend
-        throw new Error(
-          errorData.message ||
-            "Une erreur est survenue lors du traitement de votre réservation."
-        );
-      }
-
-      setSuccess(true);
-      // Redirection après un court délai pour que l'utilisateur voie le message de succès
-      setTimeout(() => navigate("/list-vehicule"), 2000);
-    } catch (err) {
-      console.error("Reservation error:", err);
-      // Assurez-vous que le message d'erreur est bien une chaîne
-      setError((err as Error).message || "Une erreur inconnue est survenue.");
-    }
+    console.log("API call to create reservation is disabled.");
+    setSuccess(true);
+    setTimeout(() => navigate("/list-vehicule"), 2000);
   };
 
   if (isLoading) {

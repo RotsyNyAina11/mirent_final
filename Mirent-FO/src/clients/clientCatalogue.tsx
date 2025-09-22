@@ -4,7 +4,8 @@ import { fetchVehicles } from "../redux/features/vehicle/vehiclesSlice";
 import { useEffect } from "react";
 import { Alert, Box, Card, CardContent, CardMedia, CircularProgress, Grid, Typography } from "@mui/material";
 import { RootState } from "../redux/store";
-import Navbar from "./components/Navbar";
+import Navbar from "./Components/Navbar";
+
 
 
 const ClientCatalogue = () => {

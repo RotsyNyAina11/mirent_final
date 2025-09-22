@@ -14,7 +14,7 @@ export class Notification {
   userId: number;
 
   @Column()
-  type: string; // ex: 'new_reservation', 'proforma_status_update'
+  type: string; // ex: 'new_vehicle', 'price_update'
 
   @Column()
   message: string; // Le message affiché à l'admin
@@ -22,7 +22,7 @@ export class Notification {
   @Column({ default: false })
   isRead: boolean;
 
-  @Column({ type: 'jsonb', nullable: true }) // Pour stocker des données structurées (ex: { reservationId: 123 })
+  @Column({ type: 'jsonb', nullable: true }) // Pour stocker des données structurées (ex: { vehicleId: 123 })
   payload: any;
 
   @CreateDateColumn()

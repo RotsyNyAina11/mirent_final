@@ -10,45 +10,36 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link as RouterLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../redux/features/auth/authSlice";
+import { RootState, AppDispatch } from "../../redux/store";
 import loginImage from "../../assets/2.jpg";
 import logo from "../../assets/horizontal.png";
-import axios from "axios";
 
 const Login: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const auth = useSelector((state: RootState) => state.auth);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async () => {
-    setError(null);
-
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/utilisateur/login",
-        {
-          email,
-          password,
-        }
-      );
-
-      console.log("Connexion réussie :", response.data);
-      localStorage.setItem("access_token", response.data.access_token);
-      localStorage.setItem("user_info", JSON.stringify(response.data.user));
-      navigate("/admin/home");
-    } catch (err: any) {
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("Erreur lors de la connexion. Veuillez réessayer.");
-      }
-      console.error("Erreur de connexion:", err);
-    }
+    await dispatch(login({ email, password }));
   };
+
+  // Redirection si login réussi
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      localStorage.setItem("access_token", auth.token || "");
+      localStorage.setItem("user_info", JSON.stringify(auth.user));
+      navigate("/admin/home");
+    }
+  }, [auth.isAuthenticated, auth.token, auth.user, navigate]);
 
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -70,7 +61,7 @@ const Login: React.FC = () => {
       >
         {/* Logo */}
         <Box display="flex" alignItems="center">
-          <RouterLink to="/acceuil" style={{ textDecoration: "none" }}>
+          <RouterLink to="/accueil" style={{ textDecoration: "none" }}>
             <Box
               component="img"
               src={logo}
@@ -135,7 +126,7 @@ const Login: React.FC = () => {
                   fullWidth
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  error={!!error}
+                  error={!!auth.error}
                 />
                 <TextField
                   label="Mot de passe"
@@ -143,11 +134,11 @@ const Login: React.FC = () => {
                   fullWidth
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  error={!!error}
+                  error={!!auth.error}
                 />
-                {error && (
+                {auth.error && (
                   <Typography color="error" variant="body2" textAlign="center">
-                    {error}
+                    {auth.error}
                   </Typography>
                 )}
               </Stack>
@@ -159,25 +150,10 @@ const Login: React.FC = () => {
                 size="large"
                 onClick={handleLogin}
                 sx={{ borderRadius: 3 }}
+                disabled={auth.loading}
               >
-                Se connecter
+                {auth.loading ? "Connexion..." : "Se connecter"}
               </Button>
-
-              <Typography
-                textAlign="center"
-                variant="body2"
-                color="text.secondary"
-              >
-                Vous n'avez pas encore de compte ?{" "}
-                <Button
-                  variant="text"
-                  size="small"
-                  onClick={() => navigate("/register")}
-                  sx={{ textTransform: "none" }}
-                >
-                  Créez-en un ici
-                </Button>
-              </Typography>
             </Stack>
           </Box>
         </Paper>

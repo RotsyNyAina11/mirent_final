@@ -1,5 +1,5 @@
-import { Transform, TransformFnParams } from 'class-transformer';
-import { IsString, IsOptional, IsInt, IsNotEmpty } from 'class-validator';
+import { Transform, TransformFnParams, Type } from 'class-transformer';
+import { IsString, IsOptional, IsInt, IsNotEmpty, IsNumber, IsDate } from 'class-validator';
 
 export class UpdateVehiculeDto {
   @IsOptional()  
@@ -23,9 +23,21 @@ export class UpdateVehiculeDto {
   @Transform(({ value }: TransformFnParams) => parseInt(value))
   nombrePlace?: number;
 
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  distance_moyenne?: number;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  derniere_visite?: Date;
+
   @IsOptional()  
   @IsString()
   imageUrl?: string;
+
+
 
   @IsOptional()  
   @IsInt()

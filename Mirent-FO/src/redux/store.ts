@@ -1,43 +1,49 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage"; 
 import authReducer from "./features/auth/authSlice";
 import sidebarReducer from "./features/sidebar/SidebarSlice";
 import vehiclesReducer from "./features/vehicle/vehiclesSlice";
-import { create } from "zustand";
-import { Proforma } from "../types/Proforma";
-import locationReducer from "../redux/features/lieux/locationSlice";
+import locationReducer from "./features/lieux/locationSlice";
 import customersReducer from "./features/clients/customersSlice";
-import contractReducer from "./features/contrat/contratSlice";
-import proformasReducer from "./features/proforma/proformaSlice";
 import reservationReducer from "./features/reservation/reservationSlice";
-import devisReducer from './features/devis/devisSlice';
-import fichebordReducer from "./features/ficheBord/ficheBordSlice";
-interface ProformaState {
-  proformas: Proforma[];
-  addProforma: (newProforma: Proforma) => void;
-}
+import bonDeCommandeReducer from "./features/commande/bonDeCommandeSlice";
+import paiementReducer from "./features/paiement/paiementSlice";
+import factureReducer from "./features/facture/factureSlice"
 
-export const useProformaStore = create<ProformaState>((set) => ({
-  proformas: [],
-  addProforma: (newProforma) =>
-    set((state) => ({ proformas: [...state.proformas, newProforma] })),
-}));
+// 1. Combine tous vos réducteurs en un seul
+const rootReducer = combineReducers({
+  auth: authReducer,
+  vehicles: vehiclesReducer,
+  sidebar: sidebarReducer,
+  customer: customersReducer,
+  region: locationReducer,
+  reservations: reservationReducer,
+  bonDeCommande: bonDeCommandeReducer,
+  paiements: paiementReducer,
+  facture: factureReducer,
+});
+
+// 2. Configure la persistance
+const persistConfig = {
+  key: "root", 
+  storage, 
+  whitelist: ["auth", "reservations", "vehicles", "customer", "region"],
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    vehicles: vehiclesReducer,
-    sidebar: sidebarReducer,
-    customer: customersReducer,
-    locations: locationReducer,
-    contrat: contractReducer as any,
-    proformas: proformasReducer,
-    reservation: reservationReducer,
-      devis: devisReducer,
-      fichebord: fichebordReducer,
-    },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ serializableCheck: false }),
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+      },
+    }),
 });
+
+export const persistor = persistStore(store); 
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

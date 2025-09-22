@@ -93,7 +93,7 @@ const Register: React.FC = () => {
       >
         {/* Logo */}
         <Box display="flex" alignItems="center">
-          <RouterLink to="/acceuil" style={{ textDecoration: "none" }}>
+          <RouterLink to="/accueil" style={{ textDecoration: "none" }}>
             <Box
               component="img"
               src={logo}

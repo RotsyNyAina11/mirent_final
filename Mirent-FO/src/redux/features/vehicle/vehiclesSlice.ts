@@ -8,7 +8,9 @@ export interface Vehicle {
   modele: string;
   immatriculation: string;
   nombrePlace: number;
-  imageUrl: string;
+  imageUrl: string | null;
+  distance_moyenne?: number;
+  derniere_visite?: string;
   type: {
     id: number;
     type: string;
@@ -40,6 +42,7 @@ interface VehicleState {
   vehiclesTypeError: string | null;
   vehiclesStatusLoading: boolean;
   vehiclesStatusError: string | null;
+  availableCount: number;
 }
 
 const initialState: VehicleState = {
@@ -53,8 +56,10 @@ const initialState: VehicleState = {
   vehiclesTypeError: null,
   vehiclesStatusLoading: false,
   vehiclesStatusError: null,
+  availableCount: 0,
 };
 
+// --- FETCH TYPES & STATUSES ---
 export const fetchVehicleStatuses = createAsyncThunk(
   "vehicles/fetchVehicleStatuses",
   async (_, { rejectWithValue }) => {
@@ -62,21 +67,12 @@ export const fetchVehicleStatuses = createAsyncThunk(
       const response = await axios.get("http://localhost:3000/status");
       return response.data as VehicleStatus[];
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error fetching vehicle statuses:", error.message);
-        return rejectWithValue(error.message);
-      } else {
-        console.error(
-          "An unknown error occurred while fetching vehicle statuses:",
-          error
-        );
-        return rejectWithValue("An unknown error occurred");
-      }
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("An unknown error occurred");
     }
   }
 );
 
-// Afficher les types de  vehicules
 export const fetchVehicleTypes = createAsyncThunk(
   "vehicles/fetchVehicleTypes",
   async (_, { rejectWithValue }) => {
@@ -84,44 +80,13 @@ export const fetchVehicleTypes = createAsyncThunk(
       const response = await axios.get("http://localhost:3000/type");
       return response.data as VehicleType[];
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error fetching vehicle types:", error.message);
-        return rejectWithValue(error.message);
-      } else {
-        console.error(
-          "An unknown error occurred while fetching vehicle types:",
-          error
-        );
-        return rejectWithValue("An unknown error occurred");
-      }
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("An unknown error occurred");
     }
   }
 );
-// modifier le type de vehicule
-export const updateVehicleType = createAsyncThunk(
-  "vehicles/updateVehicleType",
-  async (vehicle: Vehicle, { rejectWithValue }) => {
-    try {
-      const response = await axios.put(
-        `http://localhost:3000/type/${vehicle.type.id}`,
-        vehicle.type
-      );
-      return response.data as VehicleType;
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error updating vehicle type:", error.message);
-        return rejectWithValue(error.message);
-      } else {
-        console.error(
-          "An unknown error occurred while updating vehicle type:",
-          error
-        );
-        return rejectWithValue("An unknown error occurred");
-      }
-    }
-  }
-);
-//ajouter un type de vehicule
+
+// --- ADD / UPDATE / DELETE TYPES ---
 export const addVehicleType = createAsyncThunk(
   "vehicles/addVehicleType",
   async (vehicleType: VehicleType, { rejectWithValue }) => {
@@ -132,20 +97,28 @@ export const addVehicleType = createAsyncThunk(
       );
       return response.data as VehicleType;
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error adding vehicle type:", error.message);
-        return rejectWithValue(error.message);
-      } else {
-        console.error(
-          "An unknown error occurred while adding vehicle type:",
-          error
-        );
-        return rejectWithValue("An unknown error occurred");
-      }
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("An unknown error occurred");
     }
   }
 );
-// supprimer un type de vehicule
+
+export const updateVehicleType = createAsyncThunk(
+  "vehicles/updateVehicleType",
+  async (vehicleType: VehicleType, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/type/${vehicleType.id}`,
+        vehicleType
+      );
+      return response.data as VehicleType;
+    } catch (error) {
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("An unknown error occurred");
+    }
+  }
+);
+
 export const deleteVehicleType = createAsyncThunk(
   "vehicles/deleteVehicleType",
   async (id: number, { rejectWithValue }) => {
@@ -153,21 +126,13 @@ export const deleteVehicleType = createAsyncThunk(
       await axios.delete(`http://localhost:3000/type/${id}`);
       return id;
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error deleting vehicle type:", error.message);
-        return rejectWithValue(error.message);
-      } else {
-        console.error(
-          "An unknown error occurred while deleting vehicle type:",
-          error
-        );
-        return rejectWithValue("An unknown error occurred");
-      }
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("An unknown error occurred");
     }
   }
 );
 
-// Affcher les vehicules
+// --- FETCH VEHICLES ---
 export const fetchVehicles = createAsyncThunk(
   "vehicles/fetchVehicles",
   async () => {
@@ -176,31 +141,132 @@ export const fetchVehicles = createAsyncThunk(
   }
 );
 
-// Creer un vehicule
+// --- CREATE VEHICLE ---
 export const createVehicle = createAsyncThunk(
   "vehicles/createVehicle",
-  async (formData: FormData, { rejectWithValue }) => {
+  async (
+    {
+      nom,
+      marque,
+      modele,
+      immatriculation,
+      nombrePlace,
+      typeId,
+      statusId,
+      distance_moyenne,
+      derniere_visite,
+      image,
+    }: {
+      nom: string;
+      marque: string;
+      modele: string;
+      immatriculation: string;
+      nombrePlace: number;
+      typeId: number;
+      statusId: number;
+      distance_moyenne?: number;
+      derniere_visite?: string;
+      image?: File;
+    },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await fetch("http://localhost:3000/vehicles", {
-        method: "POST",
-        body: formData,
+      const formData = new FormData();
+      formData.append("nom", nom);
+      formData.append("marque", marque);
+      formData.append("modele", modele);
+      formData.append("immatriculation", immatriculation);
+      formData.append("nombrePlace", nombrePlace.toString());
+      formData.append("typeId", typeId.toString());
+      formData.append("statusId", statusId.toString());
+      if (distance_moyenne !== undefined) {
+        formData.append("distance_moyenne", distance_moyenne.toString());
+      }
+      if (derniere_visite) {
+        formData.append("derniere_visite", derniere_visite);
+      }
+      if (image) {
+        formData.append("image", image);
+      }
+
+      // Log des données envoyées
+      console.log('FormData envoyée:', {
+        nom,
+        marque,
+        modele,
+        immatriculation,
+        nombrePlace,
+        typeId,
+        statusId,
+        distance_moyenne,
+        derniere_visite,
+        image: image ? image.name : null,
       });
-      if (!response.ok) {
-        throw new Error("Failed to create vehicle");
-      }
-      const data = await response.json();
-      return data;
+
+      const response = await axios.post(
+        "http://localhost:3000/vehicles",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data as Vehicle;
     } catch (err) {
-      if (err instanceof Error) {
+      if (axios.isAxiosError(err)) {
         return rejectWithValue(err.message);
-      } else {
-        return rejectWithValue("An unknown error occurred");
       }
+      return rejectWithValue("An unknown error occurred");
     }
   }
 );
 
-// Supprimer un vehicule
+// --- UPDATE VEHICLE ---
+export const updateVehicle = createAsyncThunk(
+  "vehicles/updateVehicle",
+  async (
+    { id, data, image }: { id: number; data: Partial<Vehicle>; image?: File },
+    { rejectWithValue }
+  ) => {
+    try {
+      const formData = new FormData();
+      if (data.nom) formData.append("nom", data.nom);
+      if (data.marque) formData.append("marque", data.marque);
+      if (data.modele) formData.append("modele", data.modele);
+      if (data.immatriculation)
+        formData.append("immatriculation", data.immatriculation);
+      if (data.nombrePlace)
+        formData.append("nombrePlace", data.nombrePlace.toString());
+      if (data.type) formData.append("typeId", data.type.id.toString());
+      if (data.status) formData.append("statusId", data.status.id.toString());
+      if (data.distance_moyenne !== undefined)
+        formData.append("distance_moyenne", data.distance_moyenne.toString());
+      if (data.derniere_visite)
+        formData.append("derniere_visite", data.derniere_visite);
+      if (image) {
+        formData.append("image", image);
+      }
+
+      const response = await axios.put(
+        `http://localhost:3000/vehicles/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data as Vehicle;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        return rejectWithValue(err.message);
+      }
+      return rejectWithValue("An unknown error occurred");
+    }
+  }
+);
+
 export const deleteVehicle = createAsyncThunk(
   "vehicles/deleteVehicle",
   async (id: number) => {
@@ -209,32 +275,75 @@ export const deleteVehicle = createAsyncThunk(
   }
 );
 
-// Modifier un vehicule
-export const updateVehicle = createAsyncThunk(
-  "vehicles/updateVehicle",
+// --- UPDATE VEHICLE STATUS BY ID ---
+export const updateVehicleStatus = createAsyncThunk(
+  "vehicles/updateVehicleStatus",
   async (
-    { id, formData }: { id: number; formData: FormData },
+    { id, statusId }: { id: number; statusId: number },
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`http://localhost:3000/vehicles/${id}`, {
-        method: "PUT",
-        body: formData,
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update vehicle");
-      }
-      const data = await response.json();
-      return data;
+      const response = await axios.patch(
+        `http://localhost:3000/vehicles/${id}/status`,
+        { statusId }
+      );
+      return response.data as Vehicle;
     } catch (err) {
-      if (err instanceof Error) {
+      if (axios.isAxiosError(err)) {
         return rejectWithValue(err.message);
-      } else {
-        return rejectWithValue("An unknown error occurred");
       }
+      return rejectWithValue("An unknown error occurred");
     }
   }
 );
+
+// --- UPDATE VEHICLE STATUS BY NAME ---
+export const updateVehicleStatusByName = createAsyncThunk(
+  "vehicles/updateVehicleStatusByName",
+  async (
+    { id, statusName }: { id: number; statusName: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/vehicles/${id}/status`,
+        { status: statusName }
+      );
+      return response.data as Vehicle;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        return rejectWithValue(err.message);
+      }
+      return rejectWithValue("An unknown error occurred");
+    }
+  }
+);
+
+// --- FETCH AVAILABLE VEHICLES COUNT ---
+export const fetchAvailableVehiclesCount = createAsyncThunk<
+  number,
+  void,
+  { rejectValue: string }
+>("vehicles/fetchAvailableVehiclesCount", async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get(
+      "http://localhost:3000/vehicles/available-count"
+    );
+    const data = response.data;
+    const count = typeof data === "number" ? data : data?.count;
+    if (typeof count !== "number") {
+      return rejectWithValue(
+        "Le compteur de véhicules disponibles n'est pas un nombre valide"
+      );
+    }
+    return count;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      return rejectWithValue(err.message);
+    }
+    return rejectWithValue("An unknown error occurred");
+  }
+});
 
 const vehiclesSlice = createSlice({
   name: "vehicles",
@@ -242,53 +351,47 @@ const vehiclesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // --- FETCH VEHICLES ---
       .addCase(fetchVehicles.pending, (state) => {
-        state.vehiclesLoading = true; // Correction
-        state.vehiclesError = null; // Correction
+        state.vehiclesLoading = true;
+        state.vehiclesError = null;
       })
       .addCase(fetchVehicles.fulfilled, (state, action) => {
-        state.vehiclesLoading = false; // Correction
+        state.vehiclesLoading = false;
         state.vehicles = action.payload;
       })
-      .addCase(updateVehicleType.fulfilled, (state, action) => {
-        const index = state.vehiclesType.findIndex(
-          (t) => t.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.vehiclesType[index] = action.payload;
-        }
-      })
       .addCase(fetchVehicles.rejected, (state, action) => {
-        state.vehiclesLoading = false; // Correction
-        state.vehiclesError = action.payload as string; // Correction
-        console.error("Error fetching vehicles:", action.payload); // Correction du message
+        state.vehiclesLoading = false;
+        state.vehiclesError = action.payload as string;
+      })
+      // --- CREATE VEHICLE ---
+      .addCase(createVehicle.fulfilled, (state, action) => {
+        state.vehicles.push(action.payload);
       })
       .addCase(createVehicle.rejected, (state, action) => {
-        console.error("Failed to create vehicle:", action.payload);
+        console.error('Failed to create vehicle:', action.payload, action.error);
+        state.vehiclesError = action.payload as string;
       })
+      // --- UPDATE VEHICLE ---
       .addCase(updateVehicle.pending, (state) => {
         state.loading = true;
         state.vehiclesError = null;
       })
       .addCase(updateVehicle.fulfilled, (state, action) => {
         state.loading = false;
-        console.log("API response:", action.payload);
-        state.vehicles = state.vehicles.map((vehicle) =>
-          vehicle.id === action.payload.id ? action.payload : vehicle
+        state.vehicles = state.vehicles.map((v) =>
+          v.id === action.payload.id ? action.payload : v
         );
-        console.log("Updated state:", state.vehicles);
       })
       .addCase(updateVehicle.rejected, (state, action) => {
         state.loading = false;
         state.vehiclesError = action.payload as string;
-        console.error("Failed to update vehicle:", action.payload);
       })
-
+      // --- DELETE VEHICLE ---
       .addCase(deleteVehicle.fulfilled, (state, action) => {
-        state.vehicles = state.vehicles.filter(
-          (vehicle) => vehicle.id !== action.payload
-        );
+        state.vehicles = state.vehicles.filter((v) => v.id !== action.payload);
       })
+      // --- FETCH TYPES ---
       .addCase(fetchVehicleTypes.pending, (state) => {
         state.vehiclesTypeLoading = true;
         state.vehiclesTypeError = null;
@@ -300,8 +403,23 @@ const vehiclesSlice = createSlice({
       .addCase(fetchVehicleTypes.rejected, (state, action) => {
         state.vehiclesTypeLoading = false;
         state.vehiclesTypeError = action.payload as string;
-        console.error("Failed to fetch vehicle types:", action.payload);
       })
+      // --- ADD / UPDATE / DELETE TYPE ---
+      .addCase(addVehicleType.fulfilled, (state, action) => {
+        state.vehiclesType.push(action.payload);
+      })
+      .addCase(updateVehicleType.fulfilled, (state, action) => {
+        const index = state.vehiclesType.findIndex(
+          (t) => t.id === action.payload.id
+        );
+        if (index !== -1) state.vehiclesType[index] = action.payload;
+      })
+      .addCase(deleteVehicleType.fulfilled, (state, action) => {
+        state.vehiclesType = state.vehiclesType.filter(
+          (t) => t.id !== action.payload
+        );
+      })
+      // --- FETCH STATUSES ---
       .addCase(fetchVehicleStatuses.pending, (state) => {
         state.vehiclesStatusLoading = true;
         state.vehiclesStatusError = null;
@@ -313,7 +431,37 @@ const vehiclesSlice = createSlice({
       .addCase(fetchVehicleStatuses.rejected, (state, action) => {
         state.vehiclesStatusLoading = false;
         state.vehiclesStatusError = action.payload as string;
-        console.error("Error fetching vehicle statuses:", action.payload);
+      })
+      // --- UPDATE VEHICLE STATUS BY ID ---
+      .addCase(updateVehicleStatus.fulfilled, (state, action) => {
+        state.vehicles = state.vehicles.map((v) =>
+          v.id === action.payload.id ? action.payload : v
+        );
+      })
+      .addCase(updateVehicleStatus.rejected, (state, action) => {
+        state.vehiclesError = action.payload as string;
+      })
+      // --- UPDATE VEHICLE STATUS BY NAME ---
+      .addCase(updateVehicleStatusByName.fulfilled, (state, action) => {
+        state.vehicles = state.vehicles.map((v) =>
+          v.id === action.payload.id ? action.payload : v
+        );
+      })
+      .addCase(updateVehicleStatusByName.rejected, (state, action) => {
+        state.vehiclesError = action.payload as string;
+      })
+      // --- FETCH AVAILABLE VEHICLES COUNT ---
+      .addCase(fetchAvailableVehiclesCount.fulfilled, (state, action) => {
+        state.loading = false;
+        state.availableCount = action.payload;
+      })
+      .addCase(fetchAvailableVehiclesCount.rejected, (state, action) => {
+        state.loading = false;
+        state.availableCount = 0;
+        console.error(
+          "Failed to fetch available vehicles count:",
+          action.payload
+        );
       });
   },
 });

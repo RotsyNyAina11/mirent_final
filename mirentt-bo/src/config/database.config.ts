@@ -9,13 +9,13 @@ import { Vehicule } from '../entities/vehicle.entity';
 
 import { Prix } from 'src/entities/prix.entity';
 import { Client } from '../entities/client.entity';
-import { ProformaItem } from 'src/entities/proformat-item.entity';
-import { Proforma } from 'src/entities/proforma.entity';
 import { User } from 'src/auth/entities/user.entity';
-import { Devis } from 'src/entities/devis.entity';
-import { Reservation } from 'src/entities/reservation.entity';
 import { Utilisateur } from 'src/entities/utilisateur.entity';
 import { Notification } from 'src/entities/notifications.entity';
+import { District } from '../entities/district.entity';
+import { Reservation } from '../entities/reservation.entity';
+import { Facture } from '../entities/facture.entity';
+import { Paiement } from '../entities/paiement.entity';
 
 dotenv.config();
 
@@ -35,12 +35,12 @@ export const typeOrmConfig: DataSourceOptions = {
     Region,
     Client,
     Prix,
-    ProformaItem,
-    Proforma,
-    Devis,
-    Reservation,
     Utilisateur,
     Notification,
+    District,
+    Reservation,
+    Facture,
+    Paiement,
   ],
 
   synchronize: true,

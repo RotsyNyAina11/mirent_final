@@ -76,7 +76,7 @@ const initialState: FactureState = {
 };
 
 // Configuration de l'URL de base de l'API
-const API_URL = 'http://localhost:3000/factures'; // À ajuster selon votre configuration
+const API_URL = 'http://localhost:3000/factures'; 
 
 // Thunk pour récupérer toutes les factures
 export const fetchAllFactures = createAsyncThunk(

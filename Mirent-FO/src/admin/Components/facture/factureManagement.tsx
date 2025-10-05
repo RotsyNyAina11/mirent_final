@@ -43,7 +43,7 @@ import logoImage from '../../../assets/horizontal.png';
 import signatureImage from '../../../assets/signature.png';
 
 // Styles cohérents avec la page de paiement
-const DashboardCard = styled(Card)(({ }) => ({
+const DashboardCard = styled(Card)(({}) => ({
   borderRadius: "12px",
   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
   backgroundColor: "#fff",
@@ -117,7 +117,7 @@ const FacturePage: React.FC = () => {
   };
 
   // Fonction pour déterminer le statut de paiement d'une facture
-  const getPaymentStatus = (facture: any) => {
+  const getPaymentStatus = (facture) => {
     const totalPaye = facture.totalPaiements || 0;
     const montantTotal = facture.montant || 0;
     return totalPaye >= montantTotal ? 'paid' : 'pending';

@@ -13,8 +13,8 @@ import {
   selectError, 
   selectLoading, 
   setCurrentReservation, 
-  cancelReservation, // Ajout de l'action pour l'annulation
-  deleteReservation, // Ajout de l'action pour la suppression
+  cancelReservation, 
+  deleteReservation, 
 } from '../../../redux/features/reservation/reservationSlice';
 import { useAppDispatch } from '../../../hooks';
 import { RootState } from '../../../redux/store';

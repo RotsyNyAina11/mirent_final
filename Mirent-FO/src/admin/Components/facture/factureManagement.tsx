@@ -66,7 +66,7 @@ const FacturePage: React.FC = () => {
   const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'pending'>('all');
   const [createFactureModalOpen, setCreateFactureModalOpen] = useState(false);
   const [bdcId, setBdcId] = useState('');
-  const [bdcReference, setBdcReference] = useState(''); // New state for BDC reference
+  const [bdcReference, setBdcReference] = useState(''); 
 
   useEffect(() => {
     dispatch(fetchAllFactures());
@@ -527,7 +527,7 @@ const FacturePage: React.FC = () => {
             value={bdcId}
             onChange={(e) => {
               setBdcId(e.target.value);
-              setBdcReference(''); // Clear reference when ID is entered
+              setBdcReference(''); 
             }}
             sx={{ mt: 2 }}
             type="number"

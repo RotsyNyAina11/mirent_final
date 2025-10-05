@@ -19,7 +19,7 @@ export interface Reservation {
   total_price: number;
   client: Client;
   vehicule: Vehicle;
-  location: Region;
+  region: Region;
   nombreJours: number;
   note?: string;
   carburant_policy: CarburantPolicy;

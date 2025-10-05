@@ -170,10 +170,10 @@ const BonDeCommandeManager: React.FC = () => {
                           <td>${selectedBonDeCommande.reference}</td>
                           <td>${selectedBonDeCommande.reservation?.vehicule?.nom || 'N/A'}</td>
                           <td>${selectedBonDeCommande.reservation?.vehicule?.immatriculation || 'N/A'}</td>
-                          <td>${selectedBonDeCommande.reservation?.location?.nom_region || 'N/A'} (${selectedBonDeCommande.reservation?.location?.nom_district || 'N/A'})</td>
+                          <td>${selectedBonDeCommande.reservation?.region?.nom_region || 'N/A'} (${selectedBonDeCommande.reservation?.region?.nom_district || 'N/A'})</td>
                           <td>Du ${new Date(selectedBonDeCommande.reservation.pickup_date).toLocaleDateString()} au ${new Date(selectedBonDeCommande.reservation.return_date).toLocaleDateString()}</td>
                           <td>${selectedBonDeCommande.reservation?.nombreJours || 'N/A'}</td>
-                          <td>${selectedBonDeCommande.reservation?.location?.prix?.prix ? formatCurrencyAr(selectedBonDeCommande.reservation.location.prix.prix) + '/jour' : 'N/A'}</td>
+                          <td>${selectedBonDeCommande.reservation?.region?.prix ? formatCurrencyAr(selectedBonDeCommande.reservation.region.prix) + '/jour' : 'N/A'}</td>
                           <td>${selectedBonDeCommande.reservation?.total_price ? formatCurrencyAr(selectedBonDeCommande.reservation.total_price) : 'N/A'}</td>
                       </tr>
                       <tr>
@@ -360,7 +360,7 @@ const BonDeCommandeManager: React.FC = () => {
                           </TableCell>
                           <TableCell>
                             <Typography variant="body2">
-                              {bdc.reservation?.location?.nom_region || 'N/A'}
+                              {bdc.reservation?.region?.nom_region || 'N/A'}
                             </Typography>
                           </TableCell>
                           <TableCell>
@@ -370,7 +370,7 @@ const BonDeCommandeManager: React.FC = () => {
                           </TableCell>
                           <TableCell>
                             <Typography variant="body2" fontWeight={500}>
-                              {bdc.reservation?.location?.prix?.prix ? `${formatCurrencyAr(bdc.reservation.location.prix.prix)}` : 'N/A'}
+                              {bdc.reservation?.region?.prix ? `${formatCurrencyAr(bdc.reservation.region.prix)}` : 'N/A'}
                             </Typography>
                           </TableCell>
                           <TableCell>
@@ -559,8 +559,8 @@ const BonDeCommandeManager: React.FC = () => {
                           Destination
                         </Typography>
                         <Typography variant="body1" fontWeight={500}>
-                          {selectedBonDeCommande.reservation?.location?.nom_region || 'N/A'} 
-                          ({selectedBonDeCommande.reservation?.location?.nom_district || 'N/A'})
+                          {selectedBonDeCommande.reservation?.region?.nom_region || 'N/A'} 
+                          ({selectedBonDeCommande.reservation?.region?.nom_district || 'N/A'})
                         </Typography>
                       </Box>
                       <Box>
@@ -568,8 +568,8 @@ const BonDeCommandeManager: React.FC = () => {
                           Prix unitaire
                         </Typography>
                         <Typography variant="body1" fontWeight={500}>
-                          {selectedBonDeCommande.reservation?.location?.prix?.prix ? 
-                            `${formatCurrencyAr(selectedBonDeCommande.reservation.location.prix.prix)}/jour` : 'N/A'}
+                          {selectedBonDeCommande.reservation?.region?.prix ? 
+                            `${formatCurrencyAr(selectedBonDeCommande.reservation.region.prix)}/jour` : 'N/A'}
                         </Typography>
                       </Box>
                     </CardContent>

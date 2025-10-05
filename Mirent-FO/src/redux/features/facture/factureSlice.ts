@@ -15,7 +15,7 @@ interface Vehicule {
   modele: string;
 }
 
-interface Location {
+interface Region {
   id: number;
   nom: string;
 }
@@ -25,7 +25,7 @@ interface Reservation {
   reference: string;
   client: Client;
   vehicule: Vehicule;
-  location: Location;
+  location: Region;
   pickup_date: string;
   return_date: string;
   unit_price: number;
@@ -85,7 +85,7 @@ export const fetchAllFactures = createAsyncThunk(
     try {
       const response = await axios.get<Facture[]>(`${API_URL}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Erreur lors de la récupération des factures');
     }
   }
@@ -98,7 +98,7 @@ export const fetchFactureById = createAsyncThunk(
     try {
       const response = await axios.get<Facture>(`${API_URL}/${id}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(error.response?.data?.message || `Facture ${id} introuvable`);
     }
   }
@@ -111,7 +111,7 @@ export const generateFactureFinaleByReference = createAsyncThunk(
     try {
       const response = await axios.post<Facture>(`${API_URL}/generate-by-reference/${bdcReference}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Erreur lors de la génération de la facture par référence');
     }
   }
@@ -124,7 +124,7 @@ export const generateFactureFinale = createAsyncThunk(
     try {
       const response = await axios.post<Facture>(`${API_URL}/generate/${bdcId}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Erreur lors de la génération de la facture');
     }
   }
